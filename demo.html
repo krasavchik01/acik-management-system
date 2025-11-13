@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACIK Project Management System - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .flags {
+            font-size: 3em;
+            margin: 20px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .initiatives {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .initiative-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .initiative {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .initiative:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .initiative-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .initiative-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .initiative-details {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .initiative-budget {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .timeline {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: -30px;
+            width: 2px;
+            background: #667eea;
+        }
+
+        .timeline-item:last-child:before {
+            display: none;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f5f7fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .quarter-title {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .org-chart {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .org-level {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .org-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            display: inline-block;
+            min-width: 200px;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .org-box.president {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .org-box.vp {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .org-box.ceo {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .org-box.team {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .financial {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .financial-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .financial-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .financial-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .revenue-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .revenue-list li {
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .cta {
+            background: white;
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.1);
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .financial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .initiative-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 ACIK Project Management System</h1>
+            <div class="subtitle">Italian-Kazakh Trade Association</div>
+            <div class="flags">🇮🇹 🤝 🇰🇿</div>
+            <p style="font-size: 1.2em; color: #666; margin-top: 20px;">
+                Comprehensive Bilingual Management Framework for 2025-2026
+            </p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">22</div>
+                <div class="stat-label">Documents Created</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2</div>
+                <div class="stat-label">Languages (EN/RU)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">10</div>
+                <div class="stat-label">Major Initiatives</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">€260K+</div>
+                <div class="stat-label">Annual Budget</div>
+            </div>
+        </div>
+
+        <div class="initiatives">
+            <h2 class="section-title">🚀 10 Major Initiatives 2025-2026</h2>
+            <div class="initiative-grid">
+                <div class="initiative">
+                    <div class="initiative-icon">✈️</div>
+                    <div class="initiative-title">Atyrau-Milan Flight Launch</div>
+                    <div class="initiative-details">📅 November 18, 2025<br>📍 Atyrau, Kazakhstan<br>👥 100+ attendees</div>
+                    <div class="initiative-budget">€10-14K</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">🎉</div>
+                    <div class="initiative-title">10th Anniversary Celebration</div>
+                    <div class="initiative-details">📅 February 5-7, 2026<br>📍 Milan, Italy<br>👥 200+ guests<br>🏆 Awards Ceremony</div>
+                    <div class="initiative-budget">€58-82K</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">🏢</div>
+                    <div class="initiative-title">Coworking Space Almaty</div>
+                    <div class="initiative-details">📅 Q2 2025<br>📍 Almaty<br>🎯 80%+ occupancy target</div>
+                    <div class="initiative-budget">€50-70K Investment</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">📧</div>
+                    <div class="initiative-title">Monthly Bulletin</div>
+                    <div class="initiative-details">📅 Starting Q1 2025<br>🎯 500+ subscribers<br>📊 Business opportunities</div>
+                    <div class="initiative-budget">€1-2K/year</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">🎙️</div>
+                    <div class="initiative-title">Podcast Series</div>
+                    <div class="initiative-details">📅 24 episodes/year<br>🎧 Success stories<br>💼 Company features</div>
+                    <div class="initiative-budget">€4-7K</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">🌍</div>
+                    <div class="initiative-title">Site Visits & Trade Missions</div>
+                    <div class="initiative-details">📅 3-4 per year<br>✈️ Italy ⇄ Kazakhstan<br>👥 10-15 participants each</div>
+                    <div class="initiative-budget">€70-100K</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">💼</div>
+                    <div class="initiative-title">Sponsorship Program</div>
+                    <div class="initiative-details">🎯 Platinum, Gold, Silver<br>📈 Revenue generator<br>🤝 Partner benefits</div>
+                    <div class="initiative-budget">€80-120K Revenue</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">👥</div>
+                    <div class="initiative-title">Membership Engagement</div>
+                    <div class="initiative-details">🎯 90%+ retention<br>📈 20+ new members/year<br>🎁 Exclusive benefits</div>
+                    <div class="initiative-budget">€7-12K</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">📖</div>
+                    <div class="initiative-title">Year Book 2026</div>
+                    <div class="initiative-details">📅 Publication 2026<br>📚 500 print + digital<br>🏆 Success stories</div>
+                    <div class="initiative-budget">€9-14K</div>
+                </div>
+
+                <div class="initiative">
+                    <div class="initiative-icon">🤝</div>
+                    <div class="initiative-title">Networking Events</div>
+                    <div class="initiative-details">📅 5-6 per year<br>🎯 Forums, exhibitions<br>💼 B2B meetings</div>
+                    <div class="initiative-budget">€50-80K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="financial">
+            <h2 class="section-title">💰 Financial Framework</h2>
+            <div class="financial-grid">
+                <div class="financial-card">
+                    <h3>📊 Total Budget</h3>
+                    <div class="financial-amount">€259-381K</div>
+                    <ul class="revenue-list">
+                        <li>💼 Personnel: 50-60%</li>
+                        <li>🎉 Events: 20-25%</li>
+                        <li>📱 Marketing: 10-15%</li>
+                        <li>⚙️ Operations: 10-15%</li>
+                    </ul>
+                </div>
+                <div class="financial-card">
+                    <h3>💵 Expected Revenue</h3>
+                    <div class="financial-amount">€256-385K</div>
+                    <ul class="revenue-list">
+                        <li>👥 Membership: 35-40%</li>
+                        <li>🎯 Sponsorships: 30-35%</li>
+                        <li>💼 Consulting: 10-15%</li>
+                        <li>🏢 Coworking: 10-12%</li>
+                        <li>✈️ Site Visits: 3-5%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <h2 class="section-title">📅 2025-2026 Timeline</h2>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q1 2025 (Jan-Mar)</div>
+                    <p>✅ Launch Monthly Bulletin<br>
+                       ✅ Finalize Coworking Space plans<br>
+                       ✅ Develop Sponsorship Packages<br>
+                       ✅ Member recruitment campaign</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q2 2025 (Apr-Jun)</div>
+                    <p>🏢 Coworking Space OPENS<br>
+                       🎙️ Podcast Series LAUNCH<br>
+                       ✈️ First Site Visit to Kazakhstan<br>
+                       🎯 Investment Forum in Rome</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q3 2025 (Jul-Sep)</div>
+                    <p>🎨 Design Exhibition with Kazakhstan<br>
+                       ✈️ Site Visit to Italy<br>
+                       ⛏️ Mining Forum in Astana</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q4 2025 (Oct-Dec)</div>
+                    <p>✈️ <strong>ATYRAU-MILAN FLIGHT LAUNCH (Nov 18)</strong><br>
+                       🎄 Year-end networking reception<br>
+                       📊 Annual strategic planning</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q1 2026 (Jan-Mar)</div>
+                    <p>🎉 <strong>10TH ANNIVERSARY CELEBRATION (Feb 5-7)</strong><br>
+                       🏆 Awards Ceremony in Milan<br>
+                       📖 Year Book Publication<br>
+                       💼 Business Forum with 200+ guests</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="org-chart">
+            <h2 class="section-title">👥 Organizational Structure</h2>
+
+            <div class="org-level">
+                <div class="org-box president">
+                    <strong>President</strong><br>
+                    Strategic Leadership
+                </div>
+            </div>
+
+            <div class="org-level">
+                <div class="org-box vp">
+                    <strong>Vice President</strong><br>
+                    Executive Oversight
+                </div>
+                <div class="org-box vp">
+                    <strong>CFO</strong><br>
+                    Financial Management
+                </div>
+            </div>
+
+            <div class="org-level">
+                <div class="org-box ceo">
+                    <strong>CEO</strong><br>
+                    Operational Management
+                </div>
+            </div>
+
+            <div class="org-level">
+                <div class="org-box team">
+                    <strong>Project Manager</strong><br>
+                    Coordination
+                </div>
+                <div class="org-box team">
+                    <strong>Marketing Team</strong><br>
+                    Micaela, Sara
+                </div>
+                <div class="org-box team">
+                    <strong>Operations Team</strong><br>
+                    Olzhas, Saule, Dimash
+                </div>
+            </div>
+        </div>
+
+        <div class="cta">
+            <h2 class="section-title">🚀 Ready to Launch!</h2>
+            <p style="font-size: 1.3em; color: #666; margin: 30px 0;">
+                Complete system with 22 documents, 5 templates, and detailed roadmaps<br>
+                Available in English and Russian
+            </p>
+            <button class="cta-button" onclick="window.open('https://github.com/krasavchik01/ACIK/tree/claude/acik-project-management-system-011CV5ksUezdw8CcMtaEPDNR', '_blank')">
+                📂 View on GitHub
+            </button>
+            <button class="cta-button" onclick="alert('Open INDEX.md in GitHub for full navigation!')">
+                🗺️ Full Navigation
+            </button>
+        </div>
+
+        <footer>
+            <p style="font-size: 1.2em; margin-bottom: 10px;">
+                <strong>ACIK Project Management System</strong>
+            </p>
+            <p>Italian-Kazakh Trade Association • 2025-2026</p>
+            <p style="margin-top: 20px;">
+                Created with ❤️ for fostering Italian-Kazakh business relations
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
