@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACIK Project Management System - Demo</title>
+    <title>ACIK Project Management System 2025-2026</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -12,571 +14,719 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Poppins', sans-serif;
+            background: #0f0c29;
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            color: #fff;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
 
-        header {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .hero-content {
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1 {
-            color: #667eea;
-            font-size: 3em;
-            margin-bottom: 10px;
+            font-size: 5em;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7b731);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 5s ease infinite;
+            margin-bottom: 20px;
+            text-shadow: 0 0 80px rgba(255,255,255,0.3);
         }
 
-        .subtitle {
-            color: #764ba2;
-            font-size: 1.5em;
-            margin-bottom: 20px;
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .flags {
-            font-size: 3em;
+            font-size: 5em;
+            margin: 30px 0;
+            animation: bounce 2s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .subtitle {
+            font-size: 2em;
             margin: 20px 0;
+            opacity: 0.9;
         }
 
-        .stats {
+        .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
         }
 
-        .stat-card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-card:hover {
-            transform: translateY(-10px);
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+
+        .stat-box:hover::before {
+            transform: translateX(100%);
+        }
+
+        .stat-box:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border-color: rgba(255,255,255,0.3);
         }
 
         .stat-number {
-            font-size: 3em;
-            font-weight: bold;
-            color: #667eea;
+            font-size: 4em;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
         }
 
         .stat-label {
-            color: #666;
-            font-size: 1.1em;
+            font-size: 1.2em;
+            opacity: 0.8;
         }
 
-        .initiatives {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
+        .section {
+            max-width: 1400px;
+            margin: 100px auto;
+            padding: 40px 20px;
         }
 
-        .initiative-grid {
+        .section-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 60px;
+            background: linear-gradient(45deg, #fff, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .initiatives-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            gap: 30px;
         }
 
-        .initiative {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 25px;
-            border-radius: 15px;
-            border-left: 5px solid #667eea;
-            transition: all 0.3s ease;
+        .initiative-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .initiative:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .initiative-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: 0.6s;
+        }
+
+        .initiative-card:hover::after {
+            opacity: 1;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .initiative-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            border-color: rgba(78, 205, 196, 0.5);
         }
 
         .initiative-icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .initiative-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4ecdc4;
         }
 
         .initiative-details {
-            color: #666;
-            margin-bottom: 10px;
+            line-height: 1.8;
+            opacity: 0.9;
+            margin-bottom: 20px;
         }
 
         .initiative-budget {
-            background: #667eea;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
             display: inline-block;
-            font-weight: bold;
-            margin-top: 10px;
+            animation: glow 2s ease infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(78, 205, 196, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(78, 205, 196, 0.8); }
         }
 
         .timeline {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
+            position: relative;
+            padding: 50px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #ff6b6b, #4ecdc4, #45b7d1);
+            transform: translateX(-50%);
         }
 
         .timeline-item {
             display: flex;
-            margin-bottom: 30px;
+            margin-bottom: 80px;
             position: relative;
-            padding-left: 50px;
         }
 
-        .timeline-item:before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 0;
-            bottom: -30px;
-            width: 2px;
-            background: #667eea;
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
         }
 
-        .timeline-item:last-child:before {
-            display: none;
+        .timeline-content {
+            width: 45%;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
         .timeline-dot {
             position: absolute;
-            left: 0;
+            left: 50%;
             width: 30px;
             height: 30px;
-            background: #667eea;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             border-radius: 50%;
-            border: 5px solid white;
-            box-shadow: 0 0 0 3px #667eea;
-        }
-
-        .timeline-content {
-            flex: 1;
-            background: #f5f7fa;
-            padding: 20px;
-            border-radius: 10px;
+            transform: translateX(-50%);
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.8);
+            animation: pulse 2s ease infinite;
         }
 
         .quarter-title {
-            font-size: 1.5em;
-            color: #667eea;
-            font-weight: bold;
+            font-size: 2em;
+            color: #4ecdc4;
             margin-bottom: 15px;
-        }
-
-        .org-chart {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
-        }
-
-        .org-level {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .org-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            display: inline-block;
-            min-width: 200px;
-            margin: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .org-box.president {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .org-box.vp {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .org-box.ceo {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .org-box.team {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
-
-        .section-title {
-            font-size: 2.5em;
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .financial {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
+            font-weight: 700;
         }
 
         .financial-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
         }
 
         .financial-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 50px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .financial-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(78, 205, 196, 0.2), transparent 30%);
+            animation: rotate 4s linear infinite;
+        }
+
+        .financial-card:hover {
+            transform: translateY(-20px);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7);
         }
 
         .financial-amount {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin: 20px 0;
+            font-size: 4em;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #f7b731);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 30px 0;
+            position: relative;
+            z-index: 1;
         }
 
         .revenue-list {
             list-style: none;
-            margin-top: 20px;
+            text-align: left;
+            position: relative;
+            z-index: 1;
         }
 
         .revenue-list li {
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            margin-bottom: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+            transition: all 0.3s ease;
         }
 
-        .cta {
-            background: white;
-            padding: 60px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        .revenue-list li:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(10px);
+        }
+
+        .cta-section {
             text-align: center;
+            padding: 100px 20px;
+            background: rgba(255,255,255,0.03);
+            margin: 100px 0;
+            border-radius: 30px;
         }
 
         .cta-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             color: white;
-            padding: 20px 50px;
             border: none;
+            padding: 20px 60px;
+            font-size: 1.5em;
             border-radius: 50px;
-            font-size: 1.3em;
-            font-weight: bold;
+            margin: 15px;
             cursor: pointer;
-            margin: 10px;
-            transition: transform 0.3s ease;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .cta-button:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .cta-button:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 20px 60px rgba(78, 205, 196, 0.5);
         }
 
         footer {
             text-align: center;
-            color: white;
-            padding: 30px;
-            margin-top: 30px;
+            padding: 60px 20px;
+            background: rgba(0,0,0,0.3);
+            margin-top: 100px;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: float 2s ease infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, 20px); }
+        }
+
+        .scroll-indicator::before {
+            content: '⬇';
+            font-size: 3em;
+            opacity: 0.7;
         }
 
         @media (max-width: 768px) {
-            .financial-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .initiative-grid {
-                grid-template-columns: 1fr;
-            }
+            h1 { font-size: 3em; }
+            .flags { font-size: 3em; }
+            .subtitle { font-size: 1.5em; }
+            .section-title { font-size: 2.5em; }
+            .initiatives-grid { grid-template-columns: 1fr; }
+            .financial-grid { grid-template-columns: 1fr; }
+            .timeline::before { left: 20px; }
+            .timeline-item { flex-direction: column !important; }
+            .timeline-content { width: 100%; margin-left: 40px; }
+            .timeline-dot { left: 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎯 ACIK Project Management System</h1>
-            <div class="subtitle">Italian-Kazakh Trade Association</div>
+    <canvas class="particles" id="particles"></canvas>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>ACIK 2025-2026</h1>
+            <div class="subtitle">Project Management System</div>
             <div class="flags">🇮🇹 🤝 🇰🇿</div>
-            <p style="font-size: 1.2em; color: #666; margin-top: 20px;">
-                Comprehensive Bilingual Management Framework for 2025-2026
+            <p style="font-size: 1.4em; opacity: 0.8; max-width: 800px; margin: 0 auto;">
+                Italian-Kazakh Trade Association<br>
+                Complete Bilingual Framework for Strategic Growth
             </p>
-        </header>
-
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number">22</div>
-                <div class="stat-label">Documents Created</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">2</div>
-                <div class="stat-label">Languages (EN/RU)</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">10</div>
-                <div class="stat-label">Major Initiatives</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">€260K+</div>
-                <div class="stat-label">Annual Budget</div>
-            </div>
         </div>
-
-        <div class="initiatives">
-            <h2 class="section-title">🚀 10 Major Initiatives 2025-2026</h2>
-            <div class="initiative-grid">
-                <div class="initiative">
-                    <div class="initiative-icon">✈️</div>
-                    <div class="initiative-title">Atyrau-Milan Flight Launch</div>
-                    <div class="initiative-details">📅 November 18, 2025<br>📍 Atyrau, Kazakhstan<br>👥 100+ attendees</div>
-                    <div class="initiative-budget">€10-14K</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">🎉</div>
-                    <div class="initiative-title">10th Anniversary Celebration</div>
-                    <div class="initiative-details">📅 February 5-7, 2026<br>📍 Milan, Italy<br>👥 200+ guests<br>🏆 Awards Ceremony</div>
-                    <div class="initiative-budget">€58-82K</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">🏢</div>
-                    <div class="initiative-title">Coworking Space Almaty</div>
-                    <div class="initiative-details">📅 Q2 2025<br>📍 Almaty<br>🎯 80%+ occupancy target</div>
-                    <div class="initiative-budget">€50-70K Investment</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">📧</div>
-                    <div class="initiative-title">Monthly Bulletin</div>
-                    <div class="initiative-details">📅 Starting Q1 2025<br>🎯 500+ subscribers<br>📊 Business opportunities</div>
-                    <div class="initiative-budget">€1-2K/year</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">🎙️</div>
-                    <div class="initiative-title">Podcast Series</div>
-                    <div class="initiative-details">📅 24 episodes/year<br>🎧 Success stories<br>💼 Company features</div>
-                    <div class="initiative-budget">€4-7K</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">🌍</div>
-                    <div class="initiative-title">Site Visits & Trade Missions</div>
-                    <div class="initiative-details">📅 3-4 per year<br>✈️ Italy ⇄ Kazakhstan<br>👥 10-15 participants each</div>
-                    <div class="initiative-budget">€70-100K</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">💼</div>
-                    <div class="initiative-title">Sponsorship Program</div>
-                    <div class="initiative-details">🎯 Platinum, Gold, Silver<br>📈 Revenue generator<br>🤝 Partner benefits</div>
-                    <div class="initiative-budget">€80-120K Revenue</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">👥</div>
-                    <div class="initiative-title">Membership Engagement</div>
-                    <div class="initiative-details">🎯 90%+ retention<br>📈 20+ new members/year<br>🎁 Exclusive benefits</div>
-                    <div class="initiative-budget">€7-12K</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">📖</div>
-                    <div class="initiative-title">Year Book 2026</div>
-                    <div class="initiative-details">📅 Publication 2026<br>📚 500 print + digital<br>🏆 Success stories</div>
-                    <div class="initiative-budget">€9-14K</div>
-                </div>
-
-                <div class="initiative">
-                    <div class="initiative-icon">🤝</div>
-                    <div class="initiative-title">Networking Events</div>
-                    <div class="initiative-details">📅 5-6 per year<br>🎯 Forums, exhibitions<br>💼 B2B meetings</div>
-                    <div class="initiative-budget">€50-80K</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="financial">
-            <h2 class="section-title">💰 Financial Framework</h2>
-            <div class="financial-grid">
-                <div class="financial-card">
-                    <h3>📊 Total Budget</h3>
-                    <div class="financial-amount">€259-381K</div>
-                    <ul class="revenue-list">
-                        <li>💼 Personnel: 50-60%</li>
-                        <li>🎉 Events: 20-25%</li>
-                        <li>📱 Marketing: 10-15%</li>
-                        <li>⚙️ Operations: 10-15%</li>
-                    </ul>
-                </div>
-                <div class="financial-card">
-                    <h3>💵 Expected Revenue</h3>
-                    <div class="financial-amount">€256-385K</div>
-                    <ul class="revenue-list">
-                        <li>👥 Membership: 35-40%</li>
-                        <li>🎯 Sponsorships: 30-35%</li>
-                        <li>💼 Consulting: 10-15%</li>
-                        <li>🏢 Coworking: 10-12%</li>
-                        <li>✈️ Site Visits: 3-5%</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="timeline">
-            <h2 class="section-title">📅 2025-2026 Timeline</h2>
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="quarter-title">Q1 2025 (Jan-Mar)</div>
-                    <p>✅ Launch Monthly Bulletin<br>
-                       ✅ Finalize Coworking Space plans<br>
-                       ✅ Develop Sponsorship Packages<br>
-                       ✅ Member recruitment campaign</p>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="quarter-title">Q2 2025 (Apr-Jun)</div>
-                    <p>🏢 Coworking Space OPENS<br>
-                       🎙️ Podcast Series LAUNCH<br>
-                       ✈️ First Site Visit to Kazakhstan<br>
-                       🎯 Investment Forum in Rome</p>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="quarter-title">Q3 2025 (Jul-Sep)</div>
-                    <p>🎨 Design Exhibition with Kazakhstan<br>
-                       ✈️ Site Visit to Italy<br>
-                       ⛏️ Mining Forum in Astana</p>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="quarter-title">Q4 2025 (Oct-Dec)</div>
-                    <p>✈️ <strong>ATYRAU-MILAN FLIGHT LAUNCH (Nov 18)</strong><br>
-                       🎄 Year-end networking reception<br>
-                       📊 Annual strategic planning</p>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="quarter-title">Q1 2026 (Jan-Mar)</div>
-                    <p>🎉 <strong>10TH ANNIVERSARY CELEBRATION (Feb 5-7)</strong><br>
-                       🏆 Awards Ceremony in Milan<br>
-                       📖 Year Book Publication<br>
-                       💼 Business Forum with 200+ guests</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="org-chart">
-            <h2 class="section-title">👥 Organizational Structure</h2>
-
-            <div class="org-level">
-                <div class="org-box president">
-                    <strong>President</strong><br>
-                    Strategic Leadership
-                </div>
-            </div>
-
-            <div class="org-level">
-                <div class="org-box vp">
-                    <strong>Vice President</strong><br>
-                    Executive Oversight
-                </div>
-                <div class="org-box vp">
-                    <strong>CFO</strong><br>
-                    Financial Management
-                </div>
-            </div>
-
-            <div class="org-level">
-                <div class="org-box ceo">
-                    <strong>CEO</strong><br>
-                    Operational Management
-                </div>
-            </div>
-
-            <div class="org-level">
-                <div class="org-box team">
-                    <strong>Project Manager</strong><br>
-                    Coordination
-                </div>
-                <div class="org-box team">
-                    <strong>Marketing Team</strong><br>
-                    Micaela, Sara
-                </div>
-                <div class="org-box team">
-                    <strong>Operations Team</strong><br>
-                    Olzhas, Saule, Dimash
-                </div>
-            </div>
-        </div>
-
-        <div class="cta">
-            <h2 class="section-title">🚀 Ready to Launch!</h2>
-            <p style="font-size: 1.3em; color: #666; margin: 30px 0;">
-                Complete system with 22 documents, 5 templates, and detailed roadmaps<br>
-                Available in English and Russian
-            </p>
-            <button class="cta-button" onclick="window.open('https://github.com/krasavchik01/ACIK/tree/claude/acik-project-management-system-011CV5ksUezdw8CcMtaEPDNR', '_blank')">
-                📂 View on GitHub
-            </button>
-            <button class="cta-button" onclick="alert('Open INDEX.md in GitHub for full navigation!')">
-                🗺️ Full Navigation
-            </button>
-        </div>
-
-        <footer>
-            <p style="font-size: 1.2em; margin-bottom: 10px;">
-                <strong>ACIK Project Management System</strong>
-            </p>
-            <p>Italian-Kazakh Trade Association • 2025-2026</p>
-            <p style="margin-top: 20px;">
-                Created with ❤️ for fostering Italian-Kazakh business relations
-            </p>
-        </footer>
+        <div class="scroll-indicator"></div>
     </div>
+
+    <div class="stats-container">
+        <div class="stat-box">
+            <div class="stat-number">22</div>
+            <div class="stat-label">Documents</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">10</div>
+            <div class="stat-label">Initiatives</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">€260K+</div>
+            <div class="stat-label">Budget</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Languages</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">🚀 Major Initiatives</h2>
+        <div class="initiatives-grid">
+            <div class="initiative-card">
+                <div class="initiative-icon">✈️</div>
+                <div class="initiative-title">Atyrau-Milan Flight Launch</div>
+                <div class="initiative-details">
+                    📅 November 18, 2025<br>
+                    📍 Atyrau, Kazakhstan<br>
+                    👥 100+ attendees
+                </div>
+                <div class="initiative-budget">€10-14K</div>
+            </div>
+
+            <div class="initiative-card">
+                <div class="initiative-icon">🎉</div>
+                <div class="initiative-title">10th Anniversary</div>
+                <div class="initiative-details">
+                    📅 February 5-7, 2026<br>
+                    📍 Milan, Italy<br>
+                    👥 200+ guests<br>
+                    🏆 Awards Ceremony
+                </div>
+                <div class="initiative-budget">€58-82K</div>
+            </div>
+
+            <div class="initiative-card">
+                <div class="initiative-icon">🏢</div>
+                <div class="initiative-title">Coworking Space</div>
+                <div class="initiative-details">
+                    📅 Q2 2025<br>
+                    📍 Almaty<br>
+                    🎯 80% occupancy target
+                </div>
+                <div class="initiative-budget">€50-70K</div>
+            </div>
+
+            <div class="initiative-card">
+                <div class="initiative-icon">🎙️</div>
+                <div class="initiative-title">Podcast Series</div>
+                <div class="initiative-details">
+                    📅 24 episodes/year<br>
+                    🎧 Bi-weekly<br>
+                    💼 Success stories
+                </div>
+                <div class="initiative-budget">€4-7K</div>
+            </div>
+
+            <div class="initiative-card">
+                <div class="initiative-icon">🌍</div>
+                <div class="initiative-title">Trade Missions</div>
+                <div class="initiative-details">
+                    📅 3-4 per year<br>
+                    ✈️ Italy ⇄ Kazakhstan<br>
+                    👥 10-15 participants
+                </div>
+                <div class="initiative-budget">€70-100K</div>
+            </div>
+
+            <div class="initiative-card">
+                <div class="initiative-icon">💼</div>
+                <div class="initiative-title">Sponsorship Program</div>
+                <div class="initiative-details">
+                    🎯 4 Levels<br>
+                    📈 Revenue generator<br>
+                    🤝 Partner benefits
+                </div>
+                <div class="initiative-budget">€80-120K Revenue</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">💰 Financial Framework</h2>
+        <div class="financial-grid">
+            <div class="financial-card">
+                <h3 style="font-size: 2em; margin-bottom: 20px; position: relative; z-index: 1;">Total Budget</h3>
+                <div class="financial-amount">€259-381K</div>
+                <ul class="revenue-list">
+                    <li>💼 Personnel: 50-60%</li>
+                    <li>🎉 Events: 20-25%</li>
+                    <li>📱 Marketing: 10-15%</li>
+                    <li>⚙️ Operations: 10-15%</li>
+                </ul>
+            </div>
+            <div class="financial-card">
+                <h3 style="font-size: 2em; margin-bottom: 20px; position: relative; z-index: 1;">Expected Revenue</h3>
+                <div class="financial-amount">€256-385K</div>
+                <ul class="revenue-list">
+                    <li>👥 Membership: 35-40%</li>
+                    <li>🎯 Sponsorships: 30-35%</li>
+                    <li>💼 Consulting: 10-15%</li>
+                    <li>🏢 Coworking: 10-12%</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">📅 Timeline 2025-2026</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q1 2025</div>
+                    <p>🚀 Launch Monthly Bulletin<br>
+                       🏢 Finalize Coworking plans<br>
+                       💼 Sponsorship packages<br>
+                       👥 Member recruitment</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q2 2025</div>
+                    <p>🏢 <strong>Coworking OPENS</strong><br>
+                       🎙️ Podcast LAUNCH<br>
+                       ✈️ First Kazakhstan visit<br>
+                       🎯 Rome Investment Forum</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q4 2025</div>
+                    <p>✈️ <strong style="color: #ff6b6b;">FLIGHT LAUNCH NOV 18</strong><br>
+                       🎄 Year-end reception<br>
+                       📊 Strategic planning</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="quarter-title">Q1 2026</div>
+                    <p>🎉 <strong style="color: #ff6b6b;">10TH ANNIVERSARY FEB 5-7</strong><br>
+                       🏆 Awards Ceremony<br>
+                       📖 Year Book launch<br>
+                       💼 200+ guests in Milan</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2 class="section-title">Ready to Launch!</h2>
+        <p style="font-size: 1.5em; margin: 30px 0; opacity: 0.9;">
+            Complete system with documentation, templates, and roadmaps
+        </p>
+        <button class="cta-button" onclick="alert('📂 Open /home/user/ACIK/demo.html\n\n✅ 22 Documents Created\n✅ 10 Major Initiatives\n✅ €260K+ Budget\n✅ Bilingual EN/RU\n\nAll files in your repository!')">
+            View System
+        </button>
+        <button class="cta-button" onclick="window.location.href='https://github.com/krasavchik01/ACIK/tree/claude/acik-project-management-system-011CV5ksUezdw8CcMtaEPDNR'">
+            GitHub Repo
+        </button>
+    </div>
+
+    <footer>
+        <p style="font-size: 1.5em; margin-bottom: 20px;"><strong>ACIK Project Management System</strong></p>
+        <p style="opacity: 0.8;">Italian-Kazakh Trade Association • 2025-2026</p>
+        <p style="margin-top: 30px; font-size: 1.2em;">🇮🇹 Fostering Business Relations 🇰🇿</p>
+    </footer>
+
+    <script>
+        // Particle animation
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 100;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(78, 205, 196, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </body>
 </html>
