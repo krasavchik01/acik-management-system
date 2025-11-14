@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACIK Project Management System 2025-2026</title>
+    <title>ACIK Project Management System - Interactive Dashboard</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap');
 
         * {
             margin: 0;
@@ -13,10 +13,20 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #4ecdc4;
+            --warning: #f7b731;
+            --danger: #ff6b6b;
+            --dark: #0f0c29;
+            --light: #ffffff;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
-            background: #0f0c29;
-            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
             overflow-x: hidden;
         }
@@ -30,47 +40,107 @@
             z-index: -1;
         }
 
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px 0;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .user-role {
+            background: linear-gradient(45deg, var(--accent), var(--danger));
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-role:hover {
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
         .hero {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 20px;
-            position: relative;
+            padding: 120px 20px 20px;
         }
 
-        .hero-content {
-            animation: fadeInUp 1s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h1 {
+        .hero h1 {
             font-size: 5em;
-            font-weight: 800;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7b731);
-            background-size: 300% 300%;
+            font-weight: 900;
+            background: linear-gradient(45deg, #fff, var(--success), var(--warning));
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientShift 5s ease infinite;
+            animation: gradientFlow 5s ease infinite;
             margin-bottom: 20px;
-            text-shadow: 0 0 80px rgba(255,255,255,0.3);
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        }
+
+        .hero .subtitle {
+            font-size: 2em;
+            margin: 20px 0;
+            opacity: 0.9;
         }
 
         .flags {
@@ -84,117 +154,52 @@
             50% { transform: translateY(-20px); }
         }
 
-        .subtitle {
-            font-size: 2em;
-            margin: 20px 0;
-            opacity: 0.9;
-        }
-
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-
-        .stat-box {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
+        /* Dashboard Section */
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 40px 20px;
+        }
+
+        .section-title {
+            font-size: 3em;
             text-align: center;
-            transition: all 0.3s ease;
+            margin: 80px 0 40px;
+            background: linear-gradient(45deg, #fff, var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.4s ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
         }
 
-        .stat-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: translateX(-100%);
-            transition: 0.6s;
-        }
-
-        .stat-box:hover::before {
-            transform: translateX(100%);
-        }
-
-        .stat-box:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .stat-number {
-            font-size: 4em;
-            font-weight: 800;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 1.2em;
-            opacity: 0.8;
-        }
-
-        .section {
-            max-width: 1400px;
-            margin: 100px auto;
-            padding: 40px 20px;
-        }
-
-        .section-title {
-            font-size: 3.5em;
-            text-align: center;
-            margin-bottom: 60px;
-            background: linear-gradient(45deg, #fff, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .initiatives-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-        }
-
-        .initiative-card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 30px;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .initiative-card::after {
+        .stat-card::before {
             content: '';
             position: absolute;
             top: -50%;
-            right: -50%;
+            left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            opacity: 0;
-            transition: 0.6s;
-        }
-
-        .initiative-card:hover::after {
-            opacity: 1;
-            animation: rotate 3s linear infinite;
+            background: conic-gradient(transparent, rgba(255,255,255,0.1), transparent 30%);
+            animation: rotate 4s linear infinite;
         }
 
         @keyframes rotate {
@@ -202,50 +207,201 @@
             to { transform: rotate(360deg); }
         }
 
-        .initiative-card:hover {
-            transform: translateY(-15px);
-            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-            border-color: rgba(78, 205, 196, 0.5);
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border-color: var(--success);
         }
 
-        .initiative-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
-            animation: pulse 2s ease infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .initiative-title {
-            font-size: 1.5em;
-            font-weight: 600;
+        .stat-icon {
+            font-size: 3em;
             margin-bottom: 15px;
-            color: #4ecdc4;
+            position: relative;
+            z-index: 1;
         }
 
-        .initiative-details {
-            line-height: 1.8;
+        .stat-number {
+            font-size: 3.5em;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 15px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
             opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Roles Section */
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .role-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 35px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .role-card:hover::after {
+            opacity: 1;
+        }
+
+        .role-card:hover {
+            transform: translateY(-15px) rotateX(5deg);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            border-color: var(--success);
+        }
+
+        .role-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
             margin-bottom: 20px;
         }
 
-        .initiative-budget {
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            padding: 12px 25px;
+        .role-icon {
+            font-size: 3em;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .role-info h3 {
+            font-size: 1.6em;
+            color: var(--success);
+            margin-bottom: 5px;
+        }
+
+        .role-subtitle {
+            opacity: 0.8;
+            font-size: 0.95em;
+        }
+
+        .role-responsibilities {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .role-responsibilities li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.9;
+        }
+
+        .role-responsibilities li::before {
+            content: '✓';
+            margin-right: 10px;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* News Feed */
+        .news-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .news-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.5);
+            border-color: var(--warning);
+        }
+
+        .news-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+        }
+
+        .news-content {
+            padding: 30px;
+        }
+
+        .news-date {
+            color: var(--warning);
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .news-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .news-excerpt {
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .read-more {
+            background: linear-gradient(45deg, var(--primary), var(--success));
+            color: white;
+            border: none;
+            padding: 12px 30px;
             border-radius: 25px;
             font-weight: 600;
-            display: inline-block;
-            animation: glow 2s ease infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(78, 205, 196, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(78, 205, 196, 0.8); }
+        .read-more:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.5);
         }
 
+        /* Project Timeline */
         .timeline {
             position: relative;
             padding: 50px 0;
@@ -258,7 +414,7 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: linear-gradient(to bottom, #ff6b6b, #4ecdc4, #45b7d1);
+            background: linear-gradient(to bottom, var(--danger), var(--success), var(--primary));
             transform: translateX(-50%);
         }
 
@@ -266,21 +422,32 @@
             display: flex;
             margin-bottom: 80px;
             position: relative;
+            animation: slideIn 0.6s ease;
         }
 
-        .timeline-item:nth-child(odd) {
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-item:nth-child(even) {
             flex-direction: row-reverse;
         }
 
         .timeline-content {
             width: 45%;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 20px;
-            position: relative;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 35px;
+            border-radius: 25px;
+            transition: all 0.4s ease;
         }
 
         .timeline-content:hover {
@@ -291,108 +458,113 @@
         .timeline-dot {
             position: absolute;
             left: 50%;
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, var(--danger), var(--success));
             border-radius: 50%;
             transform: translateX(-50%);
-            box-shadow: 0 0 30px rgba(78, 205, 196, 0.8);
+            box-shadow: 0 0 30px var(--success);
             animation: pulse 2s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 30px var(--success);
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                box-shadow: 0 0 50px var(--success);
+                transform: translateX(-50%) scale(1.2);
+            }
         }
 
         .quarter-title {
             font-size: 2em;
-            color: #4ecdc4;
+            color: var(--success);
             margin-bottom: 15px;
             font-weight: 700;
         }
 
-        .financial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 40px;
-            margin-top: 50px;
+        /* Interactive Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
         }
 
-        .financial-card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 30px;
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
+            backdrop-filter: blur(20px);
             padding: 50px;
-            text-align: center;
-            transition: all 0.4s ease;
+            border-radius: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             position: relative;
-            overflow: hidden;
+            animation: modalSlide 0.5s ease;
         }
 
-        .financial-card::before {
-            content: '';
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(78, 205, 196, 0.2), transparent 30%);
-            animation: rotate 4s linear infinite;
-        }
-
-        .financial-card:hover {
-            transform: translateY(-20px);
-            box-shadow: 0 40px 100px rgba(0,0,0,0.7);
-        }
-
-        .financial-amount {
-            font-size: 4em;
-            font-weight: 800;
-            background: linear-gradient(45deg, #ff6b6b, #f7b731);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 30px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .revenue-list {
-            list-style: none;
-            text-align: left;
-            position: relative;
-            z-index: 1;
-        }
-
-        .revenue-list li {
-            padding: 15px;
-            margin: 10px 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            border-left: 4px solid #4ecdc4;
+            top: 20px;
+            right: 20px;
+            font-size: 2em;
+            cursor: pointer;
+            color: #fff;
             transition: all 0.3s ease;
         }
 
-        .revenue-list li:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateX(10px);
+        .modal-close:hover {
+            transform: rotate(90deg);
+            color: var(--danger);
         }
 
-        .cta-section {
-            text-align: center;
-            padding: 100px 20px;
-            background: rgba(255,255,255,0.03);
-            margin: 100px 0;
-            border-radius: 30px;
+        /* CTA Buttons */
+        .cta-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 60px 0;
+            flex-wrap: wrap;
         }
 
         .cta-button {
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            background: linear-gradient(45deg, var(--danger), var(--warning));
             color: white;
             border: none;
-            padding: 20px 60px;
-            font-size: 1.5em;
+            padding: 20px 50px;
+            font-size: 1.3em;
             border-radius: 50px;
-            margin: 15px;
+            font-weight: 700;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             position: relative;
             overflow: hidden;
@@ -405,320 +577,523 @@
             left: 50%;
             width: 0;
             height: 0;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             transition: width 0.6s, height 0.6s;
         }
 
         .cta-button:hover::before {
-            width: 300px;
-            height: 300px;
+            width: 400px;
+            height: 400px;
         }
 
         .cta-button:hover {
-            transform: scale(1.1) translateY(-5px);
-            box-shadow: 0 20px 60px rgba(78, 205, 196, 0.5);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(247, 183, 49, 0.6);
         }
 
+        /* Footer */
         footer {
             text-align: center;
             padding: 60px 20px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.4);
             margin-top: 100px;
         }
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: float 2s ease infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(-50%, 0); }
-            50% { transform: translate(-50%, 20px); }
-        }
-
-        .scroll-indicator::before {
-            content: '⬇';
-            font-size: 3em;
-            opacity: 0.7;
-        }
-
+        /* Mobile */
         @media (max-width: 768px) {
-            h1 { font-size: 3em; }
+            .hero h1 { font-size: 3em; }
             .flags { font-size: 3em; }
-            .subtitle { font-size: 1.5em; }
-            .section-title { font-size: 2.5em; }
-            .initiatives-grid { grid-template-columns: 1fr; }
-            .financial-grid { grid-template-columns: 1fr; }
+            .nav-menu { display: none; }
             .timeline::before { left: 20px; }
             .timeline-item { flex-direction: column !important; }
             .timeline-content { width: 100%; margin-left: 40px; }
             .timeline-dot { left: 20px; }
+        }
+
+        /* Loading Animation */
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid var(--success);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <canvas class="particles" id="particles"></canvas>
 
-    <div class="hero">
-        <div class="hero-content">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🇮🇹 ACIK 🇰🇿</div>
+            <ul class="nav-menu">
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#roles">Team</a></li>
+                <li><a href="#news">News</a></li>
+                <li><a href="#timeline">Timeline</a></li>
+            </ul>
+            <div class="user-role" onclick="changeRole()">👤 CEO</div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div>
             <h1>ACIK 2025-2026</h1>
-            <div class="subtitle">Project Management System</div>
+            <div class="subtitle">Interactive Project Management System</div>
             <div class="flags">🇮🇹 🤝 🇰🇿</div>
-            <p style="font-size: 1.4em; opacity: 0.8; max-width: 800px; margin: 0 auto;">
+            <p style="font-size: 1.3em; opacity: 0.9; max-width: 700px; margin: 20px auto;">
                 Italian-Kazakh Trade Association<br>
-                Complete Bilingual Framework for Strategic Growth
+                Complete Digital Platform for Strategic Growth
             </p>
-        </div>
-        <div class="scroll-indicator"></div>
-    </div>
-
-    <div class="stats-container">
-        <div class="stat-box">
-            <div class="stat-number">22</div>
-            <div class="stat-label">Documents</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-number">10</div>
-            <div class="stat-label">Initiatives</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-number">€260K+</div>
-            <div class="stat-label">Budget</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-number">2</div>
-            <div class="stat-label">Languages</div>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2 class="section-title">🚀 Major Initiatives</h2>
-        <div class="initiatives-grid">
-            <div class="initiative-card">
-                <div class="initiative-icon">✈️</div>
-                <div class="initiative-title">Atyrau-Milan Flight Launch</div>
-                <div class="initiative-details">
-                    📅 November 18, 2025<br>
-                    📍 Atyrau, Kazakhstan<br>
-                    👥 100+ attendees
-                </div>
-                <div class="initiative-budget">€10-14K</div>
-            </div>
-
-            <div class="initiative-card">
-                <div class="initiative-icon">🎉</div>
-                <div class="initiative-title">10th Anniversary</div>
-                <div class="initiative-details">
-                    📅 February 5-7, 2026<br>
-                    📍 Milan, Italy<br>
-                    👥 200+ guests<br>
-                    🏆 Awards Ceremony
-                </div>
-                <div class="initiative-budget">€58-82K</div>
-            </div>
-
-            <div class="initiative-card">
-                <div class="initiative-icon">🏢</div>
-                <div class="initiative-title">Coworking Space</div>
-                <div class="initiative-details">
-                    📅 Q2 2025<br>
-                    📍 Almaty<br>
-                    🎯 80% occupancy target
-                </div>
-                <div class="initiative-budget">€50-70K</div>
-            </div>
-
-            <div class="initiative-card">
-                <div class="initiative-icon">🎙️</div>
-                <div class="initiative-title">Podcast Series</div>
-                <div class="initiative-details">
-                    📅 24 episodes/year<br>
-                    🎧 Bi-weekly<br>
-                    💼 Success stories
-                </div>
-                <div class="initiative-budget">€4-7K</div>
-            </div>
-
-            <div class="initiative-card">
-                <div class="initiative-icon">🌍</div>
-                <div class="initiative-title">Trade Missions</div>
-                <div class="initiative-details">
-                    📅 3-4 per year<br>
-                    ✈️ Italy ⇄ Kazakhstan<br>
-                    👥 10-15 participants
-                </div>
-                <div class="initiative-budget">€70-100K</div>
-            </div>
-
-            <div class="initiative-card">
-                <div class="initiative-icon">💼</div>
-                <div class="initiative-title">Sponsorship Program</div>
-                <div class="initiative-details">
-                    🎯 4 Levels<br>
-                    📈 Revenue generator<br>
-                    🤝 Partner benefits
-                </div>
-                <div class="initiative-budget">€80-120K Revenue</div>
+            <div class="cta-container">
+                <button class="cta-button" onclick="scrollToSection('dashboard')">View Dashboard</button>
+                <button class="cta-button" onclick="openModal('overview')">Learn More</button>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="section">
-        <h2 class="section-title">💰 Financial Framework</h2>
-        <div class="financial-grid">
-            <div class="financial-card">
-                <h3 style="font-size: 2em; margin-bottom: 20px; position: relative; z-index: 1;">Total Budget</h3>
-                <div class="financial-amount">€259-381K</div>
-                <ul class="revenue-list">
-                    <li>💼 Personnel: 50-60%</li>
-                    <li>🎉 Events: 20-25%</li>
-                    <li>📱 Marketing: 10-15%</li>
-                    <li>⚙️ Operations: 10-15%</li>
+    <!-- Dashboard -->
+    <section class="dashboard" id="dashboard">
+        <h2 class="section-title">📊 Live Dashboard</h2>
+
+        <div class="stats-grid">
+            <div class="stat-card" onclick="openModal('docs')">
+                <div class="stat-icon">📚</div>
+                <div class="stat-number">22</div>
+                <div class="stat-label">Documents</div>
+            </div>
+            <div class="stat-card" onclick="openModal('initiatives')">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-number">10</div>
+                <div class="stat-label">Initiatives</div>
+            </div>
+            <div class="stat-card" onclick="openModal('budget')">
+                <div class="stat-icon">💰</div>
+                <div class="stat-number">€260K+</div>
+                <div class="stat-label">Budget</div>
+            </div>
+            <div class="stat-card" onclick="openModal('members')">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Target Members</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roles Section -->
+    <section class="dashboard" id="roles">
+        <h2 class="section-title">👥 Team & Roles</h2>
+
+        <div class="roles-grid">
+            <div class="role-card">
+                <div class="role-header">
+                    <div class="role-icon">👑</div>
+                    <div class="role-info">
+                        <h3>President</h3>
+                        <div class="role-subtitle">Strategic Leadership</div>
+                    </div>
+                </div>
+                <ul class="role-responsibilities">
+                    <li>Strategic direction & vision</li>
+                    <li>High-level stakeholder engagement</li>
+                    <li>Final approval authority</li>
+                    <li>International representation</li>
                 </ul>
             </div>
-            <div class="financial-card">
-                <h3 style="font-size: 2em; margin-bottom: 20px; position: relative; z-index: 1;">Expected Revenue</h3>
-                <div class="financial-amount">€256-385K</div>
-                <ul class="revenue-list">
-                    <li>👥 Membership: 35-40%</li>
-                    <li>🎯 Sponsorships: 30-35%</li>
-                    <li>💼 Consulting: 10-15%</li>
-                    <li>🏢 Coworking: 10-12%</li>
+
+            <div class="role-card">
+                <div class="role-header">
+                    <div class="role-icon">⭐</div>
+                    <div class="role-info">
+                        <h3>Vice President</h3>
+                        <div class="role-subtitle">Executive Oversight</div>
+                    </div>
+                </div>
+                <ul class="role-responsibilities">
+                    <li>Cross-border coordination</li>
+                    <li>Quality assurance</li>
+                    <li>Partner management</li>
+                    <li>KPI monitoring</li>
+                </ul>
+            </div>
+
+            <div class="role-card">
+                <div class="role-header">
+                    <div class="role-icon">💼</div>
+                    <div class="role-info">
+                        <h3>CEO</h3>
+                        <div class="role-subtitle">Operational Management</div>
+                    </div>
+                </div>
+                <ul class="role-responsibilities">
+                    <li>Day-to-day operations</li>
+                    <li>Team leadership</li>
+                    <li>Resource allocation</li>
+                    <li>External relations</li>
+                </ul>
+            </div>
+
+            <div class="role-card">
+                <div class="role-header">
+                    <div class="role-icon">📊</div>
+                    <div class="role-info">
+                        <h3>CFO</h3>
+                        <div class="role-subtitle">Financial Director</div>
+                    </div>
+                </div>
+                <ul class="role-responsibilities">
+                    <li>Financial planning</li>
+                    <li>Budget control</li>
+                    <li>Financial reporting</li>
+                    <li>Revenue management</li>
+                </ul>
+            </div>
+
+            <div class="role-card">
+                <div class="role-header">
+                    <div class="role-icon">🎯</div>
+                    <div class="role-info">
+                        <h3>Project Manager</h3>
+                        <div class="role-subtitle">Project Coordination</div>
+                    </div>
+                </div>
+                <ul class="role-responsibilities">
+                    <li>Project planning & execution</li>
+                    <li>Timeline management</li>
+                    <li>Stakeholder communication</li>
+                    <li>KPI tracking</li>
+                </ul>
+            </div>
+
+            <div class="role-card">
+                <div class="role-header">
+                    <div class="role-icon">📱</div>
+                    <div class="role-info">
+                        <h3>Marketing Team</h3>
+                        <div class="role-subtitle">Micaela, Sara</div>
+                    </div>
+                </div>
+                <ul class="role-responsibilities">
+                    <li>Content creation</li>
+                    <li>Social media management</li>
+                    <li>Event promotion</li>
+                    <li>Brand management</li>
                 </ul>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="section">
-        <h2 class="section-title">📅 Timeline 2025-2026</h2>
+    <!-- News Section -->
+    <section class="dashboard" id="news">
+        <h2 class="section-title">📰 Latest News & Updates</h2>
+
+        <div class="news-container">
+            <div class="news-card">
+                <div class="news-image">✈️</div>
+                <div class="news-content">
+                    <div class="news-date">📅 November 18, 2025</div>
+                    <div class="news-title">Atyrau-Milan Flight Launch</div>
+                    <div class="news-excerpt">
+                        ACIK celebrates the launch of direct flight connection between Atyrau and Milan.
+                        100+ business leaders expected to attend this historic event.
+                    </div>
+                    <button class="read-more" onclick="openModal('flight')">Read More</button>
+                </div>
+            </div>
+
+            <div class="news-card">
+                <div class="news-image">🎉</div>
+                <div class="news-content">
+                    <div class="news-date">📅 February 5-7, 2026</div>
+                    <div class="news-title">10th Anniversary Celebration</div>
+                    <div class="news-excerpt">
+                        Join us in Milan for ACIK's 10th Anniversary with gala dinner, awards ceremony,
+                        and business forum featuring 200+ distinguished guests.
+                    </div>
+                    <button class="read-more" onclick="openModal('anniversary')">Read More</button>
+                </div>
+            </div>
+
+            <div class="news-card">
+                <div class="news-image">🏢</div>
+                <div class="news-content">
+                    <div class="news-date">📅 Q2 2025</div>
+                    <div class="news-title">Coworking Space Opens in Almaty</div>
+                    <div class="news-excerpt">
+                        ACIK launches state-of-the-art coworking space in Almaty, providing Italian
+                        companies with a professional hub for business operations in Kazakhstan.
+                    </div>
+                    <button class="read-more" onclick="openModal('coworking')">Read More</button>
+                </div>
+            </div>
+
+            <div class="news-card">
+                <div class="news-image">🎙️</div>
+                <div class="news-content">
+                    <div class="news-date">📅 Starting Q2 2025</div>
+                    <div class="news-title">New Podcast Series Launch</div>
+                    <div class="news-excerpt">
+                        ACIK introduces bi-weekly podcast featuring success stories, expert insights,
+                        and interviews with Italian-Kazakh business leaders.
+                    </div>
+                    <button class="read-more" onclick="openModal('podcast')">Read More</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="dashboard" id="timeline">
+        <h2 class="section-title">📅 Project Timeline 2025-2026</h2>
+
         <div class="timeline">
             <div class="timeline-item">
-                <div class="timeline-dot"></div>
+                <div class="timeline-dot">1️⃣</div>
                 <div class="timeline-content">
                     <div class="quarter-title">Q1 2025</div>
-                    <p>🚀 Launch Monthly Bulletin<br>
-                       🏢 Finalize Coworking plans<br>
-                       💼 Sponsorship packages<br>
-                       👥 Member recruitment</p>
+                    <p><strong>Foundation Phase</strong></p>
+                    <p>🚀 Monthly Bulletin Launch<br>
+                       🏢 Coworking Space Finalization<br>
+                       💼 Sponsorship Packages<br>
+                       👥 Member Recruitment Campaign</p>
                 </div>
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-dot"></div>
+                <div class="timeline-dot">2️⃣</div>
                 <div class="timeline-content">
                     <div class="quarter-title">Q2 2025</div>
-                    <p>🏢 <strong>Coworking OPENS</strong><br>
-                       🎙️ Podcast LAUNCH<br>
-                       ✈️ First Kazakhstan visit<br>
-                       🎯 Rome Investment Forum</p>
+                    <p><strong>Launch & Growth</strong></p>
+                    <p>🏢 <strong>Coworking Space OPENS</strong><br>
+                       🎙️ Podcast Series LAUNCH<br>
+                       ✈️ First Site Visit to Kazakhstan<br>
+                       🎯 Investment Forum in Rome</p>
                 </div>
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-dot"></div>
+                <div class="timeline-dot">3️⃣</div>
                 <div class="timeline-content">
                     <div class="quarter-title">Q4 2025</div>
-                    <p>✈️ <strong style="color: #ff6b6b;">FLIGHT LAUNCH NOV 18</strong><br>
-                       🎄 Year-end reception<br>
-                       📊 Strategic planning</p>
+                    <p><strong>Major Events</strong></p>
+                    <p>✈️ <strong style="color: #ff6b6b;">ATYRAU-MILAN FLIGHT (NOV 18)</strong><br>
+                       🎄 Year-End Networking Reception<br>
+                       📊 Annual Strategic Planning</p>
                 </div>
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-dot"></div>
+                <div class="timeline-dot">4️⃣</div>
                 <div class="timeline-content">
                     <div class="quarter-title">Q1 2026</div>
-                    <p>🎉 <strong style="color: #ff6b6b;">10TH ANNIVERSARY FEB 5-7</strong><br>
-                       🏆 Awards Ceremony<br>
-                       📖 Year Book launch<br>
-                       💼 200+ guests in Milan</p>
+                    <p><strong>Celebration & Scale</strong></p>
+                    <p>🎉 <strong style="color: #ff6b6b;">10TH ANNIVERSARY (FEB 5-7)</strong><br>
+                       🏆 Awards Ceremony in Milan<br>
+                       📖 Year Book Publication<br>
+                       💼 200+ Guests Business Forum</p>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">×</span>
+            <div id="modal-body"></div>
+        </div>
     </div>
 
-    <div class="cta-section">
-        <h2 class="section-title">Ready to Launch!</h2>
-        <p style="font-size: 1.5em; margin: 30px 0; opacity: 0.9;">
-            Complete system with documentation, templates, and roadmaps
-        </p>
-        <button class="cta-button" onclick="alert('📂 Open /home/user/ACIK/demo.html\n\n✅ 22 Documents Created\n✅ 10 Major Initiatives\n✅ €260K+ Budget\n✅ Bilingual EN/RU\n\nAll files in your repository!')">
-            View System
-        </button>
-        <button class="cta-button" onclick="window.location.href='https://github.com/krasavchik01/ACIK/tree/claude/acik-project-management-system-011CV5ksUezdw8CcMtaEPDNR'">
-            GitHub Repo
-        </button>
-    </div>
-
+    <!-- Footer -->
     <footer>
-        <p style="font-size: 1.5em; margin-bottom: 20px;"><strong>ACIK Project Management System</strong></p>
-        <p style="opacity: 0.8;">Italian-Kazakh Trade Association • 2025-2026</p>
-        <p style="margin-top: 30px; font-size: 1.2em;">🇮🇹 Fostering Business Relations 🇰🇿</p>
+        <p style="font-size: 1.8em; margin-bottom: 20px;"><strong>ACIK Project Management System</strong></p>
+        <p style="opacity: 0.8; font-size: 1.1em;">Italian-Kazakh Trade Association • 2025-2026</p>
+        <p style="margin-top: 30px; font-size: 1.3em;">🇮🇹 Fostering Business Relations 🇰🇿</p>
+        <div style="margin-top: 40px;">
+            <button class="cta-button" onclick="window.location.href='https://github.com/krasavchik01/ACIK'">
+                View on GitHub
+            </button>
+        </div>
     </footer>
 
     <script>
-        // Particle animation
+        // Particles
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
         const particles = [];
-        const particleCount = 100;
+        for (let i = 0; i < 150; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 3 - 1.5,
+                speedY: Math.random() * 3 - 1.5
+            });
+        }
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 3 + 1;
-                this.speedX = Math.random() * 3 - 1.5;
-                this.speedY = Math.random() * 3 - 1.5;
-            }
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.y > canvas.height) p.y = 0;
+                if (p.y < 0) p.y = canvas.height;
 
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
-            }
-
-            draw() {
                 ctx.fillStyle = 'rgba(78, 205, 196, 0.5)';
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
-            }
+            });
+            requestAnimationFrame(animateParticles);
         }
-
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-            }
-            requestAnimationFrame(animate);
-        }
-
-        animate();
+        animateParticles();
 
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
 
-        // Smooth scroll
+        // Modal Content
+        const modalContent = {
+            overview: `
+                <h2 style="font-size: 2.5em; margin-bottom: 20px;">🎯 System Overview</h2>
+                <p style="font-size: 1.2em; line-height: 1.8;">
+                    <strong>ACIK Project Management System</strong> is a comprehensive digital platform designed to streamline
+                    operations for the Italian-Kazakh Trade Association.<br><br>
+
+                    <strong>Key Features:</strong><br>
+                    • 22 comprehensive documents (EN/RU)<br>
+                    • 10 major initiatives for 2025-2026<br>
+                    • Complete role-based access system<br>
+                    • Real-time project tracking<br>
+                    • €260K+ budget management<br>
+                    • Integrated news and updates<br><br>
+
+                    All documentation, templates, and roadmaps are available in both English and Russian.
+                </p>
+            `,
+            docs: `
+                <h2 style="font-size: 2.5em; margin-bottom: 20px;">📚 Documentation</h2>
+                <p style="font-size: 1.2em; line-height: 1.8;">
+                    <strong>English Documentation (10 docs):</strong><br>
+                    1. Project Charter - Governance framework<br>
+                    2. Purpose & Goals - Mission and vision<br>
+                    3. Strategic Goals - 5 strategic objectives<br>
+                    4. Project Objectives - Operational activities<br>
+                    5. Stakeholders - Engagement strategies<br>
+                    6. Project Timeline - Resource planning<br>
+                    7. Planning Activities - 2025-2026 roadmap<br>
+                    8. Evaluation - Monitoring framework<br>
+                    9. Sustainability - Long-term growth<br>
+                    10. Governance & Roles - Org structure<br><br>
+
+                    <strong>Templates (5):</strong><br>
+                    • Weekly Report Template<br>
+                    • Monthly Report Template<br>
+                    • Project Plan Template<br>
+                    • Event Planning Template<br>
+                    • Plus Russian versions
+                </p>
+            `,
+            initiatives: `
+                <h2 style="font-size: 2.5em; margin-bottom: 20px;">🚀 10 Major Initiatives</h2>
+                <div style="font-size: 1.1em; line-height: 1.8;">
+                    1. <strong>✈️ Atyrau-Milan Flight Launch</strong> (Nov 18, 2025) - €10-14K<br>
+                    2. <strong>🎉 10th Anniversary Celebration</strong> (Feb 5-7, 2026) - €58-82K<br>
+                    3. <strong>🏢 Coworking Space</strong> (Q2 2025) - €50-70K<br>
+                    4. <strong>📧 Monthly Bulletin</strong> - €1-2K/year<br>
+                    5. <strong>🎙️ Podcast Series</strong> (24 episodes/year) - €4-7K<br>
+                    6. <strong>✈️ Site Visits & Trade Missions</strong> (3-4/year) - €70-100K<br>
+                    7. <strong>💼 Sponsorship Program</strong> - €80-120K revenue<br>
+                    8. <strong>👥 Membership Engagement</strong> - €7-12K<br>
+                    9. <strong>📖 Year Book 2026</strong> - €9-14K<br>
+                    10. <strong>🤝 Networking Events</strong> (5-6/year) - €50-80K
+                </div>
+            `,
+            budget: `
+                <h2 style="font-size: 2.5em; margin-bottom: 20px;">💰 Financial Framework</h2>
+                <div style="font-size: 1.2em; line-height: 1.8;">
+                    <strong>Total Budget:</strong> €259,000 - 381,000<br>
+                    <strong>Expected Revenue:</strong> €256,000 - 385,000<br>
+                    <strong>Net Position:</strong> Break-even to POSITIVE<br><br>
+
+                    <strong>Budget Breakdown:</strong><br>
+                    • Personnel: 50-60%<br>
+                    • Events: 20-25%<br>
+                    • Marketing: 10-15%<br>
+                    • Operations: 10-15%<br><br>
+
+                    <strong>Revenue Sources:</strong><br>
+                    • Membership Fees: 35-40%<br>
+                    • Event Sponsorships: 30-35%<br>
+                    • Consulting Services: 10-15%<br>
+                    • Coworking Space: 10-12%<br>
+                    • Other: 5-10%
+                </div>
+            `,
+            members: `
+                <h2 style="font-size: 2.5em; margin-bottom: 20px;">👥 Membership</h2>
+                <p style="font-size: 1.2em; line-height: 1.8;">
+                    <strong>2025 Target:</strong> 50+ members<br>
+                    <strong>2026 Target:</strong> 70+ members<br>
+                    <strong>Retention Goal:</strong> 90%+<br><br>
+
+                    <strong>Member Benefits:</strong><br>
+                    • Priority B2B matchmaking<br>
+                    • Discounted event access (20-30%)<br>
+                    • Free consulting hours<br>
+                    • Coworking space access<br>
+                    • Featured in newsletter<br>
+                    • Exclusive networking events<br>
+                    • Access to trade missions<br><br>
+
+                    <strong>Membership Types:</strong><br>
+                    • Corporate Members<br>
+                    • Associate Members<br>
+                    • Honorary Members
+                </p>
+            `
+        };
+
+        function openModal(type) {
+            const modal = document.getElementById('modal');
+            const body = document.getElementById('modal-body');
+            body.innerHTML = modalContent[type] || '<h2>Coming Soon!</h2>';
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        const roles = ['CEO', 'President', 'Vice President', 'CFO', 'Project Manager', 'Marketing Team'];
+        let currentRole = 0;
+
+        function changeRole() {
+            currentRole = (currentRole + 1) % roles.length;
+            document.querySelector('.user-role').innerHTML = '👤 ' + roles[currentRole];
+        }
+
+        // Smooth scroll for nav
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -727,6 +1102,14 @@
                 });
             });
         });
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
     </script>
 </body>
 </html>
