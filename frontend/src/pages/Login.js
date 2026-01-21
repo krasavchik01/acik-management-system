@@ -29,7 +29,7 @@ const Login = () => {
     setLoading(false);
   };
 
-  const quickLogin = (role) => {
+  const quickLogin = async (role) => {
     const credentials = {
       president: { email: 'president@acik.com', password: 'password123' },
       cfo: { email: 'cfo@acik.com', password: 'password123' },
@@ -38,8 +38,15 @@ const Login = () => {
     };
 
     const cred = credentials[role];
-    setEmail(cred.email);
-    setPassword(cred.password);
+    setLoading(true);
+
+    const result = await login(cred);
+
+    if (result.success) {
+      navigate('/');
+    }
+
+    setLoading(false);
   };
 
   return (
