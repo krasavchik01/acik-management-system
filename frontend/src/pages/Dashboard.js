@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { projectsAPI, tasksAPI, membersAPI, eventsAPI, financeAPI, attendanceAPI } from '../services/api';
+import { projectsAPI, membersAPI, eventsAPI, financeAPI, attendanceAPI } from '../services/api';
 import Layout from '../components/Layout';
 import './Dashboard.css';
 
@@ -16,7 +16,6 @@ const Dashboard = () => {
     attendance: { today: { present: 0, absent: 0 } }
   });
   const [loading, setLoading] = useState(true);
-  const [recentActivities, setRecentActivities] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
