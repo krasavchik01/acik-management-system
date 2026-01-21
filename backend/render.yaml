@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: acik-backend
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: acik_super_secret_key_2024_production
+      - key: MONGO_URI
+        generateValue: true
+      - key: PORT
+        value: 5000
+    autoDeploy: true
+
+databases:
+  - name: acik-mongodb
+    databaseName: acik
+    user: acikuser
