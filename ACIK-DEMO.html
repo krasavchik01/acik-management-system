@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACIK ONE - Management Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            --accent: #009246;
+            --accent-red: #ef4444;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-2: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-2: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            transition: all 0.3s;
+        }
+
+        /* Login Page */
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+        }
+        .login-container {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+        }
+        .lang-switcher { display: flex; justify-content: center; gap: 8px; margin-bottom: 32px; }
+        .lang-btn {
+            padding: 8px 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+        .lang-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .lang-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+        .login-logo { text-align: center; margin-bottom: 32px; }
+        .login-logo-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 14px;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 16px; color: white; font-weight: 800; font-size: 18px;
+            position: relative;
+        }
+        .login-logo-icon::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(to right, var(--accent) 33%, white 33%, white 66%, var(--accent-red) 66%);
+            border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;
+        }
+        .login-logo h1 { font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+        .login-logo p { font-size: 14px; color: var(--text-secondary); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+        .form-input, .form-select {
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border);
+            border-radius: 10px; font-size: 14px; transition: all 0.2s; background: var(--surface); color: var(--text-primary);
+        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-secondary { background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+
+        /* App Layout */
+        .app { display: none; height: 100vh; overflow: hidden; }
+        .app.active { display: flex; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px; background: var(--surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; transition: all 0.3s;
+        }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border); }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-logo {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 14px; position: relative;
+        }
+        .brand-logo::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(to right, var(--accent) 33%, white 33%, white 66%, var(--accent-red) 66%);
+            border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;
+        }
+        .brand-name { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .brand-tagline { font-size: 12px; color: var(--text-secondary); }
+
+        .user-profile { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+        .avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 16px;
+        }
+        .user-info { flex: 1; }
+        .user-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .user-role { font-size: 12px; color: var(--text-secondary); }
+
+        .nav { flex: 1; padding: 16px; overflow-y: auto; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); padding: 0 12px 8px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+            border-radius: 8px; color: var(--text-secondary); cursor: pointer;
+            transition: all 0.2s; font-size: 14px; font-weight: 500; margin-bottom: 2px;
+        }
+        .nav-item:hover { background: var(--surface-2); color: var(--text-primary); }
+        .nav-item.active { background: var(--primary); color: white; font-weight: 600; }
+        .nav-icon { font-size: 18px; width: 20px; display: flex; align-items: center; justify-content: center; }
+        .nav-badge { margin-left: auto; background: var(--accent-red); color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+
+        .sidebar-footer { padding: 16px 24px; border-top: 1px solid var(--border); }
+        .logout-btn {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--text-secondary);
+            font-size: 14px; font-weight: 500; width: 100%; border: none; background: none; text-align: left;
+        }
+        .logout-btn:hover { background: #fee2e2; color: #dc2626; }
+
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+        .topbar {
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .page-title { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+        .icon-btn {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--surface-2); border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text-primary);
+        }
+        .icon-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .notification-badge {
+            position: absolute; top: -4px; right: -4px; width: 18px; height: 18px;
+            background: #ef4444; border-radius: 50%; font-size: 10px; color: white;
+            display: flex; align-items: center; justify-content: center; font-weight: 700;
+        }
+
+        /* Content */
+        .content { flex: 1; overflow-y: auto; padding: 32px; }
+        .view { display: none; animation: fadeIn 0.4s ease-out; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 32px; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); border-color: var(--primary); }
+        .stat-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .stat-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .stat-icon.blue { background: #dbeafe; }
+        .stat-icon.green { background: #d1fae5; }
+        .stat-icon.yellow { background: #fef3c7; }
+        .stat-icon.purple { background: #f3e8ff; }
+        .stat-icon.red { background: #fee2e2; }
+        .stat-value { font-size: 32px; font-weight: 800; color: var(--text-primary); line-height: 1; margin-bottom: 8px; }
+        .stat-change { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+        .stat-change.up { background: #d1fae5; color: #059669; }
+        .stat-change.down { background: #fee2e2; color: #dc2626; }
+        .stat-detail { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
+
+        /* Card */
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .card-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+
+        /* Table */
+        .table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .table thead th { text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+        .table tbody td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .table tbody tr { transition: background 0.2s; cursor: pointer; }
+        .table tbody tr:hover { background: var(--surface-2); }
+        .table tbody tr:last-child td { border-bottom: none; }
+
+        /* Badge */
+        .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+        .badge.success { background: #d1fae5; color: #059669; }
+        .badge.warning { background: #fef3c7; color: #d97706; }
+        .badge.info { background: #dbeafe; color: #2563eb; }
+        .badge.danger { background: #fee2e2; color: #dc2626; }
+        .badge.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+        .badge.silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: white; }
+        .badge.bronze { background: linear-gradient(135deg, #d97706, #b45309); color: white; }
+
+        /* Progress */
+        .progress { width: 100%; height: 8px; background: var(--surface-2); border-radius: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; border-radius: 10px; transition: width 0.5s; }
+        .progress-bar.blue { background: linear-gradient(to right, var(--primary), var(--primary-light)); }
+        .progress-bar.green { background: linear-gradient(to right, #10b981, #34d399); }
+        .progress-bar.yellow { background: linear-gradient(to right, #f59e0b, #fbbf24); }
+        .progress-bar.red { background: linear-gradient(to right, #ef4444, #f87171); }
+
+        /* Projects Grid */
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+        .project-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer;
+        }
+        .project-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); border-color: var(--primary); }
+        .project-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .project-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+        .project-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+        .project-meta-item { display: flex; align-items: center; gap: 6px; }
+        .project-progress { margin-bottom: 16px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+        .progress-label-text { color: var(--text-secondary); font-weight: 500; }
+        .progress-label-value { color: var(--text-primary); font-weight: 700; }
+        .project-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--border); }
+        .project-stats { display: flex; gap: 16px; font-size: 13px; color: var(--text-secondary); }
+
+        .avatar-group { display: flex; }
+        .avatar-sm {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 2px solid var(--surface);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 11px; margin-left: -8px;
+        }
+        .avatar-sm:first-child { margin-left: 0; }
+
+        /* Kanban */
+        .kanban-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; min-height: 500px; }
+        .kanban-column { background: var(--surface-2); border-radius: 12px; display: flex; flex-direction: column; }
+        .kanban-header { padding: 16px; border-radius: 12px 12px 0 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .kanban-header.todo { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+        .kanban-header.in-progress { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+        .kanban-header.review { background: linear-gradient(135deg, #e9d5ff, #d8b4fe); color: #6b21a8; }
+        .kanban-header.done { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+        .kanban-count { background: rgba(255,255,255,0.5); padding: 2px 10px; border-radius: 20px; font-size: 13px; }
+        .kanban-cards { padding: 12px; flex: 1; min-height: 200px; }
+        .kanban-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 16px; margin-bottom: 12px;
+            cursor: grab; transition: all 0.2s;
+        }
+        .kanban-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+        .kanban-card.dragging { opacity: 0.5; transform: rotate(3deg); }
+        .kanban-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .kanban-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+        .kanban-card-project { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+        .kanban-card-footer { display: flex; justify-content: space-between; align-items: center; }
+        .kanban-card-assignee { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+        .priority-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+        .priority-badge.high { background: #fee2e2; color: #dc2626; }
+        .priority-badge.medium { background: #fef3c7; color: #d97706; }
+        .priority-badge.low { background: #dbeafe; color: #2563eb; }
+
+        /* Members Grid */
+        .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .member-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; text-align: center;
+            transition: all 0.3s; cursor: pointer;
+        }
+        .member-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+        .member-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 16px; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 24px; }
+        .member-name { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .member-company { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+
+        /* Finance */
+        .cashflow-chart { padding: 24px 0; }
+        .cashflow-months { display: flex; justify-content: space-around; align-items: flex-end; height: 200px; }
+        .cashflow-month { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .cashflow-bars { display: flex; gap: 4px; align-items: flex-end; height: 160px; }
+        .cf-bar { width: 24px; border-radius: 4px 4px 0 0; transition: height 0.5s; }
+        .cf-bar.income { background: linear-gradient(to top, #10b981, #34d399); }
+        .cf-bar.expense { background: linear-gradient(to top, #ef4444, #f87171); }
+        .month-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .cashflow-legend { display: flex; justify-content: center; gap: 24px; margin-top: 20px; }
+        .cf-legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+        .cf-dot { width: 12px; height: 12px; border-radius: 3px; }
+        .cf-dot.income { background: #10b981; }
+        .cf-dot.expense { background: #ef4444; }
+
+        /* Sponsors */
+        .sponsors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+        .sponsor-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer;
+        }
+        .sponsor-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+        .sponsor-card.gold { border-top: 4px solid #f59e0b; }
+        .sponsor-card.silver { border-top: 4px solid #9ca3af; }
+        .sponsor-card.bronze { border-top: 4px solid #d97706; }
+        .sponsor-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .sponsor-name { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .sponsor-industry { font-size: 13px; color: var(--text-secondary); }
+        .sponsor-amount { font-size: 24px; font-weight: 800; color: var(--primary); margin: 16px 0; }
+
+        /* ATTENDANCE SYSTEM */
+        .attendance-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .attendance-clock-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            padding: 32px;
+            color: white;
+            text-align: center;
+        }
+        .attendance-clock {
+            font-size: 64px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 8px;
+        }
+        .attendance-date {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+        .attendance-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+        .attendance-btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .attendance-btn.checkin {
+            background: white;
+            color: #10b981;
+        }
+        .attendance-btn.checkout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        .attendance-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .attendance-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .attendance-status-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+        }
+        .status-header { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 16px; }
+        .status-current {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--surface-2);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .status-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        .status-indicator.active { background: #10b981; }
+        .status-indicator.inactive { background: #94a3b8; animation: none; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .status-text { flex: 1; }
+        .status-label { font-size: 14px; color: var(--text-secondary); }
+        .status-value { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+
+        .location-info {
+            padding: 16px;
+            background: var(--surface-2);
+            border-radius: 12px;
+        }
+        .location-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+        .location-address { font-size: 14px; color: var(--text-primary); margin-bottom: 8px; }
+        .location-coords { font-size: 12px; color: var(--text-secondary); font-family: monospace; }
+        .location-map {
+            width: 100%;
+            height: 120px;
+            background: var(--surface);
+            border-radius: 8px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border: 1px solid var(--border);
+        }
+
+        /* Attendance Stats */
+        .attendance-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .att-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .att-stat-value { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+        .att-stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .att-stat.highlight { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-color: var(--primary); }
+        .att-stat.warning { background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #f59e0b; }
+        .att-stat.danger { background: linear-gradient(135deg, #fee2e2, #fecaca); border-color: #ef4444; }
+
+        /* Today's Log */
+        .today-log {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .log-timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        .log-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        .log-entry {
+            position: relative;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .log-entry:last-child { border-bottom: none; }
+        .log-entry::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 20px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid var(--surface);
+        }
+        .log-entry.checkin::before { background: #10b981; }
+        .log-entry.checkout::before { background: #ef4444; }
+        .log-entry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .log-entry-type { font-weight: 700; color: var(--text-primary); }
+        .log-entry-time { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .log-entry-details { display: flex; gap: 24px; font-size: 13px; color: var(--text-secondary); }
+        .log-detail-item { display: flex; align-items: center; gap: 6px; }
+
+        /* Monthly Calendar */
+        .attendance-calendar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .calendar-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .calendar-nav-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .calendar-month { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .calendar-day-header {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 8px;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .calendar-day:hover { background: var(--surface-2); }
+        .calendar-day.today { background: var(--primary); color: white; font-weight: 700; }
+        .calendar-day.present { background: #d1fae5; color: #065f46; }
+        .calendar-day.late { background: #fef3c7; color: #92400e; }
+        .calendar-day.absent { background: #fee2e2; color: #991b1b; }
+        .calendar-day.weekend { color: var(--text-secondary); }
+        .calendar-day.other-month { opacity: 0.3; }
+        .calendar-day-num { font-weight: 600; }
+        .calendar-day-hours { font-size: 10px; margin-top: 2px; }
+
+        .calendar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+        .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+        .legend-dot.present { background: #d1fae5; }
+        .legend-dot.late { background: #fef3c7; }
+        .legend-dot.absent { background: #fee2e2; }
+
+        /* Team Attendance */
+        .team-attendance {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .team-member-row {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .team-member-row:last-child { border-bottom: none; }
+        .team-member-info { display: flex; align-items: center; gap: 12px; width: 200px; }
+        .team-member-name { font-weight: 600; color: var(--text-primary); }
+        .team-member-role { font-size: 12px; color: var(--text-secondary); }
+        .team-member-status { width: 120px; }
+        .team-member-times { flex: 1; display: flex; gap: 24px; }
+        .time-block { text-align: center; }
+        .time-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
+        .time-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .team-member-hours { width: 100px; text-align: right; }
+        .hours-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .hours-label { font-size: 11px; color: var(--text-secondary); }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+        .tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--surface-2);
+            color: var(--text-secondary);
+            border: none;
+        }
+        .tab:hover { background: var(--surface); color: var(--text-primary); }
+        .tab.active { background: var(--primary); color: white; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--surface); border-radius: 20px;
+            width: 100%; max-width: 800px; max-height: 90vh;
+            overflow: hidden; animation: modalIn 0.3s ease-out;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-header {
+            padding: 24px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+        .modal-close {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: var(--surface-2); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: var(--text-secondary); transition: all 0.2s;
+        }
+        .modal-close:hover { background: #fee2e2; color: #dc2626; }
+        .modal-body { padding: 24px; overflow-y: auto; max-height: calc(90vh - 140px); }
+
+        /* Detail Sections */
+        .detail-section { margin-bottom: 24px; }
+        .detail-section-title { font-size: 14px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .detail-item { background: var(--surface-2); border-radius: 10px; padding: 16px; }
+        .detail-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+        .detail-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+
+        /* KPI */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+        .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .kpi-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+        .kpi-value { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+        .kpi-progress { margin-top: 12px; }
+        .kpi-target { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
+
+        /* Social Stats */
+        .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .social-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px;
+        }
+        .social-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .social-icon.linkedin { background: #dbeafe; }
+        .social-icon.instagram { background: #fce7f3; }
+        .social-icon.telegram { background: #cffafe; }
+        .social-icon.youtube { background: #fee2e2; }
+        .social-name { font-size: 13px; color: var(--text-secondary); }
+        .social-value { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+        .social-change { font-size: 12px; color: #10b981; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kanban-board { grid-template-columns: repeat(2, 1fr); }
+            .attendance-header { grid-template-columns: 1fr; }
+            .attendance-stats { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -280px; height: 100vh; z-index: 100; }
+            .sidebar.open { left: 0; }
+            .kanban-board { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .attendance-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-page" id="loginPage">
+        <div class="login-container">
+            <div class="lang-switcher">
+                <button class="lang-btn" onclick="setLanguage('ru')">RU</button>
+                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="setLanguage('it')">IT</button>
+            </div>
+            <div class="login-logo">
+                <div class="login-logo-icon">ACIK</div>
+                <h1>ACIK ONE</h1>
+                <p id="loginSubtitle">Management Platform</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label" id="roleLabel">Select Role</label>
+                <select class="form-select" id="roleSelect">
+                    <option value="vp">Olzhas Shintayev - Vice President</option>
+                    <option value="president">Marco Rossi - President</option>
+                    <option value="ceo">Alessandro Bianchi - CEO</option>
+                    <option value="cfo">Laura Conti - CFO</option>
+                    <option value="pm">Dmitry Petrov - Project Manager</option>
+                    <option value="marketing">Sofia Romano - Marketing Director</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="login()" id="loginBtn">Enter System</button>
+        </div>
+    </div>
+
+    <!-- App -->
+    <div class="app" id="app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-logo">ACIK</div>
+                    <div>
+                        <div class="brand-name">ACIK ONE</div>
+                        <div class="brand-tagline" id="brandTagline">Management Platform</div>
+                    </div>
+                </div>
+            </div>
+            <div class="user-profile">
+                <div class="avatar" id="userAvatar">OS</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Olzhas Shintayev</div>
+                    <div class="user-role" id="userRoleDisplay">Vice President</div>
+                </div>
+            </div>
+            <nav class="nav" id="navigation"></nav>
+            <div class="sidebar-footer">
+                <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" style="width:100%;justify-content:flex-start;gap:10px;background:var(--surface-2);margin-bottom:12px;">
+                    <span>🌙</span> <span id="themeLabel">Dark Mode</span>
+                </button>
+                <button class="logout-btn" onclick="logout()">
+                    <span>🚪</span> <span id="logoutLabel">Logout</span>
+                </button>
+            </div>
+        </aside>
+        <main class="main">
+            <header class="topbar">
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <div class="topbar-actions">
+                    <div class="icon-btn" style="position:relative" onclick="showNotifications()">
+                        🔔<span class="notification-badge">5</span>
+                    </div>
+                </div>
+            </header>
+            <div class="content" id="content"></div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===============================
+        // STATE
+        // ===============================
+        let currentLang = 'en';
+        let currentRole = 'vp';
+        let currentView = 'dashboard';
+        let isDark = false;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+
+        // Attendance State
+        let isCheckedIn = false;
+        let currentLocation = null;
+        let todayLog = [];
+        let checkInTime = null;
+
+        // Generate realistic attendance history
+        const attendanceHistory = generateAttendanceHistory();
+
+        function generateAttendanceHistory() {
+            const history = {};
+            const today = new Date();
+            for (let i = 30; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateKey = date.toISOString().split('T')[0];
+                const dayOfWeek = date.getDay();
+
+                if (dayOfWeek === 0 || dayOfWeek === 6) continue; // Skip weekends
+
+                const isToday = i === 0;
+                if (isToday) continue;
+
+                const rand = Math.random();
+                if (rand < 0.85) { // 85% present
+                    const checkInHour = 8 + Math.floor(Math.random() * 2);
+                    const checkInMin = Math.floor(Math.random() * 60);
+                    const checkOutHour = 17 + Math.floor(Math.random() * 3);
+                    const checkOutMin = Math.floor(Math.random() * 60);
+                    const isLate = checkInHour > 9 || (checkInHour === 9 && checkInMin > 0);
+
+                    history[dateKey] = {
+                        status: isLate ? 'late' : 'present',
+                        checkIn: `${checkInHour.toString().padStart(2,'0')}:${checkInMin.toString().padStart(2,'0')}`,
+                        checkOut: `${checkOutHour.toString().padStart(2,'0')}:${checkOutMin.toString().padStart(2,'0')}`,
+                        hours: checkOutHour - checkInHour + (checkOutMin - checkInMin) / 60,
+                        location: { lat: 45.4642 + (Math.random() - 0.5) * 0.01, lng: 9.1900 + (Math.random() - 0.5) * 0.01, address: 'Via Monte Napoleone 8, Milan' }
+                    };
+                } else if (rand < 0.95) { // 10% absent
+                    history[dateKey] = { status: 'absent' };
+                }
+            }
+            return history;
+        }
+
+        // Team attendance data
+        const teamAttendance = [
+            { id: 'vp', name: 'Olzhas Shintayev', role: 'Vice President', status: 'present', checkIn: '08:45', checkOut: null, hours: 0 },
+            { id: 'president', name: 'Marco Rossi', role: 'President', status: 'present', checkIn: '09:15', checkOut: null, hours: 0, late: true },
+            { id: 'ceo', name: 'Alessandro Bianchi', role: 'CEO', status: 'present', checkIn: '08:30', checkOut: null, hours: 0 },
+            { id: 'cfo', name: 'Laura Conti', role: 'CFO', status: 'absent', checkIn: null, checkOut: null, hours: 0 },
+            { id: 'pm', name: 'Dmitry Petrov', role: 'Project Manager', status: 'present', checkIn: '08:55', checkOut: '17:30', hours: 8.5 },
+            { id: 'marketing', name: 'Sofia Romano', role: 'Marketing Director', status: 'remote', checkIn: '09:00', checkOut: null, hours: 0 }
+        ];
+
+        // ===============================
+        // TRANSLATIONS
+        // ===============================
+        const T = {
+            en: {
+                subtitle: 'Management Platform', role: 'Select Role', login: 'Enter System', logout: 'Logout', darkMode: 'Dark Mode', lightMode: 'Light Mode',
+                main: 'Main', management: 'Management', finances: 'Finances', communications: 'Communications',
+                dashboard: 'Dashboard', analytics: 'Analytics', projects: 'Projects', tasks: 'Tasks', members: 'Members', events: 'Events', finance: 'Finance', sponsors: 'Sponsors', marketing: 'Marketing', reports: 'Reports', attendance: 'Attendance',
+                activeProjects: 'Active Projects', totalMembers: 'Total Members', upcomingEvents: 'Upcoming Events', kpiAchievement: 'KPI Achievement', totalBudget: 'Total Budget', income: 'Income', expenses: 'Expenses', netProfit: 'Net Profit',
+                todo: 'To Do', inProgress: 'In Progress', review: 'Review', done: 'Done',
+                high: 'High', medium: 'Medium', low: 'Low',
+                progress: 'Progress', deadline: 'Deadline', team: 'Team', tasksCount: 'Tasks', budget: 'Budget', spent: 'Spent', location: 'Location', date: 'Date', status: 'Status',
+                corporate: 'Corporate', individual: 'Individual', since: 'Since', allMembers: 'All Members',
+                planning: 'Planning', completed: 'Completed',
+                cashflow: 'Cash Flow', recentTransactions: 'Recent Transactions',
+                sponsorPackages: 'Sponsor Packages', totalSponsorship: 'Total Sponsorship',
+                socialStats: 'Social Media Stats', followers: 'Followers', engagement: 'Engagement',
+                kpiOverview: 'KPI Overview', target: 'Target', current: 'Current',
+                viewDetails: 'View Details',
+                // Attendance translations
+                checkIn: 'Check In', checkOut: 'Check Out',
+                todayAttendance: "Today's Attendance", workingHours: 'Working Hours',
+                checkedIn: 'Checked In', checkedOut: 'Checked Out', notCheckedIn: 'Not checked in',
+                currentStatus: 'Current Status', geoLocation: 'Geolocation',
+                monthlyReport: 'Monthly Report', teamOverview: 'Team Overview',
+                totalDays: 'Work Days', presentDays: 'Present', lateDays: 'Late', absentDays: 'Absent', avgHours: 'Avg Hours',
+                myAttendance: 'My Attendance', teamAttendance: 'Team Attendance', reports: 'Reports',
+                present: 'Present', late: 'Late', absent: 'Absent', remote: 'Remote',
+                employee: 'Employee', checkInTime: 'Check In', checkOutTime: 'Check Out', hoursWorked: 'Hours',
+                locationVerified: 'Location Verified', officeLocation: 'Office Location',
+                attendanceReport: 'Attendance Report', exportReport: 'Export Report',
+                overtimeHours: 'Overtime', regularHours: 'Regular Hours'
+            },
+            ru: {
+                subtitle: 'Платформа управления', role: 'Выберите роль', login: 'Войти в систему', logout: 'Выйти', darkMode: 'Тёмная тема', lightMode: 'Светлая тема',
+                main: 'Главное', management: 'Управление', finances: 'Финансы', communications: 'Коммуникации',
+                dashboard: 'Главная', analytics: 'Аналитика', projects: 'Проекты', tasks: 'Задачи', members: 'Участники', events: 'Мероприятия', finance: 'Финансы', sponsors: 'Спонсоры', marketing: 'Маркетинг', reports: 'Отчёты', attendance: 'Посещаемость',
+                activeProjects: 'Активные проекты', totalMembers: 'Всего участников', upcomingEvents: 'Предстоящие события', kpiAchievement: 'Достижение KPI', totalBudget: 'Общий бюджет', income: 'Доходы', expenses: 'Расходы', netProfit: 'Чистая прибыль',
+                todo: 'К выполнению', inProgress: 'В работе', review: 'На проверке', done: 'Завершено',
+                high: 'Высокий', medium: 'Средний', low: 'Низкий',
+                progress: 'Прогресс', deadline: 'Дедлайн', team: 'Команда', tasksCount: 'Задач', budget: 'Бюджет', spent: 'Потрачено', location: 'Место', date: 'Дата', status: 'Статус',
+                corporate: 'Корпоративный', individual: 'Индивидуальный', since: 'С', allMembers: 'Все участники',
+                planning: 'Планируется', completed: 'Завершено',
+                cashflow: 'Денежный поток', recentTransactions: 'Последние операции',
+                sponsorPackages: 'Спонсорские пакеты', totalSponsorship: 'Всего спонсорства',
+                socialStats: 'Социальные сети', followers: 'Подписчики', engagement: 'Вовлечённость',
+                kpiOverview: 'Обзор KPI', target: 'Цель', current: 'Текущее',
+                viewDetails: 'Подробнее',
+                // Attendance translations
+                checkIn: 'Приход', checkOut: 'Уход',
+                todayAttendance: 'Посещаемость сегодня', workingHours: 'Рабочие часы',
+                checkedIn: 'На работе', checkedOut: 'Ушёл', notCheckedIn: 'Не отмечен',
+                currentStatus: 'Текущий статус', geoLocation: 'Геолокация',
+                monthlyReport: 'Месячный отчёт', teamOverview: 'Обзор команды',
+                totalDays: 'Рабочих дней', presentDays: 'Присутствие', lateDays: 'Опоздания', absentDays: 'Отсутствие', avgHours: 'Сред. часов',
+                myAttendance: 'Моя посещаемость', teamAttendance: 'Команда', reports: 'Отчёты',
+                present: 'На месте', late: 'Опоздал', absent: 'Отсутствует', remote: 'Удалённо',
+                employee: 'Сотрудник', checkInTime: 'Приход', checkOutTime: 'Уход', hoursWorked: 'Часов',
+                locationVerified: 'Локация подтверждена', officeLocation: 'Офис',
+                attendanceReport: 'Отчёт по посещаемости', exportReport: 'Экспорт отчёта',
+                overtimeHours: 'Переработка', regularHours: 'Обычные часы'
+            },
+            it: {
+                subtitle: 'Piattaforma di Gestione', role: 'Seleziona Ruolo', login: 'Accedi al Sistema', logout: 'Esci', darkMode: 'Tema Scuro', lightMode: 'Tema Chiaro',
+                main: 'Principale', management: 'Gestione', finances: 'Finanze', communications: 'Comunicazioni',
+                dashboard: 'Dashboard', analytics: 'Analisi', projects: 'Progetti', tasks: 'Attività', members: 'Membri', events: 'Eventi', finance: 'Finanze', sponsors: 'Sponsor', marketing: 'Marketing', reports: 'Rapporti', attendance: 'Presenze',
+                activeProjects: 'Progetti Attivi', totalMembers: 'Membri Totali', upcomingEvents: 'Eventi in Arrivo', kpiAchievement: 'Obiettivo KPI', totalBudget: 'Budget Totale', income: 'Entrate', expenses: 'Uscite', netProfit: 'Profitto Netto',
+                todo: 'Da Fare', inProgress: 'In Corso', review: 'In Revisione', done: 'Completato',
+                high: 'Alta', medium: 'Media', low: 'Bassa',
+                progress: 'Progresso', deadline: 'Scadenza', team: 'Team', tasksCount: 'Attività', budget: 'Budget', spent: 'Speso', location: 'Luogo', date: 'Data', status: 'Stato',
+                corporate: 'Aziendale', individual: 'Individuale', since: 'Dal', allMembers: 'Tutti i Membri',
+                planning: 'In Pianificazione', completed: 'Completato',
+                cashflow: 'Flusso di Cassa', recentTransactions: 'Transazioni Recenti',
+                sponsorPackages: 'Pacchetti Sponsor', totalSponsorship: 'Sponsorizzazione Totale',
+                socialStats: 'Statistiche Social', followers: 'Follower', engagement: 'Coinvolgimento',
+                kpiOverview: 'Panoramica KPI', target: 'Obiettivo', current: 'Attuale',
+                viewDetails: 'Vedi Dettagli',
+                // Attendance translations
+                checkIn: 'Entrata', checkOut: 'Uscita',
+                todayAttendance: 'Presenze Oggi', workingHours: 'Ore Lavorate',
+                checkedIn: 'Presente', checkedOut: 'Uscito', notCheckedIn: 'Non registrato',
+                currentStatus: 'Stato Attuale', geoLocation: 'Geolocalizzazione',
+                monthlyReport: 'Rapporto Mensile', teamOverview: 'Panoramica Team',
+                totalDays: 'Giorni Lavorativi', presentDays: 'Presenze', lateDays: 'Ritardi', absentDays: 'Assenze', avgHours: 'Media Ore',
+                myAttendance: 'Le Mie Presenze', teamAttendance: 'Team', reports: 'Rapporti',
+                present: 'Presente', late: 'In Ritardo', absent: 'Assente', remote: 'Remoto',
+                employee: 'Dipendente', checkInTime: 'Entrata', checkOutTime: 'Uscita', hoursWorked: 'Ore',
+                locationVerified: 'Posizione Verificata', officeLocation: 'Ufficio',
+                attendanceReport: 'Rapporto Presenze', exportReport: 'Esporta Rapporto',
+                overtimeHours: 'Straordinari', regularHours: 'Ore Regolari'
+            }
+        };
+
+        const roles = {
+            vp: { name: 'Olzhas Shintayev', initials: 'OS', title: 'Vice President', access: ['dashboard', 'analytics', 'projects', 'tasks', 'members', 'events', 'finance', 'sponsors', 'marketing', 'reports', 'attendance'] },
+            president: { name: 'Marco Rossi', initials: 'MR', title: 'President', access: ['dashboard', 'analytics', 'reports', 'members', 'attendance'] },
+            ceo: { name: 'Alessandro Bianchi', initials: 'AB', title: 'CEO', access: ['dashboard', 'analytics', 'projects', 'finance', 'reports', 'attendance'] },
+            cfo: { name: 'Laura Conti', initials: 'LC', title: 'CFO', access: ['dashboard', 'finance', 'sponsors', 'reports', 'analytics', 'attendance'] },
+            pm: { name: 'Dmitry Petrov', initials: 'DP', title: 'Project Manager', access: ['dashboard', 'projects', 'tasks', 'members', 'events', 'attendance'] },
+            marketing: { name: 'Sofia Romano', initials: 'SR', title: 'Marketing Director', access: ['dashboard', 'marketing', 'events', 'reports', 'attendance'] }
+        };
+
+        // Project Data (abbreviated for space)
+        const projectsData = [
+            { id: 1, title: '10th Anniversary Gala', location: 'Milan', deadline: 'Feb 5-7, 2026', progress: 65, status: 'in-progress', team: ['OS', 'MR', 'AB', 'LC'], tasksTotal: 48, tasksCompleted: 31, budget: 85000, spent: 52000, description: 'Grand celebration of ACIK\'s 10th anniversary.' },
+            { id: 2, title: 'B2B Forum 2026', location: 'Almaty', deadline: 'Mar 2026', progress: 35, status: 'planning', team: ['DP', 'AB'], tasksTotal: 32, tasksCompleted: 11, budget: 45000, spent: 8500, description: 'Business forum connecting Italian and Kazakh companies.' },
+            { id: 3, title: 'ACIK Talks Podcast', location: 'Online', deadline: 'Ongoing', progress: 100, status: 'active', team: ['SR'], tasksTotal: 12, tasksCompleted: 12, budget: 8000, spent: 6200, description: 'Monthly podcast series.' }
+        ];
+
+        const tasksData = [
+            { id: 1, title: 'Finalize gala venue contract', project: '10th Anniversary Gala', priority: 'high', status: 'done', assignee: 'OS', dueDate: 'Jan 10, 2026' },
+            { id: 2, title: 'Confirm catering menu', project: '10th Anniversary Gala', priority: 'high', status: 'review', assignee: 'LC', dueDate: 'Jan 15, 2026' },
+            { id: 3, title: 'Design event invitations', project: '10th Anniversary Gala', priority: 'medium', status: 'in-progress', assignee: 'SR', dueDate: 'Jan 20, 2026' },
+            { id: 4, title: 'Book keynote speakers', project: '10th Anniversary Gala', priority: 'high', status: 'in-progress', assignee: 'MR', dueDate: 'Jan 25, 2026' },
+            { id: 5, title: 'Prepare press release', project: '10th Anniversary Gala', priority: 'medium', status: 'todo', assignee: 'SR', dueDate: 'Jan 30, 2026' }
+        ];
+
+        const membersData = {
+            corporate: [
+                { id: 1, name: 'ENI S.p.A.', initials: 'EN', industry: 'Energy', since: 2020, contact: 'Giovanni Rossi', email: 'g.rossi@eni.com', contribution: '€25,000/year' },
+                { id: 2, name: 'UniCredit', initials: 'UC', industry: 'Banking', since: 2021, contact: 'Maria Bianchi', email: 'm.bianchi@unicredit.it', contribution: '€25,000/year' }
+            ],
+            individual: 147
+        };
+
+        const financeData = {
+            budget: 320000,
+            income: { total: 235000, breakdown: { membershipFees: 95000, eventRevenue: 65000, sponsorshipIncome: 60000, otherIncome: 15000 } },
+            expenses: { total: 185000, breakdown: { operationalCosts: 45000, eventCosts: 85000, marketingCosts: 35000, adminCosts: 20000 } },
+            monthly: [
+                { month: 'Jan', income: 42000, expense: 28000 },
+                { month: 'Feb', income: 38000, expense: 32000 },
+                { month: 'Mar', income: 45000, expense: 35000 },
+                { month: 'Apr', income: 35000, expense: 30000 },
+                { month: 'May', income: 40000, expense: 32000 },
+                { month: 'Jun', income: 35000, expense: 28000 }
+            ]
+        };
+
+        const sponsorsData = [
+            { id: 1, name: 'ENI S.p.A.', tier: 'gold', amount: 25000, industry: 'Energy', since: 2020 },
+            { id: 2, name: 'UniCredit', tier: 'gold', amount: 25000, industry: 'Banking', since: 2021 },
+            { id: 3, name: 'Saipem', tier: 'silver', amount: 15000, industry: 'Engineering', since: 2019 }
+        ];
+
+        // ===============================
+        // CORE FUNCTIONS
+        // ===============================
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('loginSubtitle').textContent = T[lang].subtitle;
+            document.getElementById('roleLabel').textContent = T[lang].role;
+            document.getElementById('loginBtn').textContent = T[lang].login;
+        }
+
+        function login() {
+            currentRole = document.getElementById('roleSelect').value;
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('app').classList.add('active');
+            updateUI();
+            showView('dashboard');
+        }
+
+        function logout() {
+            document.getElementById('app').classList.remove('active');
+            document.getElementById('loginPage').style.display = 'flex';
+            isCheckedIn = false;
+            todayLog = [];
+        }
+
+        function toggleTheme() {
+            isDark = !isDark;
+            document.body.setAttribute('data-theme', isDark ? 'dark' : '');
+            const t = T[currentLang];
+            document.getElementById('themeToggle').innerHTML = `<span>${isDark ? '☀️' : '🌙'}</span> <span id="themeLabel">${isDark ? t.lightMode : t.darkMode}</span>`;
+        }
+
+        function updateUI() {
+            const t = T[currentLang];
+            const role = roles[currentRole];
+            document.getElementById('brandTagline').textContent = t.subtitle;
+            document.getElementById('userName').textContent = role.name;
+            document.getElementById('userRoleDisplay').textContent = role.title;
+            document.getElementById('userAvatar').textContent = role.initials;
+            document.getElementById('logoutLabel').textContent = t.logout;
+            renderNavigation();
+        }
+
+        function renderNavigation() {
+            const t = T[currentLang];
+            const role = roles[currentRole];
+            const navSections = [
+                { title: t.main, items: ['dashboard', 'analytics', 'attendance'] },
+                { title: t.management, items: ['projects', 'tasks', 'members', 'events'] },
+                { title: t.finances, items: ['finance', 'sponsors'] },
+                { title: t.communications, items: ['marketing', 'reports'] }
+            ];
+            const icons = { dashboard: '📊', analytics: '📈', projects: '🎯', tasks: '✅', members: '👥', events: '📅', finance: '💰', sponsors: '🤝', marketing: '📢', reports: '📋', attendance: '🕐' };
+
+            let html = '';
+            navSections.forEach(section => {
+                const visibleItems = section.items.filter(item => role.access.includes(item));
+                if (visibleItems.length === 0) return;
+                html += `<div class="nav-section"><div class="nav-title">${section.title}</div>`;
+                visibleItems.forEach(item => {
+                    html += `<div class="nav-item ${currentView === item ? 'active' : ''}" onclick="showView('${item}')">
+                        <span class="nav-icon">${icons[item]}</span>
+                        <span>${t[item]}</span>
+                    </div>`;
+                });
+                html += '</div>';
+            });
+            document.getElementById('navigation').innerHTML = html;
+        }
+
+        function showView(viewName) {
+            if (!roles[currentRole].access.includes(viewName)) return;
+            currentView = viewName;
+            renderNavigation();
+            const t = T[currentLang];
+            document.getElementById('pageTitle').textContent = t[viewName];
+            const content = document.getElementById('content');
+
+            switch(viewName) {
+                case 'dashboard': content.innerHTML = renderDashboard(); break;
+                case 'projects': content.innerHTML = renderProjects(); break;
+                case 'tasks': content.innerHTML = renderTasks(); break;
+                case 'members': content.innerHTML = renderMembers(); break;
+                case 'events': content.innerHTML = renderEvents(); break;
+                case 'finance': content.innerHTML = renderFinance(); break;
+                case 'sponsors': content.innerHTML = renderSponsors(); break;
+                case 'marketing': content.innerHTML = renderMarketing(); break;
+                case 'analytics': content.innerHTML = renderAnalytics(); break;
+                case 'reports': content.innerHTML = renderReports(); break;
+                case 'attendance': content.innerHTML = renderAttendance(); break;
+            }
+            initDragAndDrop();
+        }
+
+        // ===============================
+        // ATTENDANCE SYSTEM
+        // ===============================
+        function renderAttendance() {
+            const t = T[currentLang];
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            const dateStr = now.toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : currentLang === 'it' ? 'it-IT' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            // Calculate stats from history
+            const stats = calculateAttendanceStats();
+
+            return `
+                <div class="tabs">
+                    <button class="tab active" onclick="switchAttendanceTab('my')">${t.myAttendance}</button>
+                    <button class="tab" onclick="switchAttendanceTab('team')">${t.teamAttendance}</button>
+                    <button class="tab" onclick="switchAttendanceTab('reports')">${t.reports}</button>
+                </div>
+
+                <div id="attendanceContent">
+                    ${renderMyAttendance(t, timeStr, dateStr, stats)}
+                </div>
+            `;
+        }
+
+        function renderMyAttendance(t, timeStr, dateStr, stats) {
+            const locationStr = currentLocation ?
+                `${currentLocation.address}<br><span class="location-coords">${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}</span>` :
+                `<span style="color:var(--text-secondary)">${t.geoLocation}: ${t.notCheckedIn}</span>`;
+
+            return `
+                <div class="attendance-header">
+                    <div class="attendance-clock-card">
+                        <div class="attendance-clock" id="liveClock">${timeStr}</div>
+                        <div class="attendance-date">${dateStr}</div>
+                        <div class="attendance-actions">
+                            <button class="attendance-btn checkin" onclick="handleCheckIn()" ${isCheckedIn ? 'disabled' : ''}>
+                                📍 ${t.checkIn}
+                            </button>
+                            <button class="attendance-btn checkout" onclick="handleCheckOut()" ${!isCheckedIn ? 'disabled' : ''}>
+                                🚪 ${t.checkOut}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="attendance-status-card">
+                        <div class="status-header">${t.currentStatus}</div>
+                        <div class="status-current">
+                            <div class="status-indicator ${isCheckedIn ? 'active' : 'inactive'}"></div>
+                            <div class="status-text">
+                                <div class="status-label">${isCheckedIn ? t.checkedIn : t.notCheckedIn}</div>
+                                <div class="status-value">${isCheckedIn && checkInTime ? `${t.since} ${checkInTime}` : '--:--'}</div>
+                            </div>
+                        </div>
+                        <div class="location-info">
+                            <div class="location-header">📍 ${t.geoLocation}</div>
+                            <div class="location-address" id="locationDisplay">${locationStr}</div>
+                            <div class="location-map" id="locationMap">
+                                ${currentLocation ? `<iframe width="100%" height="100%" frameborder="0" style="border:0;border-radius:8px" src="https://maps.google.com/maps?q=${currentLocation.lat},${currentLocation.lng}&z=15&output=embed"></iframe>` : '🗺️ Map will appear after check-in'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="attendance-stats">
+                    <div class="att-stat highlight">
+                        <div class="att-stat-value">${stats.totalDays}</div>
+                        <div class="att-stat-label">${t.totalDays}</div>
+                    </div>
+                    <div class="att-stat" style="background:#d1fae5">
+                        <div class="att-stat-value">${stats.presentDays}</div>
+                        <div class="att-stat-label">${t.presentDays}</div>
+                    </div>
+                    <div class="att-stat warning">
+                        <div class="att-stat-value">${stats.lateDays}</div>
+                        <div class="att-stat-label">${t.lateDays}</div>
+                    </div>
+                    <div class="att-stat danger">
+                        <div class="att-stat-value">${stats.absentDays}</div>
+                        <div class="att-stat-label">${t.absentDays}</div>
+                    </div>
+                    <div class="att-stat">
+                        <div class="att-stat-value">${stats.avgHours.toFixed(1)}h</div>
+                        <div class="att-stat-label">${t.avgHours}</div>
+                    </div>
+                </div>
+
+                ${todayLog.length > 0 ? `
+                <div class="today-log">
+                    <div class="card-header" style="border:none;padding:0;margin-bottom:16px">
+                        <h3 class="card-title">${t.todayAttendance}</h3>
+                    </div>
+                    <div class="log-timeline">
+                        ${todayLog.map(entry => `
+                            <div class="log-entry ${entry.type}">
+                                <div class="log-entry-header">
+                                    <span class="log-entry-type">${entry.type === 'checkin' ? '🟢 ' + t.checkIn : '🔴 ' + t.checkOut}</span>
+                                    <span class="log-entry-time">${entry.time}</span>
+                                </div>
+                                <div class="log-entry-details">
+                                    <div class="log-detail-item">📍 ${entry.location.address}</div>
+                                    <div class="log-detail-item">🌐 ${entry.location.lat.toFixed(4)}, ${entry.location.lng.toFixed(4)}</div>
+                                    ${entry.type === 'checkout' && entry.duration ? `<div class="log-detail-item">⏱️ ${entry.duration}</div>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                ${renderAttendanceCalendar(t)}
+            `;
+        }
+
+        function renderAttendanceCalendar(t) {
+            const months = currentLang === 'ru' ?
+                ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'] :
+                currentLang === 'it' ?
+                ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'] :
+                ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+            const days = currentLang === 'ru' ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] :
+                         currentLang === 'it' ? ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'] :
+                         ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const startDay = (firstDay.getDay() + 6) % 7; // Monday = 0
+            const daysInMonth = lastDay.getDate();
+            const today = new Date();
+
+            let calendarDays = '';
+
+            // Previous month days
+            const prevMonthLast = new Date(currentYear, currentMonth, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                calendarDays += `<div class="calendar-day other-month">${prevMonthLast - i}</div>`;
+            }
+
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                const dateKey = date.toISOString().split('T')[0];
+                const isToday = date.toDateString() === today.toDateString();
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const attendance = attendanceHistory[dateKey];
+
+                let dayClass = '';
+                let hoursText = '';
+
+                if (isToday) {
+                    dayClass = 'today';
+                } else if (isWeekend) {
+                    dayClass = 'weekend';
+                } else if (attendance) {
+                    dayClass = attendance.status;
+                    if (attendance.hours) hoursText = `${attendance.hours.toFixed(1)}h`;
+                }
+
+                calendarDays += `
+                    <div class="calendar-day ${dayClass}" onclick="showDayDetail('${dateKey}')">
+                        <div class="calendar-day-num">${day}</div>
+                        ${hoursText ? `<div class="calendar-day-hours">${hoursText}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Next month days
+            const totalCells = startDay + daysInMonth;
+            const remaining = 42 - totalCells;
+            for (let i = 1; i <= remaining && totalCells + i <= 42; i++) {
+                calendarDays += `<div class="calendar-day other-month">${i}</div>`;
+            }
+
+            return `
+                <div class="attendance-calendar">
+                    <div class="calendar-header">
+                        <h3 class="card-title">${t.monthlyReport}</h3>
+                        <div class="calendar-nav">
+                            <button class="calendar-nav-btn" onclick="changeMonth(-1)">◀</button>
+                            <span class="calendar-month">${months[currentMonth]} ${currentYear}</span>
+                            <button class="calendar-nav-btn" onclick="changeMonth(1)">▶</button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid">
+                        ${days.map(d => `<div class="calendar-day-header">${d}</div>`).join('')}
+                        ${calendarDays}
+                    </div>
+                    <div class="calendar-legend">
+                        <div class="legend-item"><div class="legend-dot present"></div>${t.present}</div>
+                        <div class="legend-item"><div class="legend-dot late"></div>${t.late}</div>
+                        <div class="legend-item"><div class="legend-dot absent"></div>${t.absent}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTeamAttendance(t) {
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">${t.teamOverview} - ${new Date().toLocaleDateString()}</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="exportTeamReport()">${t.exportReport}</button>
+                    </div>
+                    <div class="team-attendance">
+                        ${teamAttendance.map(member => `
+                            <div class="team-member-row">
+                                <div class="team-member-info">
+                                    <div class="avatar" style="width:40px;height:40px;font-size:14px">${member.name.split(' ').map(n=>n[0]).join('')}</div>
+                                    <div>
+                                        <div class="team-member-name">${member.name}</div>
+                                        <div class="team-member-role">${member.role}</div>
+                                    </div>
+                                </div>
+                                <div class="team-member-status">
+                                    <span class="badge ${member.status === 'present' ? (member.late ? 'warning' : 'success') : member.status === 'remote' ? 'info' : 'danger'}">
+                                        ${t[member.status]}${member.late ? ' ⚠️' : ''}
+                                    </span>
+                                </div>
+                                <div class="team-member-times">
+                                    <div class="time-block">
+                                        <div class="time-label">${t.checkInTime}</div>
+                                        <div class="time-value">${member.checkIn || '--:--'}</div>
+                                    </div>
+                                    <div class="time-block">
+                                        <div class="time-label">${t.checkOutTime}</div>
+                                        <div class="time-value">${member.checkOut || '--:--'}</div>
+                                    </div>
+                                </div>
+                                <div class="team-member-hours">
+                                    <div class="hours-value">${member.hours > 0 ? member.hours.toFixed(1) : '--'}</div>
+                                    <div class="hours-label">${t.hoursWorked}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header"><div><div class="stat-label">${t.present}</div><div class="stat-value">${teamAttendance.filter(m => m.status === 'present').length}</div></div><div class="stat-icon green">✅</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header"><div><div class="stat-label">${t.remote}</div><div class="stat-value">${teamAttendance.filter(m => m.status === 'remote').length}</div></div><div class="stat-icon blue">🏠</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header"><div><div class="stat-label">${t.late}</div><div class="stat-value">${teamAttendance.filter(m => m.late).length}</div></div><div class="stat-icon yellow">⏰</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header"><div><div class="stat-label">${t.absent}</div><div class="stat-value">${teamAttendance.filter(m => m.status === 'absent').length}</div></div><div class="stat-icon red">❌</div></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAttendanceReports(t) {
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">${t.attendanceReport}</h3>
+                        <div style="display:flex;gap:12px">
+                            <select class="form-select" style="width:auto">
+                                <option>January 2026</option>
+                                <option>December 2025</option>
+                                <option>November 2025</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" onclick="exportReport('pdf')">📄 PDF</button>
+                            <button class="btn btn-secondary btn-sm" onclick="exportReport('excel')">📊 Excel</button>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>${t.employee}</th>
+                                <th>${t.totalDays}</th>
+                                <th>${t.presentDays}</th>
+                                <th>${t.lateDays}</th>
+                                <th>${t.absentDays}</th>
+                                <th>${t.regularHours}</th>
+                                <th>${t.overtimeHours}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(roles).map(([key, role]) => {
+                                const present = Math.floor(Math.random() * 5) + 17;
+                                const late = Math.floor(Math.random() * 3);
+                                const absent = 22 - present;
+                                const regular = present * 8;
+                                const overtime = Math.floor(Math.random() * 20);
+                                return `
+                                    <tr>
+                                        <td><strong>${role.name}</strong><br><small style="color:var(--text-secondary)">${role.title}</small></td>
+                                        <td>22</td>
+                                        <td><span class="badge success">${present}</span></td>
+                                        <td><span class="badge ${late > 0 ? 'warning' : 'success'}">${late}</span></td>
+                                        <td><span class="badge ${absent > 0 ? 'danger' : 'success'}">${absent}</span></td>
+                                        <td>${regular}h</td>
+                                        <td style="color:${overtime > 10 ? '#10b981' : 'inherit'}">${overtime}h</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function switchAttendanceTab(tab) {
+            const t = T[currentLang];
+            document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const content = document.getElementById('attendanceContent');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            const dateStr = now.toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : currentLang === 'it' ? 'it-IT' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const stats = calculateAttendanceStats();
+
+            switch(tab) {
+                case 'my': content.innerHTML = renderMyAttendance(t, timeStr, dateStr, stats); break;
+                case 'team': content.innerHTML = renderTeamAttendance(t); break;
+                case 'reports': content.innerHTML = renderAttendanceReports(t); break;
+            }
+        }
+
+        function calculateAttendanceStats() {
+            let totalDays = 0, presentDays = 0, lateDays = 0, absentDays = 0, totalHours = 0;
+
+            Object.values(attendanceHistory).forEach(day => {
+                totalDays++;
+                if (day.status === 'present') { presentDays++; totalHours += day.hours || 8; }
+                else if (day.status === 'late') { lateDays++; presentDays++; totalHours += day.hours || 8; }
+                else if (day.status === 'absent') absentDays++;
+            });
+
+            return {
+                totalDays: totalDays || 22,
+                presentDays,
+                lateDays,
+                absentDays,
+                avgHours: presentDays > 0 ? totalHours / presentDays : 8
+            };
+        }
+
+        function handleCheckIn() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const now = new Date();
+                        checkInTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                        currentLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            address: 'Via Monte Napoleone 8, 20121 Milano MI, Italy',
+                            accuracy: position.coords.accuracy
+                        };
+
+                        todayLog.push({
+                            type: 'checkin',
+                            time: checkInTime,
+                            location: currentLocation,
+                            timestamp: now.getTime()
+                        });
+
+                        isCheckedIn = true;
+                        showView('attendance');
+                    },
+                    (error) => {
+                        // Fallback with mock location
+                        const now = new Date();
+                        checkInTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                        currentLocation = {
+                            lat: 45.4642,
+                            lng: 9.1900,
+                            address: 'Via Monte Napoleone 8, 20121 Milano MI, Italy',
+                            accuracy: 10
+                        };
+
+                        todayLog.push({
+                            type: 'checkin',
+                            time: checkInTime,
+                            location: currentLocation,
+                            timestamp: now.getTime()
+                        });
+
+                        isCheckedIn = true;
+                        showView('attendance');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                alert('Geolocation not supported');
+            }
+        }
+
+        function handleCheckOut() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        processCheckOut(position.coords.latitude, position.coords.longitude);
+                    },
+                    () => {
+                        processCheckOut(45.4642 + (Math.random() - 0.5) * 0.01, 9.1900 + (Math.random() - 0.5) * 0.01);
+                    }
+                );
+            }
+        }
+
+        function processCheckOut(lat, lng) {
+            const now = new Date();
+            const checkOutTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+            const lastCheckIn = todayLog.find(l => l.type === 'checkin');
+            let duration = '';
+            if (lastCheckIn) {
+                const diff = now.getTime() - lastCheckIn.timestamp;
+                const hours = Math.floor(diff / 3600000);
+                const mins = Math.floor((diff % 3600000) / 60000);
+                duration = `${hours}h ${mins}m`;
+            }
+
+            todayLog.push({
+                type: 'checkout',
+                time: checkOutTime,
+                location: { lat, lng, address: 'Via Monte Napoleone 8, 20121 Milano MI, Italy' },
+                duration,
+                timestamp: now.getTime()
+            });
+
+            isCheckedIn = false;
+            currentLocation = null;
+            showView('attendance');
+        }
+
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            showView('attendance');
+        }
+
+        function showDayDetail(dateKey) {
+            const t = T[currentLang];
+            const attendance = attendanceHistory[dateKey];
+            const date = new Date(dateKey);
+
+            document.getElementById('modalTitle').textContent = date.toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : currentLang === 'it' ? 'it-IT' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            if (attendance) {
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="detail-section">
+                        <div class="detail-section-title">${t.status}</div>
+                        <span class="badge ${attendance.status === 'present' ? 'success' : attendance.status === 'late' ? 'warning' : 'danger'}" style="font-size:16px;padding:8px 16px">
+                            ${t[attendance.status]}
+                        </span>
+                    </div>
+                    ${attendance.checkIn ? `
+                    <div class="detail-section">
+                        <div class="detail-section-title">${t.workingHours}</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><div class="detail-label">${t.checkIn}</div><div class="detail-value">${attendance.checkIn}</div></div>
+                            <div class="detail-item"><div class="detail-label">${t.checkOut}</div><div class="detail-value">${attendance.checkOut}</div></div>
+                            <div class="detail-item"><div class="detail-label">${t.hoursWorked}</div><div class="detail-value">${attendance.hours?.toFixed(1) || '8.0'}h</div></div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-section-title">${t.geoLocation}</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><div class="detail-label">${t.officeLocation}</div><div class="detail-value">${attendance.location?.address || 'N/A'}</div></div>
+                            <div class="detail-item"><div class="detail-label">Coordinates</div><div class="detail-value" style="font-family:monospace">${attendance.location?.lat.toFixed(6)}, ${attendance.location?.lng.toFixed(6)}</div></div>
+                        </div>
+                    </div>
+                    ` : `<p style="color:var(--text-secondary)">${t.absent}</p>`}
+                `;
+            } else {
+                document.getElementById('modalBody').innerHTML = `<p style="color:var(--text-secondary);text-align:center;padding:40px">No data for this day</p>`;
+            }
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function exportReport(format) {
+            alert(`Exporting ${format.toUpperCase()} report... (Demo)`);
+        }
+
+        function exportTeamReport() {
+            alert('Exporting team report... (Demo)');
+        }
+
+        // Update clock every second
+        setInterval(() => {
+            const clockEl = document.getElementById('liveClock');
+            if (clockEl) {
+                const now = new Date();
+                clockEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            }
+        }, 1000);
+
+        // ===============================
+        // OTHER VIEWS (abbreviated)
+        // ===============================
+        function renderDashboard() {
+            const t = T[currentLang];
+            return `
+                <div class="stats-grid">
+                    <div class="stat-card" onclick="showView('projects')"><div class="stat-header"><div><div class="stat-label">${t.activeProjects}</div><div class="stat-value">${projectsData.length}</div><span class="stat-change up">↑ 2</span></div><div class="stat-icon blue">🎯</div></div></div>
+                    <div class="stat-card" onclick="showView('members')"><div class="stat-header"><div><div class="stat-label">${t.totalMembers}</div><div class="stat-value">${membersData.corporate.length + membersData.individual}</div><span class="stat-change up">↑ +18</span></div><div class="stat-icon green">👥</div></div></div>
+                    <div class="stat-card" onclick="showView('events')"><div class="stat-header"><div><div class="stat-label">${t.upcomingEvents}</div><div class="stat-value">8</div></div><div class="stat-icon yellow">📅</div></div></div>
+                    <div class="stat-card" onclick="showView('analytics')"><div class="stat-header"><div><div class="stat-label">${t.kpiAchievement}</div><div class="stat-value">92%</div><span class="stat-change up">↑ +7%</span></div><div class="stat-icon purple">📊</div></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h2 class="card-title">${t.activeProjects}</h2></div>
+                    <div class="projects-grid">${projectsData.map(p => `
+                        <div class="project-card" onclick="showProjectDetail(${p.id})">
+                            <div class="project-title">${p.title}</div>
+                            <div class="project-meta"><span>📍 ${p.location}</span><span>📅 ${p.deadline}</span></div>
+                            <div class="project-progress"><div class="progress-label"><span>${t.progress}</span><span>${p.progress}%</span></div><div class="progress"><div class="progress-bar blue" style="width:${p.progress}%"></div></div></div>
+                        </div>
+                    `).join('')}</div>
+                </div>
+            `;
+        }
+
+        function renderProjects() { const t = T[currentLang]; return `<div class="projects-grid">${projectsData.map(p => `<div class="project-card" onclick="showProjectDetail(${p.id})"><div class="project-title">${p.title}</div><span class="badge ${p.status === 'active' ? 'success' : 'warning'}">${p.status}</span><div class="project-meta" style="margin:12px 0"><span>📍 ${p.location}</span><span>📅 ${p.deadline}</span></div><div class="progress-label"><span>${t.progress}</span><span>${p.progress}%</span></div><div class="progress"><div class="progress-bar blue" style="width:${p.progress}%"></div></div></div>`).join('')}</div>`; }
+
+        function renderTasks() {
+            const t = T[currentLang];
+            const columns = [{ key: 'todo', title: t.todo, class: 'todo' }, { key: 'in-progress', title: t.inProgress, class: 'in-progress' }, { key: 'review', title: t.review, class: 'review' }, { key: 'done', title: t.done, class: 'done' }];
+            return `<div class="kanban-board">${columns.map(col => {
+                const colTasks = tasksData.filter(task => task.status === col.key);
+                return `<div class="kanban-column"><div class="kanban-header ${col.class}"><span>${col.title}</span><span class="kanban-count">${colTasks.length}</span></div><div class="kanban-cards">${colTasks.map(task => `<div class="kanban-card" draggable="true"><div class="kanban-card-header"><span class="priority-badge ${task.priority}">${t[task.priority]}</span></div><div class="kanban-card-title">${task.title}</div><div class="kanban-card-project">${task.project}</div></div>`).join('')}</div></div>`;
+            }).join('')}</div>`;
+        }
+
+        function renderMembers() { const t = T[currentLang]; return `<div class="stats-grid"><div class="stat-card"><div class="stat-header"><div><div class="stat-label">Total</div><div class="stat-value">${membersData.corporate.length + membersData.individual}</div></div><div class="stat-icon blue">👥</div></div></div><div class="stat-card"><div class="stat-header"><div><div class="stat-label">${t.corporate}</div><div class="stat-value">${membersData.corporate.length}</div></div><div class="stat-icon green">🏢</div></div></div></div><div class="members-grid">${membersData.corporate.map(m => `<div class="member-card"><div class="member-avatar">${m.initials}</div><div class="member-name">${m.name}</div><div class="member-company">${m.industry}</div></div>`).join('')}</div>`; }
+
+        function renderEvents() { const t = T[currentLang]; return `<div class="card"><div class="card-header"><h2 class="card-title">${t.upcomingEvents}</h2></div><table class="table"><thead><tr><th>Event</th><th>${t.date}</th><th>${t.location}</th><th>${t.status}</th></tr></thead><tbody><tr><td><strong>10th Anniversary</strong></td><td>Feb 5-7, 2026</td><td>Milan</td><td><span class="badge warning">${t.planning}</span></td></tr><tr><td><strong>B2B Forum</strong></td><td>Mar 2026</td><td>Almaty</td><td><span class="badge warning">${t.planning}</span></td></tr></tbody></table></div>`; }
+
+        function renderFinance() { const t = T[currentLang]; const f = financeData; return `<div class="stats-grid"><div class="stat-card"><div class="stat-header"><div><div class="stat-label">${t.totalBudget}</div><div class="stat-value">€${(f.budget/1000).toFixed(0)}K</div></div><div class="stat-icon blue">💰</div></div></div><div class="stat-card"><div class="stat-header"><div><div class="stat-label">${t.income}</div><div class="stat-value">€${(f.income.total/1000).toFixed(0)}K</div><span class="stat-change up">↑ +12%</span></div><div class="stat-icon green">📈</div></div></div><div class="stat-card"><div class="stat-header"><div><div class="stat-label">${t.expenses}</div><div class="stat-value">€${(f.expenses.total/1000).toFixed(0)}K</div></div><div class="stat-icon red">📉</div></div></div><div class="stat-card"><div class="stat-header"><div><div class="stat-label">${t.netProfit}</div><div class="stat-value">€${((f.income.total-f.expenses.total)/1000).toFixed(0)}K</div></div><div class="stat-icon purple">✅</div></div></div></div><div class="card"><div class="card-header"><h2 class="card-title">${t.cashflow}</h2></div><div class="cashflow-chart"><div class="cashflow-months">${f.monthly.map(m => `<div class="cashflow-month"><div class="cashflow-bars"><div class="cf-bar income" style="height:${m.income/300}px"></div><div class="cf-bar expense" style="height:${m.expense/300}px"></div></div><div class="month-name">${m.month}</div></div>`).join('')}</div><div class="cashflow-legend"><div class="cf-legend-item"><span class="cf-dot income"></span>${t.income}</div><div class="cf-legend-item"><span class="cf-dot expense"></span>${t.expenses}</div></div></div></div>`; }
+
+        function renderSponsors() { const t = T[currentLang]; return `<div class="sponsors-grid">${sponsorsData.map(s => `<div class="sponsor-card ${s.tier}"><div class="sponsor-header"><div><div class="sponsor-name">${s.name}</div><div class="sponsor-industry">${s.industry}</div></div><span class="badge ${s.tier}">${s.tier.toUpperCase()}</span></div><div class="sponsor-amount">€${s.amount.toLocaleString()}/year</div></div>`).join('')}</div>`; }
+
+        function renderMarketing() { const t = T[currentLang]; return `<div class="stats-grid"><div class="stat-card"><div class="stat-header"><div><div class="stat-label">${t.followers}</div><div class="stat-value">12.5K</div><span class="stat-change up">↑ +1.2K</span></div><div class="stat-icon blue">👥</div></div></div><div class="stat-card"><div class="stat-header"><div><div class="stat-label">${t.engagement}</div><div class="stat-value">4.8%</div></div><div class="stat-icon green">💬</div></div></div></div><div class="card"><div class="card-header"><h2 class="card-title">${t.socialStats}</h2></div><div class="social-grid"><div class="social-card"><div class="social-icon linkedin">💼</div><div><div class="social-name">LinkedIn</div><div class="social-value">8,240</div></div></div><div class="social-card"><div class="social-icon instagram">📷</div><div><div class="social-name">Instagram</div><div class="social-value">3,180</div></div></div></div></div>`; }
+
+        function renderAnalytics() { const t = T[currentLang]; return `<div class="card"><div class="card-header"><h2 class="card-title">${t.kpiOverview}</h2></div><div class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-title">Membership Growth</span><span class="kpi-value">+18</span></div><div class="kpi-progress"><div class="progress"><div class="progress-bar green" style="width:90%"></div></div></div><div class="kpi-target">${t.target}: 20 | ${t.current}: 18 (90%)</div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-title">Event Attendance</span><span class="kpi-value">2,840</span></div><div class="kpi-progress"><div class="progress"><div class="progress-bar blue" style="width:95%"></div></div></div><div class="kpi-target">${t.target}: 3,000 | ${t.current}: 2,840 (95%)</div></div></div></div>`; }
+
+        function renderReports() { const t = T[currentLang]; return `<div class="card"><div class="card-header"><h2 class="card-title">Available Reports</h2></div><table class="table"><thead><tr><th>Report</th><th>Period</th><th>${t.status}</th><th>Action</th></tr></thead><tbody><tr><td><strong>Monthly Finance</strong></td><td>Jan 2026</td><td><span class="badge success">Ready</span></td><td><button class="btn btn-secondary btn-sm">Download</button></td></tr><tr><td><strong>Membership Stats</strong></td><td>Q4 2025</td><td><span class="badge success">Ready</span></td><td><button class="btn btn-secondary btn-sm">Download</button></td></tr></tbody></table></div>`; }
+
+        function showProjectDetail(id) {
+            const p = projectsData.find(pr => pr.id === id);
+            if (!p) return;
+            document.getElementById('modalTitle').textContent = p.title;
+            document.getElementById('modalBody').innerHTML = `<p style="color:var(--text-secondary);margin-bottom:16px">${p.description}</p><div class="detail-grid"><div class="detail-item"><div class="detail-label">Status</div><div class="detail-value">${p.status}</div></div><div class="detail-item"><div class="detail-label">Progress</div><div class="detail-value">${p.progress}%</div></div><div class="detail-item"><div class="detail-label">Budget</div><div class="detail-value">€${p.budget.toLocaleString()}</div></div><div class="detail-item"><div class="detail-label">Spent</div><div class="detail-value">€${p.spent.toLocaleString()}</div></div></div>`;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        function showNotifications() {
+            document.getElementById('modalTitle').textContent = 'Notifications';
+            document.getElementById('modalBody').innerHTML = `<div style="padding:12px 0;border-bottom:1px solid var(--border)"><div style="font-weight:600">New task assigned</div><div style="font-size:13px;color:var(--text-secondary)">You have been assigned to "Finalize venue contract"</div></div><div style="padding:12px 0"><div style="font-weight:600">Project update</div><div style="font-size:13px;color:var(--text-secondary)">10th Anniversary Gala progress: 65%</div></div>`;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function initDragAndDrop() {
+            const cards = document.querySelectorAll('.kanban-card');
+            const columns = document.querySelectorAll('.kanban-cards');
+            cards.forEach(card => {
+                card.addEventListener('dragstart', () => card.classList.add('dragging'));
+                card.addEventListener('dragend', () => card.classList.remove('dragging'));
+            });
+            columns.forEach(column => {
+                column.addEventListener('dragover', (e) => { e.preventDefault(); const dragging = document.querySelector('.dragging'); if (dragging) column.appendChild(dragging); });
+            });
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => setLanguage('en'));
+    </script>
+</body>
+</html>
