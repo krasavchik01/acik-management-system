@@ -1,41 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import './styles/variables.css';
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-:root {
-  --primary: #4F46E5;
-  --primary-dark: #4338CA;
-  --primary-light: #818CF8;
-  --secondary: #7C3AED;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --danger: #EF4444;
-  --info: #3B82F6;
-  --dark: #1F2937;
-  --light: #F9FAFB;
-  --border: #E5E7EB;
-  --text: #111827;
-  --text-light: #6B7280;
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f8fafc;
-  color: var(--text);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 /* Scrollbar Styles */
@@ -49,12 +31,12 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #94a3b8;
 }
 
 /* Utility Classes */
@@ -65,8 +47,8 @@ code {
 }
 
 .card {
-  background: white;
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
@@ -75,11 +57,11 @@ code {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -92,10 +74,12 @@ code {
 
 .btn-primary:hover {
   background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
 }
 
 .btn-secondary {
-  background: var(--secondary);
+  background: var(--text-secondary);
   color: white;
 }
 
@@ -113,6 +97,11 @@ code {
   background: transparent;
   border: 2px solid var(--primary);
   color: var(--primary);
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: white;
 }
 
 .badge {
@@ -173,7 +162,7 @@ code {
   color: var(--danger);
   background: #FEE2E2;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin: 10px 0;
 }
 
@@ -181,7 +170,7 @@ code {
   color: var(--success);
   background: #D1FAE5;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin: 10px 0;
 }
 
@@ -194,18 +183,22 @@ code {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--text-primary);
+  font-size: 14px;
 }
 
 .form-input,
 .form-select,
 .form-textarea {
   width: 100%;
-  padding: 10px 14px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 14px;
-  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  transition: var(--transition);
+  background: var(--surface);
+  color: var(--text-primary);
 }
 
 .form-input:focus,
@@ -213,7 +206,7 @@ code {
 .form-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-textarea {
@@ -259,6 +252,21 @@ code {
   }
 }
 
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .fade-in {
   animation: fadeIn 0.3s ease;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease;
 }
