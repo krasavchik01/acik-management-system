@@ -57,67 +57,72 @@ const Dashboard = () => {
   }
 
   return (
-    <Layout>
-      <div className="dashboard">
+    <Layout pageTitle="Dashboard">
+      <div>
         <div className="dashboard-header">
           <div>
             <h1>Welcome back, {user?.name}!</h1>
             <p className="dashboard-subtitle">Here's what's happening today</p>
           </div>
-          <div className="dashboard-header-actions">
-            <Link to="/projects" className="btn btn-primary">
-              New Project
-            </Link>
-          </div>
         </div>
 
         <div className="stats-grid">
           <div className="stat-card stat-primary">
-            <div className="stat-icon">📊</div>
-            <div className="stat-content">
-              <h3>{stats.projects.total}</h3>
-              <p>Total Projects</p>
-              <span className="stat-detail">{stats.projects.active} active</span>
+            <div className="stat-header">
+              <div className="stat-content">
+                <p>Total Projects</p>
+                <h3>{stats.projects.total}</h3>
+                <span className="stat-detail">{stats.projects.active} active</span>
+              </div>
+              <div className="stat-icon blue">📊</div>
             </div>
           </div>
 
           <div className="stat-card stat-success">
-            <div className="stat-icon">✅</div>
-            <div className="stat-content">
-              <h3>{stats.members.total}</h3>
-              <p>Total Members</p>
-              <span className="stat-detail">{stats.members.active} active</span>
+            <div className="stat-header">
+              <div className="stat-content">
+                <p>Total Members</p>
+                <h3>{stats.members.total}</h3>
+                <span className="stat-detail">{stats.members.active} active</span>
+              </div>
+              <div className="stat-icon green">✅</div>
             </div>
           </div>
 
           <div className="stat-card stat-warning">
-            <div className="stat-icon">📅</div>
-            <div className="stat-content">
-              <h3>{stats.events.upcoming}</h3>
-              <p>Upcoming Events</p>
-              <span className="stat-detail">{stats.events.total} total</span>
+            <div className="stat-header">
+              <div className="stat-content">
+                <p>Upcoming Events</p>
+                <h3>{stats.events.upcoming}</h3>
+                <span className="stat-detail">{stats.events.total} total</span>
+              </div>
+              <div className="stat-icon yellow">📅</div>
             </div>
           </div>
 
           <div className="stat-card stat-info">
-            <div className="stat-icon">💰</div>
-            <div className="stat-content">
-              <h3>${stats.finance.income.toLocaleString()}</h3>
-              <p>Monthly Income</p>
-              <span className="stat-detail">
-                ${stats.finance.expenses.toLocaleString()} expenses
-              </span>
+            <div className="stat-header">
+              <div className="stat-content">
+                <p>Monthly Income</p>
+                <h3>${stats.finance.income.toLocaleString()}</h3>
+                <span className="stat-detail">
+                  ${stats.finance.expenses.toLocaleString()} expenses
+                </span>
+              </div>
+              <div className="stat-icon yellow">💰</div>
             </div>
           </div>
 
           <div className="stat-card stat-secondary">
-            <div className="stat-icon">👥</div>
-            <div className="stat-content">
-              <h3>{stats.attendance.today.present}</h3>
-              <p>Present Today</p>
-              <span className="stat-detail">
-                {stats.attendance.today.late} late
-              </span>
+            <div className="stat-header">
+              <div className="stat-content">
+                <p>Present Today</p>
+                <h3>{stats.attendance.today.present}</h3>
+                <span className="stat-detail">
+                  {stats.attendance.today.late} late
+                </span>
+              </div>
+              <div className="stat-icon purple">👥</div>
             </div>
           </div>
         </div>
