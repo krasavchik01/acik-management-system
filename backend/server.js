@@ -29,10 +29,7 @@ const io = socketIo(server, {
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://app-acik.netlify.app'
-  ],
+  origin: true, // Allow all origins for now
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' })); // Body parser
