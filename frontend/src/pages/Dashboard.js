@@ -12,8 +12,8 @@ const Dashboard = () => {
     tasks: { total: 0, completed: 0 },
     members: { total: 0, active: 0 },
     events: { total: 0, upcoming: 0 },
-    finance: { monthlyIncome: 0, monthlyExpenses: 0 },
-    attendance: { today: { present: 0, absent: 0 } }
+    finance: { income: 0, expenses: 0, net: 0 },
+    attendance: { today: { present: 0, absent: 0, late: 0 } }
   });
   const [loading, setLoading] = useState(true);
 
@@ -24,19 +24,19 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const [projects, members, events, finance, attendance] = await Promise.all([
-        projectsAPI.getStats(),
-        membersAPI.getStats(),
-        eventsAPI.getStats(),
-        financeAPI.getDashboard(),
-        attendanceAPI.getStats()
+        projectsAPI.getStats().catch(() => ({ data: { data: { total: 0, active: 0 } } })),
+        membersAPI.getStats().catch(() => ({ data: { data: { total: 0, active: 0 } } })),
+        eventsAPI.getStats().catch(() => ({ data: { data: { total: 0, upcoming: 0 } } })),
+        financeAPI.getDashboard().catch(() => ({ data: { data: { currentMonth: { income: 0, expenses: 0, net: 0 } } } })),
+        attendanceAPI.getStats().catch(() => ({ data: { data: { today: { present: 0, absent: 0, late: 0 } } } }))
       ]);
 
       setStats({
-        projects: projects.data.data,
-        members: members.data.data,
-        events: events.data.data,
-        finance: finance.data.data.currentMonth,
-        attendance: attendance.data.data
+        projects: projects.data.data || { total: 0, active: 0 },
+        members: members.data.data || { total: 0, active: 0 },
+        events: events.data.data || { total: 0, upcoming: 0 },
+        finance: finance.data.data?.currentMonth || { income: 0, expenses: 0, net: 0 },
+        attendance: attendance.data.data || { today: { present: 0, absent: 0, late: 0 } }
       });
 
       setLoading(false);
