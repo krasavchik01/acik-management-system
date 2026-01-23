@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { projectsAPI } from '../services/api';
 import Layout from '../components/Layout';
+import CreateModal from '../components/CreateModal';
 import './Projects.css';
 
 const Projects = () => {
@@ -10,6 +11,7 @@ const Projects = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -25,6 +27,77 @@ const Projects = () => {
       setLoading(false);
     }
   };
+
+  const handleCreateProject = async (formData) => {
+    try {
+      await projectsAPI.create(formData);
+      await fetchProjects(); // Refresh list
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const projectFields = [
+    {
+      name: 'name',
+      label: 'Project Name',
+      type: 'text',
+      placeholder: 'Enter project name',
+      required: true
+    },
+    {
+      name: 'description',
+      label: 'Description',
+      type: 'textarea',
+      placeholder: 'Describe your project',
+      required: true
+    },
+    {
+      name: 'category',
+      label: 'Category',
+      type: 'text',
+      placeholder: 'e.g., Technology, Education, Community',
+      required: true
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      required: true,
+      options: [
+        { value: 'Planning', label: 'Planning' },
+        { value: 'Active', label: 'Active' },
+        { value: 'On Hold', label: 'On Hold' },
+        { value: 'Completed', label: 'Completed' }
+      ]
+    },
+    {
+      name: 'startDate',
+      label: 'Start Date',
+      type: 'date',
+      required: true
+    },
+    {
+      name: 'endDate',
+      label: 'End Date',
+      type: 'date',
+      required: true
+    },
+    {
+      name: 'budget',
+      label: 'Budget',
+      type: 'number',
+      placeholder: 'Enter budget amount',
+      required: false
+    },
+    {
+      name: 'progress',
+      label: 'Progress (%)',
+      type: 'number',
+      placeholder: '0-100',
+      required: false
+    }
+  ];
 
   const filteredProjects = projects.filter(project => {
     if (filterStatus === 'all') return true;
@@ -85,7 +158,7 @@ const Projects = () => {
             </div>
           </div>
 
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
             <span>➕</span>
             New Project
           </button>
@@ -374,6 +447,15 @@ const Projects = () => {
             </div>
           </div>
         )}
+
+        {/* Create Project Modal */}
+        <CreateModal
+          type="Project"
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={handleCreateProject}
+          fields={projectFields}
+        />
       </div>
     </Layout>
   );

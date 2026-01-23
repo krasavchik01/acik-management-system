@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { tasksAPI } from '../services/api';
 import Layout from '../components/Layout';
+import CreateModal from '../components/CreateModal';
 import './Tasks.css';
 
 const Tasks = () => {
@@ -12,6 +13,7 @@ const Tasks = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     fetchTasks();
@@ -27,6 +29,61 @@ const Tasks = () => {
       setLoading(false);
     }
   };
+
+  const handleCreateTask = async (formData) => {
+    try {
+      await tasksAPI.create(formData);
+      await fetchTasks();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const taskFields = [
+    {
+      name: 'title',
+      label: 'Task Title',
+      type: 'text',
+      placeholder: 'Enter task title',
+      required: true
+    },
+    {
+      name: 'description',
+      label: 'Description',
+      type: 'textarea',
+      placeholder: 'Describe the task',
+      required: false
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      required: true,
+      options: [
+        { value: 'To Do', label: 'To Do' },
+        { value: 'In Progress', label: 'In Progress' },
+        { value: 'Review', label: 'Review' },
+        { value: 'Done', label: 'Done' }
+      ]
+    },
+    {
+      name: 'priority',
+      label: 'Priority',
+      type: 'select',
+      required: true,
+      options: [
+        { value: 'High', label: 'High' },
+        { value: 'Medium', label: 'Medium' },
+        { value: 'Low', label: 'Low' }
+      ]
+    },
+    {
+      name: 'dueDate',
+      label: 'Due Date',
+      type: 'date',
+      required: false
+    }
+  ];
 
   const filteredTasks = tasks.filter(task => {
     const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
@@ -76,7 +133,6 @@ const Tasks = () => {
 
   const toggleTaskComplete = async (taskId, currentStatus) => {
     const newStatus = currentStatus === 'Done' ? 'To Do' : 'Done';
-    // Update task status in backend
     try {
       await tasksAPI.update(taskId, { status: newStatus });
       setTasks(tasks.map(t => t._id === taskId ? { ...t, status: newStatus } : t));
@@ -130,7 +186,7 @@ const Tasks = () => {
             </div>
           </div>
 
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
             <span>➕</span>
             New Task
           </button>
@@ -393,6 +449,15 @@ const Tasks = () => {
             </div>
           </div>
         )}
+
+        {/* Create Task Modal */}
+        <CreateModal
+          type="Task"
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={handleCreateTask}
+          fields={taskFields}
+        />
       </div>
     </Layout>
   );

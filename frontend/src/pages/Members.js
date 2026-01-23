@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { membersAPI } from '../services/api';
 import Layout from '../components/Layout';
+import CreateModal from '../components/CreateModal';
 import './Members.css';
 
 const Members = () => {
@@ -12,6 +13,7 @@ const Members = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     fetchMembers();
@@ -27,6 +29,81 @@ const Members = () => {
       setLoading(false);
     }
   };
+
+  const handleCreateMember = async (formData) => {
+    try {
+      await membersAPI.create(formData);
+      await fetchMembers();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const memberFields = [
+    {
+      name: 'fullName',
+      label: 'Full Name',
+      type: 'text',
+      placeholder: 'Enter full name',
+      required: true
+    },
+    {
+      name: 'email',
+      label: 'Email',
+      type: 'email',
+      placeholder: 'member@example.com',
+      required: true
+    },
+    {
+      name: 'phone',
+      label: 'Phone Number',
+      type: 'text',
+      placeholder: '+1 234 567 8900',
+      required: false
+    },
+    {
+      name: 'category',
+      label: 'Category',
+      type: 'select',
+      required: true,
+      options: [
+        { value: 'Professional', label: 'Professional' },
+        { value: 'Student', label: 'Student' },
+        { value: 'Corporate', label: 'Corporate' },
+        { value: 'Honorary', label: 'Honorary' }
+      ]
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      required: true,
+      options: [
+        { value: 'Active', label: 'Active' },
+        { value: 'Inactive', label: 'Inactive' }
+      ]
+    },
+    {
+      name: 'joinDate',
+      label: 'Join Date',
+      type: 'date',
+      required: false
+    },
+    {
+      name: 'company',
+      label: 'Company',
+      type: 'text',
+      placeholder: 'Company name',
+      required: false
+    },
+    {
+      name: 'address',
+      label: 'Address',
+      type: 'textarea',
+      placeholder: 'Enter address',
+      required: false
+    }
+  ];
 
   const filteredMembers = members.filter(member => {
     const matchesCategory = filterCategory === 'all' || member.category === filterCategory;
@@ -125,7 +202,7 @@ const Members = () => {
             </div>
           </div>
 
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
             <span>➕</span>
             Add Member
           </button>
@@ -434,6 +511,15 @@ const Members = () => {
             </div>
           </div>
         )}
+
+        {/* Create Member Modal */}
+        <CreateModal
+          type="Member"
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={handleCreateMember}
+          fields={memberFields}
+        />
       </div>
     </Layout>
   );
