@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { tasksAPI } from '../services/api';
+import { tasksAPI, adminAPI } from '../services/api';
 import Layout from '../components/Layout';
 import CreateModal from '../components/CreateModal';
 import './Tasks.css';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('kanban'); // list, kanban
   const [filterPriority, setFilterPriority] = useState('all');
@@ -17,6 +18,7 @@ const Tasks = () => {
 
   useEffect(() => {
     fetchTasks();
+    fetchUsers();
   }, []);
 
   const fetchTasks = async () => {
@@ -27,6 +29,15 @@ const Tasks = () => {
     } catch (error) {
       console.error('Error fetching tasks:', error);
       setLoading(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await adminAPI.getUsers();
+      setUsers(response.data.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
     }
   };
 
@@ -53,6 +64,16 @@ const Tasks = () => {
       type: 'textarea',
       placeholder: 'Describe the task',
       required: false
+    },
+    {
+      name: 'assignedTo',
+      label: 'Assign To',
+      type: 'select',
+      required: false,
+      options: users.map(user => ({
+        value: user._id,
+        label: `${user.name} (${user.role})`
+      }))
     },
     {
       name: 'status',

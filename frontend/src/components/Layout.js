@@ -20,6 +20,7 @@ const Layout = ({ children, pageTitle = 'Dashboard' }) => {
       items: [
         { path: '/', icon: '📊', label: 'Dashboard' },
         { path: '/analytics', icon: '📈', label: 'Analytics' },
+        { path: '/notifications', icon: '🔔', label: 'Notifications' },
         { path: '/attendance', icon: '👥', label: 'Attendance' }
       ]
     },
@@ -29,6 +30,7 @@ const Layout = ({ children, pageTitle = 'Dashboard' }) => {
         { path: '/projects', icon: '🎯', label: 'Projects' },
         { path: '/tasks', icon: '✅', label: 'Tasks' },
         { path: '/members', icon: '👤', label: 'Members' },
+        { path: '/users', icon: '👨‍💼', label: 'Users' },
         { path: '/events', icon: '📅', label: 'Events' }
       ]
     },
@@ -37,6 +39,12 @@ const Layout = ({ children, pageTitle = 'Dashboard' }) => {
       items: [
         { path: '/finance', icon: '💰', label: 'Finance' },
         { path: '/sponsors', icon: '🤝', label: 'Sponsors' }
+      ]
+    },
+    {
+      title: 'REPORTS',
+      items: [
+        { path: '/reports', icon: '📋', label: 'Reports' }
       ]
     }
   ];

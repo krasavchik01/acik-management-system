@@ -10,6 +10,8 @@ import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Members from './pages/Members';
+import Users from './pages/Users';
+import Notifications from './pages/Notifications';
 import Events from './pages/Events';
 import Finance from './pages/Finance';
 import Sponsors from './pages/Sponsors';
@@ -66,6 +68,22 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Members />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute>
+            <Users />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
           </ProtectedRoute>
         }
       />
