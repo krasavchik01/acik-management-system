@@ -36,13 +36,24 @@ const seedData = async () => {
     console.log('👥 Creating users...');
     const users = await User.create([
       {
+        name: 'System Admin',
+        email: 'admin@acik.com',
+        password: 'password123',
+        role: 'Admin',
+        department: 'IT',
+        phone: '+1-555-0100',
+        avatar: 'https://ui-avatars.com/api/?name=System+Admin&background=059669&color=fff',
+        isDemo: false
+      },
+      {
         name: 'John President',
         email: 'president@acik.com',
         password: 'password123',
         role: 'President',
         department: 'Executive',
         phone: '+1-555-0101',
-        avatar: 'https://ui-avatars.com/api/?name=John+President&background=4F46E5&color=fff'
+        avatar: 'https://ui-avatars.com/api/?name=John+President&background=4F46E5&color=fff',
+        isDemo: false
       },
       {
         name: 'Sarah VP',
@@ -51,7 +62,8 @@ const seedData = async () => {
         role: 'Vice President',
         department: 'Executive',
         phone: '+1-555-0102',
-        avatar: 'https://ui-avatars.com/api/?name=Sarah+VP&background=7C3AED&color=fff'
+        avatar: 'https://ui-avatars.com/api/?name=Sarah+VP&background=7C3AED&color=fff',
+        isDemo: true
       },
       {
         name: 'Michael CEO',
@@ -60,7 +72,8 @@ const seedData = async () => {
         role: 'CEO',
         department: 'Executive',
         phone: '+1-555-0103',
-        avatar: 'https://ui-avatars.com/api/?name=Michael+CEO&background=DC2626&color=fff'
+        avatar: 'https://ui-avatars.com/api/?name=Michael+CEO&background=DC2626&color=fff',
+        isDemo: false
       },
       {
         name: 'Emily CFO',
@@ -69,7 +82,8 @@ const seedData = async () => {
         role: 'CFO',
         department: 'Finance',
         phone: '+1-555-0104',
-        avatar: 'https://ui-avatars.com/api/?name=Emily+CFO&background=059669&color=fff'
+        avatar: 'https://ui-avatars.com/api/?name=Emily+CFO&background=059669&color=fff',
+        isDemo: false
       },
       {
         name: 'David PM',
@@ -78,7 +92,8 @@ const seedData = async () => {
         role: 'Project Manager',
         department: 'Projects',
         phone: '+1-555-0105',
-        avatar: 'https://ui-avatars.com/api/?name=David+PM&background=D97706&color=fff'
+        avatar: 'https://ui-avatars.com/api/?name=David+PM&background=D97706&color=fff',
+        isDemo: true
       },
       {
         name: 'Lisa Marketing',
@@ -87,7 +102,8 @@ const seedData = async () => {
         role: 'Marketing Manager',
         department: 'Marketing',
         phone: '+1-555-0106',
-        avatar: 'https://ui-avatars.com/api/?name=Lisa+Marketing&background=DB2777&color=fff'
+        avatar: 'https://ui-avatars.com/api/?name=Lisa+Marketing&background=DB2777&color=fff',
+        isDemo: true
       }
     ]);
 
@@ -594,6 +610,10 @@ const seedData = async () => {
     console.log('');
     console.log('📝 DEFAULT LOGIN CREDENTIALS:');
     console.log('');
+    console.log('Admin (Full Access):');
+    console.log('  Email: admin@acik.com');
+    console.log('  Password: password123');
+    console.log('');
     console.log('President:');
     console.log('  Email: president@acik.com');
     console.log('  Password: password123');
@@ -602,13 +622,15 @@ const seedData = async () => {
     console.log('  Email: cfo@acik.com');
     console.log('  Password: password123');
     console.log('');
-    console.log('Project Manager:');
+    console.log('Project Manager (DEMO):');
     console.log('  Email: pm@acik.com');
     console.log('  Password: password123');
     console.log('');
-    console.log('Marketing Manager:');
+    console.log('Marketing Manager (DEMO):');
     console.log('  Email: marketing@acik.com');
     console.log('  Password: password123');
+    console.log('');
+    console.log('Note: DEMO users cannot be deleted');
     console.log('═══════════════════════════════════════════════════════════');
 
     process.exit(0);

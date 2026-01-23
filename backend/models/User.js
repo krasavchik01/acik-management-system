@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isDemo: {
+    type: Boolean,
+    default: false
+  },
   lastLogin: {
     type: Date
   },

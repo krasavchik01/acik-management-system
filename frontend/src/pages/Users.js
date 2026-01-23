@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import CreateModal from '../components/CreateModal';
 import { cache } from '../utils/cache';
+import { toast } from 'react-toastify';
 import './Users.css';
 
 const Users = () => {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('grid');
@@ -15,6 +18,10 @@ const Users = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  const isAdmin = currentUser?.role === 'Admin' || currentUser?.role === 'President';
 
   useEffect(() => {
     const cachedUsers = cache.get('users');
@@ -199,8 +206,43 @@ const Users = () => {
     try {
       await adminAPI.updateUser(userId, { isActive: !currentStatus });
       setUsers(users.map(u => u._id === userId ? { ...u, isActive: !currentStatus } : u));
+      cache.clear('users');
+      toast.success(`User ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
     } catch (error) {
       console.error('Error updating user status:', error);
+      toast.error('Failed to update user status');
+    }
+  };
+
+  const handleDeleteClick = (user) => {
+    if (user.isDemo) {
+      toast.warning('Demo users cannot be deleted');
+      return;
+    }
+    if (user._id === currentUser?._id) {
+      toast.error('You cannot delete yourself');
+      return;
+    }
+    setUserToDelete(user);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await adminAPI.deleteUser(userToDelete._id);
+      setUsers(users.filter(u => u._id !== userToDelete._id));
+      cache.clear('users');
+      toast.success(`User ${userToDelete.name} deleted successfully`);
+      setShowDeleteConfirm(false);
+      setUserToDelete(null);
+      if (showModal && selectedUser?._id === userToDelete._id) {
+        closeModal();
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete user');
     }
   };
 
@@ -344,6 +386,11 @@ const Users = () => {
                     <span className={`role-badge badge-${getRoleColor(user.role)}`}>
                       {getRoleIcon(user.role)} {user.role}
                     </span>
+                    {user.isDemo && (
+                      <span className="demo-badge">
+                        DEMO
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -426,6 +473,11 @@ const Users = () => {
                       <span className={`role-badge badge-${getRoleColor(user.role)}`}>
                         {getRoleIcon(user.role)} {user.role}
                       </span>
+                      {user.isDemo && (
+                        <span className="demo-badge" style={{ marginLeft: '8px' }}>
+                          DEMO
+                        </span>
+                      )}
                     </td>
                     <td onClick={() => handleUserClick(user)}>
                       <span className={`department-badge badge-${getDepartmentColor(user.department)}`}>
@@ -446,15 +498,32 @@ const Users = () => {
                       </span>
                     </td>
                     <td>
-                      <button
-                        className={`btn btn-sm ${user.isActive ? 'btn-outline' : 'btn-success'}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleActive(user._id, user.isActive);
-                        }}
-                      >
-                        {user.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {isAdmin && (
+                          <button
+                            className={`btn btn-sm ${user.isActive ? 'btn-outline' : 'btn-success'}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleActive(user._id, user.isActive);
+                            }}
+                          >
+                            {user.isActive ? 'Deactivate' : 'Activate'}
+                          </button>
+                        )}
+                        {isAdmin && (
+                          <button
+                            className="btn btn-sm btn-danger"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteClick(user);
+                            }}
+                            disabled={user.isDemo || user._id === currentUser?._id}
+                            title={user.isDemo ? 'Cannot delete demo users' : user._id === currentUser?._id ? 'Cannot delete yourself' : 'Delete user'}
+                          >
+                            🗑️
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -485,9 +554,16 @@ const Users = () => {
                   </div>
                   <div>
                     <h2>{selectedUser.name}</h2>
-                    <span className={`role-badge badge-${getRoleColor(selectedUser.role)}`}>
-                      {getRoleIcon(selectedUser.role)} {selectedUser.role}
-                    </span>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span className={`role-badge badge-${getRoleColor(selectedUser.role)}`}>
+                        {getRoleIcon(selectedUser.role)} {selectedUser.role}
+                      </span>
+                      {selectedUser.isDemo && (
+                        <span className="demo-badge">
+                          DEMO
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <button className="modal-close" onClick={closeModal}>✕</button>
@@ -570,16 +646,30 @@ const Users = () => {
                 <button className="btn btn-outline" onClick={closeModal}>
                   Close
                 </button>
-                <button
-                  className={`btn ${selectedUser.isActive ? 'btn-secondary' : 'btn-success'}`}
-                  onClick={() => {
-                    handleToggleActive(selectedUser._id, selectedUser.isActive);
-                    closeModal();
-                  }}
-                >
-                  {selectedUser.isActive ? 'Deactivate User' : 'Activate User'}
-                </button>
-                <button className="btn btn-primary">Edit User</button>
+                {isAdmin && (
+                  <>
+                    <button
+                      className={`btn ${selectedUser.isActive ? 'btn-secondary' : 'btn-success'}`}
+                      onClick={() => {
+                        handleToggleActive(selectedUser._id, selectedUser.isActive);
+                        closeModal();
+                      }}
+                    >
+                      {selectedUser.isActive ? 'Deactivate User' : 'Activate User'}
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => {
+                        handleDeleteClick(selectedUser);
+                      }}
+                      disabled={selectedUser.isDemo || selectedUser._id === currentUser?._id}
+                      title={selectedUser.isDemo ? 'Cannot delete demo users' : selectedUser._id === currentUser?._id ? 'Cannot delete yourself' : 'Delete user'}
+                    >
+                      🗑️ Delete User
+                    </button>
+                  </>
+                )}
+                {isAdmin && <button className="btn btn-primary">Edit User</button>}
               </div>
             </div>
           </div>
@@ -593,6 +683,36 @@ const Users = () => {
           onSubmit={handleCreateUser}
           fields={userFields}
         />
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && userToDelete && (
+          <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+            <div className="modal-content delete-confirm-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>⚠️ Confirm Delete</h2>
+                <button className="modal-close" onClick={() => setShowDeleteConfirm(false)}>✕</button>
+              </div>
+
+              <div className="modal-body">
+                <p style={{ fontSize: '16px', marginBottom: '16px' }}>
+                  Are you sure you want to delete user <strong>{userToDelete.name}</strong>?
+                </p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+                  This action cannot be undone. All data associated with this user will be permanently removed.
+                </p>
+              </div>
+
+              <div className="modal-footer">
+                <button className="btn btn-outline" onClick={() => setShowDeleteConfirm(false)}>
+                  Cancel
+                </button>
+                <button className="btn btn-danger" onClick={handleDeleteUser}>
+                  Delete User
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
