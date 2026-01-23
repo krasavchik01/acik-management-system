@@ -1,23 +1,38 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Import pages (we'll create simplified versions)
+// Import Login immediately (needed for first load)
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Projects from './pages/Projects';
-import Tasks from './pages/Tasks';
-import Members from './pages/Members';
-import Users from './pages/Users';
-import Notifications from './pages/Notifications';
-import Events from './pages/Events';
-import Finance from './pages/Finance';
-import Sponsors from './pages/Sponsors';
-import Attendance from './pages/Attendance';
-import Reports from './pages/Reports';
-import Settings from './pages/Settings';
+
+// Lazy load all other pages
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Projects = lazy(() => import('./pages/Projects'));
+const Tasks = lazy(() => import('./pages/Tasks'));
+const Members = lazy(() => import('./pages/Members'));
+const Users = lazy(() => import('./pages/Users'));
+const Notifications = lazy(() => import('./pages/Notifications'));
+const Events = lazy(() => import('./pages/Events'));
+const Finance = lazy(() => import('./pages/Finance'));
+const Sponsors = lazy(() => import('./pages/Sponsors'));
+const Attendance = lazy(() => import('./pages/Attendance'));
+const Reports = lazy(() => import('./pages/Reports'));
+const Settings = lazy(() => import('./pages/Settings'));
+
+// Loading component
+const PageLoader = () => (
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    background: 'var(--bg)'
+  }}>
+    <div className="spinner"></div>
+  </div>
+);
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -37,16 +52,17 @@ const ProtectedRoute = ({ children }) => {
 // App Routes Component
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
       <Route
         path="/projects"
         element={
@@ -135,7 +151,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-    </Routes>
+      </Routes>
+    </Suspense>
   );
 };
 

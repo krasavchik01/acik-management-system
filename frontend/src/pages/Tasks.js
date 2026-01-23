@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { tasksAPI, adminAPI } from '../services/api';
 import Layout from '../components/Layout';
 import CreateModal from '../components/CreateModal';
+import { cache } from '../utils/cache';
 import './Tasks.css';
 
 const Tasks = () => {
@@ -17,25 +18,42 @@ const Tasks = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
-    fetchTasks();
-    fetchUsers();
+    // Check cache first
+    const cachedTasks = cache.get('tasks');
+    const cachedUsers = cache.get('users');
+
+    if (cachedTasks) setTasks(cachedTasks);
+    if (cachedUsers) setUsers(cachedUsers);
+
+    if (cachedTasks && cachedUsers) {
+      setLoading(false);
+      // Refresh in background
+      Promise.all([fetchTasks(true), fetchUsers()]);
+    } else {
+      // Load both in parallel
+      Promise.all([fetchTasks(), fetchUsers()]);
+    }
   }, []);
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (background = false) => {
     try {
       const response = await tasksAPI.getAll();
-      setTasks(response.data.data);
-      setLoading(false);
+      const data = response.data.data;
+      setTasks(data);
+      cache.set('tasks', data);
     } catch (error) {
       console.error('Error fetching tasks:', error);
-      setLoading(false);
+    } finally {
+      if (!background) setLoading(false);
     }
   };
 
   const fetchUsers = async () => {
     try {
       const response = await adminAPI.getUsers();
-      setUsers(response.data.data);
+      const data = response.data.data;
+      setUsers(data);
+      cache.set('users', data);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -44,6 +62,7 @@ const Tasks = () => {
   const handleCreateTask = async (formData) => {
     try {
       await tasksAPI.create(formData);
+      cache.clear('tasks');
       await fetchTasks();
     } catch (error) {
       throw error;

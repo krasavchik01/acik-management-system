@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../services/api';
 import Layout from '../components/Layout';
 import CreateModal from '../components/CreateModal';
+import { cache } from '../utils/cache';
 import './Users.css';
 
 const Users = () => {
@@ -16,23 +17,33 @@ const Users = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
-    fetchUsers();
+    const cachedUsers = cache.get('users');
+    if (cachedUsers) {
+      setUsers(cachedUsers);
+      setLoading(false);
+      fetchUsers(true); // Refresh in background
+    } else {
+      fetchUsers();
+    }
   }, []);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (background = false) => {
     try {
       const response = await adminAPI.getUsers();
-      setUsers(response.data.data);
-      setLoading(false);
+      const data = response.data.data;
+      setUsers(data);
+      cache.set('users', data);
     } catch (error) {
       console.error('Error fetching users:', error);
-      setLoading(false);
+    } finally {
+      if (!background) setLoading(false);
     }
   };
 
   const handleCreateUser = async (formData) => {
     try {
       await adminAPI.updateUser('new', formData);
+      cache.clear('users');
       await fetchUsers();
     } catch (error) {
       throw error;
