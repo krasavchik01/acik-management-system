@@ -23,18 +23,35 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
-    if (token) {
+    const cachedUser = localStorage.getItem('user');
+
+    if (token && cachedUser) {
+      // Load from cache immediately
       try {
-        const response = await authAPI.getMe();
-        setUser(response.data.data);
+        setUser(JSON.parse(cachedUser));
         setIsAuthenticated(true);
+        setLoading(false);
+
+        // Verify in background
+        authAPI.getMe()
+          .then(response => {
+            setUser(response.data.data);
+            localStorage.setItem('user', JSON.stringify(response.data.data));
+          })
+          .catch(error => {
+            console.error('Auth check failed:', error);
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setUser(null);
+            setIsAuthenticated(false);
+          });
       } catch (error) {
-        console.error('Auth check failed:', error);
-        localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const login = async (credentials) => {

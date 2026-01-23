@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { projectsAPI, membersAPI, eventsAPI, financeAPI, attendanceAPI } from '../services/api';
 import Layout from '../components/Layout';
+import { cache } from '../utils/cache';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -15,10 +16,17 @@ const Dashboard = () => {
     finance: { income: 0, expenses: 0, net: 0 },
     attendance: { today: { present: 0, absent: 0, late: 0 } }
   });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboardData();
+    // Check cache first
+    const cachedStats = cache.get('dashboard_stats');
+    if (cachedStats) {
+      setStats(cachedStats);
+      // Refresh in background
+      fetchDashboardData(true);
+    } else {
+      fetchDashboardData();
+    }
   }, []);
 
   const fetchDashboardData = async () => {
@@ -31,30 +39,20 @@ const Dashboard = () => {
         attendanceAPI.getStats().catch(() => ({ data: { data: { today: { present: 0, absent: 0, late: 0 } } } }))
       ]);
 
-      setStats({
+      const newStats = {
         projects: projects.data.data || { total: 0, active: 0 },
         members: members.data.data || { total: 0, active: 0 },
         events: events.data.data || { total: 0, upcoming: 0 },
         finance: finance.data.data?.currentMonth || { income: 0, expenses: 0, net: 0 },
         attendance: attendance.data.data || { today: { present: 0, absent: 0, late: 0 } }
-      });
+      };
 
-      setLoading(false);
+      setStats(newStats);
+      cache.set('dashboard_stats', newStats);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      setLoading(false);
     }
   };
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className="loading">
-          <div className="spinner"></div>
-        </div>
-      </Layout>
-    );
-  }
 
   return (
     <Layout pageTitle="Dashboard">
