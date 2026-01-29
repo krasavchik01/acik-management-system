@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
+
+const API_URL = process.env.NODE_ENV === 'production'
+  ? 'https://acik-management-system-backend.onrender.com/api'
+  : (process.env.REACT_APP_API_URL || 'http://localhost:5000/api');
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [serverStatus, setServerStatus] = useState('waking'); // 'waking' | 'ready' | 'error'
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -15,6 +20,40 @@ const Login = () => {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
+
+  // Warm up the backend server immediately when login page loads
+  useEffect(() => {
+    let cancelled = false;
+
+    const warmUp = async () => {
+      try {
+        await fetch(`${API_URL}/auth/me`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        // Any response (even 401) means server is awake
+        if (!cancelled) setServerStatus('ready');
+      } catch (err) {
+        // Network error — try again
+        if (!cancelled) {
+          setTimeout(async () => {
+            try {
+              await fetch(`${API_URL}/auth/me`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+              });
+              if (!cancelled) setServerStatus('ready');
+            } catch {
+              if (!cancelled) setServerStatus('error');
+            }
+          }, 3000);
+        }
+      }
+    };
+
+    warmUp();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +70,7 @@ const Login = () => {
 
   const quickLogin = async (role) => {
     const credentials = {
+      admin: { email: 'admin@acik.com', password: 'password123' },
       president: { email: 'president@acik.com', password: 'password123' },
       cfo: { email: 'cfo@acik.com', password: 'password123' },
       pm: { email: 'pm@acik.com', password: 'password123' },
@@ -47,6 +87,18 @@ const Login = () => {
     }
 
     setLoading(false);
+  };
+
+  const getServerStatusText = () => {
+    if (serverStatus === 'waking') return 'Сервер просыпается...';
+    if (serverStatus === 'ready') return 'Сервер готов';
+    return 'Сервер недоступен';
+  };
+
+  const getServerStatusClass = () => {
+    if (serverStatus === 'waking') return 'server-waking';
+    if (serverStatus === 'ready') return 'server-ready';
+    return 'server-error';
   };
 
   return (
@@ -81,6 +133,12 @@ const Login = () => {
             <h2>Welcome Back</h2>
             <p className="login-subtitle">Sign in to your account</p>
 
+            {/* Server status indicator */}
+            <div className={`server-status ${getServerStatusClass()}`}>
+              <span className="server-dot"></span>
+              <span>{getServerStatusText()}</span>
+            </div>
+
             <form onSubmit={handleSubmit} className="login-form">
               <div className="form-group">
                 <label htmlFor="email">Email</label>
@@ -109,30 +167,38 @@ const Login = () => {
               </div>
 
               <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? (serverStatus === 'waking' ? 'Сервер просыпается...' : 'Вход...') : 'Войти'}
               </button>
             </form>
 
             <div className="quick-login">
-              <p className="quick-login-title">Quick Login (Demo):</p>
+              <p className="quick-login-title">Быстрый вход (Демо):</p>
               <div className="quick-login-buttons">
-                <button onClick={() => quickLogin('president')} className="btn-quick">
+                <button onClick={() => quickLogin('admin')} className="btn-quick btn-quick-admin" disabled={loading}>
+                  Admin
+                </button>
+                <button onClick={() => quickLogin('president')} className="btn-quick" disabled={loading}>
                   President
                 </button>
-                <button onClick={() => quickLogin('cfo')} className="btn-quick">
+                <button onClick={() => quickLogin('cfo')} className="btn-quick" disabled={loading}>
                   CFO
                 </button>
-                <button onClick={() => quickLogin('pm')} className="btn-quick">
+                <button onClick={() => quickLogin('pm')} className="btn-quick" disabled={loading}>
                   PM
                 </button>
-                <button onClick={() => quickLogin('marketing')} className="btn-quick">
+                <button onClick={() => quickLogin('marketing')} className="btn-quick" disabled={loading}>
                   Marketing
                 </button>
               </div>
             </div>
 
             <div className="login-footer">
-              <p>All passwords: <code>password123</code></p>
+              <p>Все пароли: <code>password123</code></p>
+              {serverStatus === 'waking' && (
+                <p className="server-hint">
+                  Первый вход может занять до 30 сек — бесплатный сервер Render просыпается после простоя
+                </p>
+              )}
             </div>
           </div>
         </div>

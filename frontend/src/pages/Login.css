@@ -91,6 +91,81 @@
   margin-bottom: 30px;
 }
 
+/* Server status */
+.server-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.server-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.server-waking {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.server-waking .server-dot {
+  background: #f59e0b;
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.server-ready {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.server-ready .server-dot {
+  background: #10b981;
+}
+
+.server-error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.server-error .server-dot {
+  background: #ef4444;
+}
+
+.server-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #92400e;
+  line-height: 1.5;
+}
+
+.btn-quick-admin {
+  border-color: #059669;
+  color: #059669;
+  grid-column: 1 / -1;
+}
+
+.btn-quick-admin:hover {
+  background: #059669;
+  color: white;
+}
+
+.btn-quick:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .login-form {
   margin-bottom: 30px;
 }
