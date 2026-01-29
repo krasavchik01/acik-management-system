@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Layout from '../components/Layout';
 import './DeliveryPlan.css';
 
@@ -8,13 +8,13 @@ const DeliveryPlan = () => {
 
   const projectInfo = {
     title: 'ACIK Management System',
-    subtitle: 'Full-Stack Web Application',
-    developer: 'Aidos Tazhbenov',
-    client: 'ACIK Organization',
-    startDate: '03 February 2025',
-    endDate: '28 March 2025',
+    subtitle: 'Полноценное веб-приложение (Full-Stack)',
+    developer: 'Айдос Тажбенов',
+    client: 'Организация ACIK',
+    startDate: '03 февраля 2025',
+    endDate: '28 марта 2025',
     totalSprints: 4,
-    sprintDuration: '2 weeks',
+    sprintDuration: '2 недели',
     totalBudget: '$12,000',
     techStack: 'React 18, Node.js, Express, MongoDB, Socket.io, JWT'
   };
@@ -22,321 +22,321 @@ const DeliveryPlan = () => {
   const sprints = [
     {
       id: 1,
-      name: 'Sprint 1 — Foundation & Core Infrastructure',
-      dates: '03 Feb — 14 Feb 2025',
+      name: 'Спринт 1 — Фундамент и базовая инфраструктура',
+      dates: '03 фев — 14 фев 2025',
       status: 'completed',
       progress: 100,
-      goal: 'Project setup, authentication, database design, core layout & navigation',
+      goal: 'Настройка проекта, аутентификация, проектирование БД, базовый макет и навигация',
       deliverables: [
         {
-          title: 'Project Initialization & Configuration',
+          title: 'Инициализация и конфигурация проекта',
           items: [
-            'React frontend with CRA + routing setup',
-            'Express.js backend with middleware stack (Helmet, CORS, Compression, Rate Limiting)',
-            'MongoDB connection with Mongoose ODM',
-            'Environment configuration (.env, dotenv)',
-            'Git repository with proper .gitignore'
+            'React фронтенд с CRA + настройка маршрутизации',
+            'Express.js бэкенд с набором middleware (Helmet, CORS, Compression, Rate Limiting)',
+            'Подключение MongoDB с Mongoose ODM',
+            'Конфигурация окружения (.env, dotenv)',
+            'Git репозиторий с правильным .gitignore'
           ],
           status: 'done'
         },
         {
-          title: 'Authentication System',
+          title: 'Система аутентификации',
           items: [
-            'User model with bcrypt password hashing',
-            'JWT token generation & validation',
-            'Login / Register API endpoints',
-            'Protected route middleware (auth.js)',
-            'Role-based authorization middleware (authorize())',
-            'AuthContext for frontend state management',
-            'Instant login with localStorage cache + background verification'
+            'Модель пользователя с хешированием паролей bcrypt',
+            'Генерация и валидация JWT токенов',
+            'API эндпоинты для входа / регистрации',
+            'Middleware защиты маршрутов (auth.js)',
+            'Middleware авторизации по ролям (authorize())',
+            'AuthContext для управления состоянием на фронтенде',
+            'Мгновенный вход через кеш localStorage + фоновая верификация'
           ],
           status: 'done'
         },
         {
-          title: 'Database Schema Design (9 Models)',
+          title: 'Проектирование схемы БД (9 моделей)',
           items: [
-            'User — roles, departments, permissions, isDemo flag',
-            'Project — budget tracking, milestones, team assignments',
-            'Task — status pipeline, assignments, comments, dependencies',
-            'Member — categories, skills, contact info, membership fees',
-            'Event — types, registration, speakers, pricing, feedback',
-            'Finance — income/expense, approval workflow, recurring',
-            'Sponsor — levels, payments, benefits tracking',
-            'Attendance — check-in/out, geospatial, breaks, overtime',
-            'Report — KPIs, charts, access levels, review workflow'
+            'User — роли, департаменты, права, флаг isDemo',
+            'Project — отслеживание бюджета, вехи, назначение команды',
+            'Task — статусный конвейер, назначения, комментарии, зависимости',
+            'Member — категории, навыки, контактная информация, членские взносы',
+            'Event — типы, регистрация, спикеры, цены, отзывы',
+            'Finance — доходы/расходы, workflow утверждения, повторяющиеся',
+            'Sponsor — уровни, платежи, отслеживание бенефитов',
+            'Attendance — отметка прихода/ухода, геолокация, перерывы, сверхурочные',
+            'Report — KPI, графики, уровни доступа, workflow проверки'
           ],
           status: 'done'
         },
         {
-          title: 'Layout & Navigation',
+          title: 'Макет и навигация',
           items: [
-            'Responsive sidebar with 4 menu sections (Main, Management, Finance, Reports)',
-            'Topbar component with page title',
-            'User profile section in sidebar',
-            'Active route highlighting',
-            'PageLoader with spinner for Suspense fallback'
+            'Адаптивный сайдбар с 4 секциями меню (Основное, Управление, Финансы, Отчёты)',
+            'Компонент Topbar с заголовком страницы',
+            'Секция профиля пользователя в сайдбаре',
+            'Подсветка активного маршрута',
+            'PageLoader со спиннером для Suspense fallback'
           ],
           status: 'done'
         }
       ],
       penalty: {
-        condition: 'Authentication not working OR database not connected',
-        amount: '15% of sprint payment ($450)',
-        details: 'If user cannot login/register or database fails to persist data by Sprint 1 deadline'
+        condition: 'Аутентификация не работает ИЛИ база данных не подключена',
+        amount: '15% от оплаты спринта ($450)',
+        details: 'Если пользователь не может войти/зарегистрироваться или БД не сохраняет данные к дедлайну Спринта 1'
       }
     },
     {
       id: 2,
-      name: 'Sprint 2 — Core Management Modules',
-      dates: '17 Feb — 28 Feb 2025',
+      name: 'Спринт 2 — Основные модули управления',
+      dates: '17 фев — 28 фев 2025',
       status: 'completed',
       progress: 100,
-      goal: 'Dashboard, Projects, Tasks, Members, Users management with full CRUD operations',
+      goal: 'Дашборд, Проекты, Задачи, Участники, Управление пользователями с полными CRUD операциями',
       deliverables: [
         {
-          title: 'Dashboard',
+          title: 'Дашборд',
           items: [
-            'Statistics cards: Projects, Members, Events, Finance, Attendance',
-            'Quick action cards linking to all main pages',
-            'Recent activity feed',
-            'Data caching with 5-min TTL for instant loading',
-            'Parallel API loading with Promise.all()'
+            'Карточки статистики: Проекты, Участники, Мероприятия, Финансы, Посещаемость',
+            'Карточки быстрых действий со ссылками на все основные страницы',
+            'Лента последних действий',
+            'Кеширование данных с TTL 5 минут для мгновенной загрузки',
+            'Параллельная загрузка API через Promise.all()'
           ],
           status: 'done'
         },
         {
-          title: 'Projects Module',
+          title: 'Модуль проектов',
           items: [
-            'Full CRUD (Create, Read, Update, Delete)',
-            '3 view modes: Grid, List, Kanban',
-            'Status filtering: Active, Completed, On Hold, Planning',
-            'Priority levels: Low, Medium, High, Critical',
-            'Budget tracking (allocated / spent / remaining)',
-            'Progress bar visualization',
-            'Team assignment with roles',
-            'Project detail modal'
+            'Полный CRUD (Создание, Чтение, Обновление, Удаление)',
+            '3 режима просмотра: Сетка, Список, Канбан',
+            'Фильтрация по статусу: Активный, Завершён, Приостановлен, Планирование',
+            'Уровни приоритета: Низкий, Средний, Высокий, Критический',
+            'Отслеживание бюджета (выделено / потрачено / остаток)',
+            'Визуализация прогресса',
+            'Назначение команды с ролями',
+            'Модальное окно деталей проекта'
           ],
           status: 'done'
         },
         {
-          title: 'Tasks Module',
+          title: 'Модуль задач',
           items: [
-            'Full CRUD with project linkage',
-            'Kanban board: TODO → In Progress → Review → Done → Blocked',
-            'User assignment dropdown (populated from Users)',
-            'Priority badges with color coding',
-            'Due date tracking with overdue detection',
-            'Checklist support within tasks',
-            'Comments system with author info',
-            'Estimated vs actual hours tracking'
+            'Полный CRUD с привязкой к проектам',
+            'Канбан доска: TODO → В работе → Ревью → Готово → Заблокировано',
+            'Выпадающий список назначения пользователя (загружается из Users)',
+            'Бейджи приоритета с цветовой кодировкой',
+            'Отслеживание дедлайнов с определением просроченных',
+            'Чеклисты внутри задач',
+            'Система комментариев с информацией об авторе',
+            'Отслеживание запланированных vs фактических часов'
           ],
           status: 'done'
         },
         {
-          title: 'Members Module',
+          title: 'Модуль участников',
           items: [
-            'Full CRUD with 180+ seed members',
-            'Categories: Bronze, Silver, Gold, Platinum, Diamond',
-            'Search by name, email, phone',
-            'Filter by category and status',
-            'Contact information management',
-            'Skills and interests tracking',
-            'Membership fee tracking'
+            'Полный CRUD с 180+ сидированными записями',
+            'Категории: Бронза, Серебро, Золото, Платина, Бриллиант',
+            'Поиск по имени, email, телефону',
+            'Фильтрация по категории и статусу',
+            'Управление контактной информацией',
+            'Отслеживание навыков и интересов',
+            'Отслеживание членских взносов'
           ],
           status: 'done'
         },
         {
-          title: 'Users Module (Admin Panel)',
+          title: 'Модуль пользователей (Панель администратора)',
           items: [
-            'User management with Grid and List views',
-            'Admin role with full delete capabilities',
-            'DEMO user badge with animated glow effect',
-            'Role-based access: 8 roles (Admin, President, VP, CEO, CFO, PM, Marketing, Member)',
-            'Department assignment: 7 departments',
-            'Activate / Deactivate users',
-            'Delete confirmation modal with protection for demo users',
-            'Search and filter by role/department'
+            'Управление пользователями в режимах Сетка и Список',
+            'Роль Admin с полными правами на удаление',
+            'Бейдж DEMO пользователей с анимацией свечения',
+            'Ролевой доступ: 8 ролей (Admin, President, VP, CEO, CFO, PM, Marketing, Member)',
+            'Назначение департамента: 7 департаментов',
+            'Активация / Деактивация пользователей',
+            'Модальное окно подтверждения удаления с защитой демо-пользователей',
+            'Поиск и фильтрация по роли/департаменту'
           ],
           status: 'done'
         }
       ],
       penalty: {
-        condition: 'CRUD not functional OR pages not rendering',
-        amount: '20% of sprint payment ($600)',
-        details: 'If any of the 5 modules fails to create/read/update/delete data, or pages throw errors on load'
+        condition: 'CRUD не работает ИЛИ страницы не рендерятся',
+        amount: '20% от оплаты спринта ($600)',
+        details: 'Если любой из 5 модулей не может создать/прочитать/обновить/удалить данные, или страницы выдают ошибки при загрузке'
       }
     },
     {
       id: 3,
-      name: 'Sprint 3 — Advanced Modules & Finance',
-      dates: '03 Mar — 14 Mar 2025',
+      name: 'Спринт 3 — Продвинутые модули и финансы',
+      dates: '03 мар — 14 мар 2025',
       status: 'completed',
       progress: 100,
-      goal: 'Events, Finance, Sponsors, Attendance, Notifications, Reports modules',
+      goal: 'Модули: Мероприятия, Финансы, Спонсоры, Посещаемость, Уведомления, Отчёты',
       deliverables: [
         {
-          title: 'Events Module',
+          title: 'Модуль мероприятий',
           items: [
-            'Full CRUD for events',
-            '8 event types: Conference, Workshop, Networking, Summit, Webinar, Meeting, Social, Training',
-            'Registration management with capacity limits',
-            'Speaker management',
-            'Pricing tiers: Free, Member, Non-Member, Early Bird',
-            'Virtual / Physical location support',
-            'Agenda creation',
-            'Event feedback and ratings'
+            'Полный CRUD для мероприятий',
+            '8 типов мероприятий: Конференция, Воркшоп, Нетворкинг, Саммит, Вебинар, Встреча, Социальное, Тренинг',
+            'Управление регистрацией с лимитами вместимости',
+            'Управление спикерами',
+            'Тарифные планы: Бесплатно, Для членов, Для нечленов, Ранняя регистрация',
+            'Поддержка виртуального / физического формата',
+            'Создание программы мероприятия',
+            'Отзывы и рейтинги мероприятий'
           ],
           status: 'done'
         },
         {
-          title: 'Finance Module',
+          title: 'Модуль финансов',
           items: [
-            'Income / Expense tracking with 17 categories',
-            'Financial dashboard with monthly summary',
-            'Payment methods: Cash, Check, Credit Card, Bank Transfer, PayPal, Stripe',
-            'Invoice and receipt number tracking',
-            'Approval workflow (recordedBy → approvedBy)',
-            'Link to Projects, Events, Sponsors',
-            'Recurring transaction support'
+            'Отслеживание доходов / расходов с 17 категориями',
+            'Финансовый дашборд с месячной сводкой',
+            'Способы оплаты: Наличные, Чек, Кредитная карта, Банковский перевод, PayPal, Stripe',
+            'Отслеживание номеров счетов и квитанций',
+            'Workflow утверждения (записал → утвердил)',
+            'Привязка к Проектам, Мероприятиям, Спонсорам',
+            'Поддержка повторяющихся транзакций'
           ],
           status: 'done'
         },
         {
-          title: 'Sponsors Module',
+          title: 'Модуль спонсоров',
           items: [
-            'Sponsor management with 5 levels (Bronze → Diamond)',
-            'Contact person management',
-            'Company details and website',
-            'Payment history tracking',
-            'Benefit delivery tracking',
-            'Link to Events and Projects',
-            'Document management'
+            'Управление спонсорами с 5 уровнями (Бронза → Бриллиант)',
+            'Управление контактным лицом',
+            'Данные компании и сайт',
+            'История платежей',
+            'Отслеживание предоставленных бенефитов',
+            'Привязка к Мероприятиям и Проектам',
+            'Управление документами'
           ],
           status: 'done'
         },
         {
-          title: 'Attendance Module',
+          title: 'Модуль посещаемости',
           items: [
-            'Check-in / Check-out with 5 methods (Manual, QR, Biometric, RFID, Mobile)',
-            'Work types: Office, Remote, Hybrid, Field Work, Client Site',
-            'Break tracking: Lunch, Coffee, Meeting',
-            'Automatic hours worked calculation with break subtraction',
-            'Overtime tracking with approval workflow',
-            'Geospatial location indexing (2dsphere)',
-            'Mood and productivity tracking',
-            'Daily attendance statistics'
+            'Отметка прихода / ухода 5-ю способами (Ручной, QR, Биометрия, RFID, Мобильное приложение)',
+            'Типы работы: Офис, Удалённо, Гибрид, Полевая работа, У клиента',
+            'Отслеживание перерывов: Обед, Кофе, Совещание',
+            'Автоматический расчёт отработанных часов с вычетом перерывов',
+            'Отслеживание сверхурочных с workflow утверждения',
+            'Геопространственная индексация локации (2dsphere)',
+            'Отслеживание настроения и продуктивности',
+            'Ежедневная статистика посещаемости'
           ],
           status: 'done'
         },
         {
-          title: 'Notifications Module',
+          title: 'Модуль уведомлений',
           items: [
-            'In-app notification system',
-            'Real-time updates via Socket.io',
-            'Notification bell in topbar'
+            'Система уведомлений внутри приложения',
+            'Обновления в реальном времени через Socket.io',
+            'Колокольчик уведомлений в верхней панели'
           ],
           status: 'done'
         },
         {
-          title: 'Reports Module',
+          title: 'Модуль отчётов',
           items: [
-            '8 report types: Weekly, Monthly, Quarterly, Annual, Project, Financial, Event, Custom',
-            'KPI tracking with target vs actual metrics',
-            '6 chart types: Line, Bar, Pie, Doughnut, Area, Scatter',
-            'Review and approval workflow',
-            'Access levels: Public, Internal, Restricted, Confidential',
-            'Financial summary integration',
-            'Export support'
+            '8 типов отчётов: Еженедельный, Ежемесячный, Квартальный, Годовой, Проектный, Финансовый, По мероприятию, Пользовательский',
+            'Отслеживание KPI с метриками план vs факт',
+            '6 типов графиков: Линейный, Столбчатый, Круговой, Кольцевой, Площадной, Точечный',
+            'Workflow проверки и утверждения',
+            'Уровни доступа: Публичный, Внутренний, Ограниченный, Конфиденциальный',
+            'Интеграция финансовой сводки',
+            'Поддержка экспорта'
           ],
           status: 'done'
         }
       ],
       penalty: {
-        condition: 'Finance calculations incorrect OR real-time features not working',
-        amount: '20% of sprint payment ($600)',
-        details: 'If income/expense totals are miscalculated, or Socket.io fails to deliver real-time updates'
+        condition: 'Финансовые расчёты неверны ИЛИ real-time функции не работают',
+        amount: '20% от оплаты спринта ($600)',
+        details: 'Если суммы доходов/расходов рассчитаны неправильно, или Socket.io не доставляет обновления в реальном времени'
       }
     },
     {
       id: 4,
-      name: 'Sprint 4 — Optimization, Security & Deployment',
-      dates: '17 Mar — 28 Mar 2025',
+      name: 'Спринт 4 — Оптимизация, безопасность и деплой',
+      dates: '17 мар — 28 мар 2025',
       status: 'completed',
       progress: 100,
-      goal: 'Performance optimization, security hardening, deployment, seed data, final QA',
+      goal: 'Оптимизация производительности, усиление безопасности, развёртывание, тестовые данные, финальный QA',
       deliverables: [
         {
-          title: 'Performance Optimization',
+          title: 'Оптимизация производительности',
           items: [
-            'React.lazy() code splitting for all pages (14% bundle reduction)',
-            'LocalStorage caching with 5-minute TTL (cache.js utility)',
-            'Instant login — load from cache, verify in background',
-            'Dashboard cached loading — show instantly, refresh in background',
-            'Parallel API calls with Promise.all()',
-            'Suspense with PageLoader fallback',
-            'Bundle split: 78.74 KB main + lazy chunks (4.8 KB, 4.27 KB, etc.)'
+            'React.lazy() code splitting для всех страниц (снижение бандла на 14%)',
+            'Кеширование в localStorage с TTL 5 минут (утилита cache.js)',
+            'Мгновенный вход — загрузка из кеша, верификация в фоне',
+            'Кешированная загрузка дашборда — показ сразу, обновление в фоне',
+            'Параллельные API вызовы через Promise.all()',
+            'Suspense с PageLoader fallback',
+            'Разделение бандла: 78.74 KB основной + ленивые чанки (4.8 KB, 4.27 KB и т.д.)'
           ],
           status: 'done'
         },
         {
-          title: 'Security',
+          title: 'Безопасность',
           items: [
-            'Helmet.js security headers',
-            'CORS configuration',
-            'Rate limiting: 100 req / 15 min',
-            'bcryptjs password hashing with salt rounds',
-            'JWT token-based authentication',
-            'Protected routes on frontend and backend',
-            'Role-based authorization middleware',
-            'Demo user deletion protection'
+            'Защитные заголовки Helmet.js',
+            'Конфигурация CORS',
+            'Ограничение запросов: 100 запросов / 15 мин',
+            'Хеширование паролей bcryptjs с солью',
+            'JWT токен аутентификация',
+            'Защищённые маршруты на фронтенде и бэкенде',
+            'Middleware авторизации по ролям',
+            'Защита демо-пользователей от удаления'
           ],
           status: 'done'
         },
         {
-          title: 'Data Seeding',
+          title: 'Наполнение тестовыми данными',
           items: [
-            '7 users (Admin, President, VP, CEO, CFO, PM, Marketing)',
-            '180 members across 5 categories',
-            '24 projects with budget and team data',
-            '100+ tasks linked to projects and users',
-            '25 events with registrations',
-            '12 sponsors with payment histories',
-            '100 finance transactions (50 income + 50 expense)',
-            '30 days of attendance records',
-            '3 reports with KPIs'
+            '7 пользователей (Admin, President, VP, CEO, CFO, PM, Marketing)',
+            '180 участников по 5 категориям',
+            '24 проекта с бюджетом и данными команды',
+            '100+ задач, привязанных к проектам и пользователям',
+            '25 мероприятий с регистрациями',
+            '12 спонсоров с историей платежей',
+            '100 финансовых транзакций (50 доходов + 50 расходов)',
+            '30 дней записей посещаемости',
+            '3 отчёта с KPI'
           ],
           status: 'done'
         },
         {
-          title: 'Deployment',
+          title: 'Развёртывание',
           items: [
-            'Frontend deployed to Netlify (app-acik.netlify.app)',
-            'Backend deployed (API server)',
-            'MongoDB Atlas cloud database',
-            'Environment variables configured',
-            'CI/CD via Git push to main branch'
+            'Фронтенд развёрнут на Netlify (app-acik.netlify.app)',
+            'Бэкенд развёрнут (API сервер)',
+            'Облачная база данных MongoDB Atlas',
+            'Настроены переменные окружения',
+            'CI/CD через Git push в ветку main'
           ],
           status: 'done'
         },
         {
-          title: 'Data Relationships',
+          title: 'Связи между данными',
           items: [
-            'Tasks → Users (assignedTo, createdBy) with .populate()',
-            'Tasks → Projects with .populate()',
-            'Projects → Users (manager, team members)',
-            'Events → Users (organizer)',
-            'Finance → Users, Projects, Events, Sponsors',
-            'Attendance → Users, Projects',
-            'Reports → Users (createdBy, reviewers, approvedBy)',
-            'All relationships display populated names in UI'
+            'Задачи → Пользователи (assignedTo, createdBy) через .populate()',
+            'Задачи → Проекты через .populate()',
+            'Проекты → Пользователи (менеджер, участники команды)',
+            'Мероприятия → Пользователи (организатор)',
+            'Финансы → Пользователи, Проекты, Мероприятия, Спонсоры',
+            'Посещаемость → Пользователи, Проекты',
+            'Отчёты → Пользователи (создатель, ревьюеры, утвердивший)',
+            'Все связи отображают заполненные имена в интерфейсе'
           ],
           status: 'done'
         }
       ],
       penalty: {
-        condition: 'App not deployed OR critical performance issues',
-        amount: '25% of sprint payment ($750)',
-        details: 'If app is not accessible online, login takes > 3 seconds, or pages crash on load'
+        condition: 'Приложение не развёрнуто ИЛИ критические проблемы с производительностью',
+        amount: '25% от оплаты спринта ($750)',
+        details: 'Если приложение недоступно онлайн, вход занимает > 3 секунд, или страницы падают при загрузке'
       }
     }
   ];
@@ -344,75 +344,75 @@ const DeliveryPlan = () => {
   const penalties = [
     {
       id: 'P1',
-      type: 'Sprint Deadline Miss',
-      description: 'If any sprint deliverables are not completed by the sprint end date',
-      penalty: '10% deduction per business day of delay (max 5 days)',
-      maxPenalty: '50% of sprint payment',
-      severity: 'high'
+      type: 'Срыв дедлайна спринта',
+      description: 'Если какие-либо результаты спринта не завершены к дате окончания спринта',
+      penalty: 'Вычет 10% за каждый рабочий день задержки (макс. 5 дней)',
+      maxPenalty: '50% от оплаты спринта',
+      severity: 'critical'
     },
     {
       id: 'P2',
-      type: 'Critical Bug in Production',
-      description: 'If a critical bug is found in production that prevents core functionality (login, CRUD operations, data loss)',
-      penalty: 'Free fix within 24 hours, otherwise $200/day penalty',
+      type: 'Критический баг в продакшене',
+      description: 'Если обнаружен критический баг, препятствующий основной функциональности (вход, CRUD операции, потеря данных)',
+      penalty: 'Бесплатное исправление в течение 24 часов, иначе штраф $200/день',
       maxPenalty: '$1,000',
       severity: 'critical'
     },
     {
       id: 'P3',
-      type: 'Security Vulnerability',
-      description: 'If a security vulnerability is discovered (SQL injection, XSS, exposed credentials, unprotected endpoints)',
-      penalty: 'Free fix within 12 hours, otherwise $300/day penalty',
+      type: 'Уязвимость безопасности',
+      description: 'Если обнаружена уязвимость безопасности (SQL-инъекция, XSS, утечка данных, незащищённые эндпоинты)',
+      penalty: 'Бесплатное исправление в течение 12 часов, иначе штраф $300/день',
       maxPenalty: '$1,500',
       severity: 'critical'
     },
     {
       id: 'P4',
-      type: 'Data Loss or Corruption',
-      description: 'If user data is lost or corrupted due to developer error (not backup/infrastructure issues)',
-      penalty: '20% of total project budget',
+      type: 'Потеря или повреждение данных',
+      description: 'Если данные пользователей потеряны или повреждены по вине разработчика (не включая проблемы инфраструктуры/бэкапов)',
+      penalty: '20% от общего бюджета проекта',
       maxPenalty: '$2,400',
       severity: 'critical'
     },
     {
       id: 'P5',
-      type: 'Performance Degradation',
-      description: 'If page load time exceeds 5 seconds or app becomes unusable under normal load',
-      penalty: '5% of sprint payment until resolved',
-      maxPenalty: '15% of sprint payment',
+      type: 'Деградация производительности',
+      description: 'Если время загрузки страницы превышает 5 секунд или приложение становится непригодным для использования при нормальной нагрузке',
+      penalty: '5% от оплаты спринта до устранения',
+      maxPenalty: '15% от оплаты спринта',
       severity: 'medium'
     },
     {
       id: 'P6',
-      type: 'Missing Feature',
-      description: 'If an agreed-upon feature listed in sprint deliverables is missing or non-functional',
-      penalty: '5% per missing feature deducted from sprint payment',
-      maxPenalty: '30% of sprint payment',
+      type: 'Отсутствие функционала',
+      description: 'Если согласованная функция, указанная в результатах спринта, отсутствует или не работает',
+      penalty: '5% за каждую недостающую функцию, вычитается из оплаты спринта',
+      maxPenalty: '30% от оплаты спринта',
       severity: 'high'
     },
     {
       id: 'P7',
-      type: 'Downtime After Deployment',
-      description: 'If the deployed application experiences downtime exceeding 4 hours (excluding infrastructure outages)',
-      penalty: '$100 per additional hour of downtime',
-      maxPenalty: '$800 per incident',
+      type: 'Простой после развёртывания',
+      description: 'Если развёрнутое приложение не работает более 4 часов (за исключением сбоев инфраструктуры)',
+      penalty: '$100 за каждый дополнительный час простоя',
+      maxPenalty: '$800 за инцидент',
       severity: 'medium'
     },
     {
       id: 'P8',
-      type: 'Abandonment',
-      description: 'If developer stops communication for more than 5 business days without prior notice',
-      penalty: 'Full refund of all payments made for undelivered sprints',
-      maxPenalty: 'Up to 100% of remaining budget',
+      type: 'Отказ от проекта',
+      description: 'Если разработчик прекращает коммуникацию более чем на 5 рабочих дней без предварительного уведомления',
+      penalty: 'Полный возврат всех платежей за недоставленные спринты',
+      maxPenalty: 'До 100% оставшегося бюджета',
       severity: 'critical'
     }
   ];
 
   const getStatusBadge = (status) => {
     const map = {
-      done: { label: 'Done', color: '#10b981' },
-      'in-progress': { label: 'In Progress', color: '#3b82f6' },
-      pending: { label: 'Pending', color: '#6b7280' }
+      done: { label: 'Готово', color: '#10b981' },
+      'in-progress': { label: 'В работе', color: '#3b82f6' },
+      pending: { label: 'Ожидание', color: '#6b7280' }
     };
     const s = map[status] || map.pending;
     return <span className="dp-status-badge" style={{ background: s.color }}>{s.label}</span>;
@@ -434,30 +434,40 @@ const DeliveryPlan = () => {
     return map[severity] || '#6b7280';
   };
 
+  const getSeverityLabel = (severity) => {
+    const map = {
+      critical: 'КРИТИЧ.',
+      high: 'ВЫСОКИЙ',
+      medium: 'СРЕДНИЙ',
+      low: 'НИЗКИЙ'
+    };
+    return map[severity] || severity.toUpperCase();
+  };
+
   return (
-    <Layout pageTitle="Delivery Plan">
+    <Layout pageTitle="План поставки">
       <div className="delivery-plan-page">
-        {/* Header */}
+        {/* Заголовок */}
         <div className="dp-hero">
           <div className="dp-hero-content">
-            <div className="dp-hero-badge">DELIVERY PLAN</div>
+            <div className="dp-hero-badge">ПЛАН ПОСТАВКИ</div>
             <h1 className="dp-hero-title">{projectInfo.title}</h1>
             <p className="dp-hero-subtitle">{projectInfo.subtitle}</p>
             <div className="dp-hero-meta">
               <div className="dp-hero-meta-item">
-                <span className="dp-meta-label">Developer</span>
+                <span className="dp-meta-label">Разработчик</span>
                 <span className="dp-meta-value">{projectInfo.developer}</span>
               </div>
               <div className="dp-hero-meta-item">
-                <span className="dp-meta-label">Client</span>
+                <span className="dp-meta-label">Заказчик</span>
                 <span className="dp-meta-value">{projectInfo.client}</span>
               </div>
               <div className="dp-hero-meta-item">
-                <span className="dp-meta-label">Duration</span>
+                <span className="dp-meta-label">Сроки</span>
                 <span className="dp-meta-value">{projectInfo.startDate} — {projectInfo.endDate}</span>
               </div>
               <div className="dp-hero-meta-item">
-                <span className="dp-meta-label">Budget</span>
+                <span className="dp-meta-label">Бюджет</span>
                 <span className="dp-meta-value">{projectInfo.totalBudget}</span>
               </div>
             </div>
@@ -465,26 +475,26 @@ const DeliveryPlan = () => {
           <div className="dp-hero-stats">
             <div className="dp-stat-card">
               <div className="dp-stat-number">{projectInfo.totalSprints}</div>
-              <div className="dp-stat-label">Sprints</div>
+              <div className="dp-stat-label">Спринты</div>
             </div>
             <div className="dp-stat-card">
               <div className="dp-stat-number">12</div>
-              <div className="dp-stat-label">Pages</div>
+              <div className="dp-stat-label">Страниц</div>
             </div>
             <div className="dp-stat-card">
               <div className="dp-stat-number">9</div>
-              <div className="dp-stat-label">Models</div>
+              <div className="dp-stat-label">Моделей</div>
             </div>
             <div className="dp-stat-card">
               <div className="dp-stat-number">11</div>
-              <div className="dp-stat-label">API Routes</div>
+              <div className="dp-stat-label">API маршрутов</div>
             </div>
           </div>
         </div>
 
-        {/* Tech Stack */}
+        {/* Технологический стек */}
         <div className="dp-tech-stack">
-          <h3>Tech Stack</h3>
+          <h3>Технологический стек</h3>
           <div className="dp-tech-tags">
             {['React 18', 'Node.js', 'Express', 'MongoDB', 'Mongoose', 'Socket.io', 'JWT', 'bcrypt', 'Helmet', 'Chart.js', 'Axios', 'Netlify'].map(tech => (
               <span key={tech} className="dp-tech-tag">{tech}</span>
@@ -492,12 +502,12 @@ const DeliveryPlan = () => {
           </div>
         </div>
 
-        {/* Timeline */}
+        {/* Таймлайн */}
         <div className="dp-section">
           <div className="dp-section-header">
-            <h2>Sprint Timeline</h2>
+            <h2>Таймлайн спринтов</h2>
             <button className="dp-penalty-btn" onClick={() => setShowPenaltyModal(true)}>
-              Penalties & SLA
+              Штрафы и SLA
             </button>
           </div>
 
@@ -532,7 +542,7 @@ const DeliveryPlan = () => {
                 {activeSprintTab === sprint.id && (
                   <div className="dp-sprint-body">
                     <div className="dp-sprint-goal">
-                      <strong>Goal:</strong> {sprint.goal}
+                      <strong>Цель:</strong> {sprint.goal}
                     </div>
 
                     <div className="dp-deliverables">
@@ -557,9 +567,9 @@ const DeliveryPlan = () => {
                     <div className="dp-sprint-penalty">
                       <div className="dp-penalty-icon">&#9888;</div>
                       <div>
-                        <strong>If Not Delivered:</strong> {sprint.penalty.condition}
+                        <strong>При невыполнении:</strong> {sprint.penalty.condition}
                         <br />
-                        <span className="dp-penalty-amount">Penalty: {sprint.penalty.amount}</span>
+                        <span className="dp-penalty-amount">Штраф: {sprint.penalty.amount}</span>
                         <br />
                         <span className="dp-penalty-detail">{sprint.penalty.details}</span>
                       </div>
@@ -571,149 +581,149 @@ const DeliveryPlan = () => {
           </div>
         </div>
 
-        {/* Summary Table */}
+        {/* Сводная таблица */}
         <div className="dp-section">
-          <h2>Deliverables Summary</h2>
+          <h2>Сводка по результатам</h2>
           <div className="dp-table-wrapper">
             <table className="dp-table">
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>Sprint</th>
-                  <th>Features</th>
-                  <th>Status</th>
+                  <th>Модуль</th>
+                  <th>Спринт</th>
+                  <th>Функционал</th>
+                  <th>Статус</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Auth & DB</strong></td>
-                  <td>Sprint 1</td>
-                  <td>JWT Login, 9 Models, Role-based Access</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Авторизация и БД</strong></td>
+                  <td>Спринт 1</td>
+                  <td>JWT авторизация, 9 моделей, ролевой доступ</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Dashboard</strong></td>
-                  <td>Sprint 2</td>
-                  <td>Stats, Activity Feed, Cached Loading</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Дашборд</strong></td>
+                  <td>Спринт 2</td>
+                  <td>Статистика, лента активности, кешированная загрузка</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Projects</strong></td>
-                  <td>Sprint 2</td>
-                  <td>CRUD, Grid/List/Kanban, Budget, Teams</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Проекты</strong></td>
+                  <td>Спринт 2</td>
+                  <td>CRUD, Сетка/Список/Канбан, бюджет, команды</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Tasks</strong></td>
-                  <td>Sprint 2</td>
-                  <td>CRUD, Kanban Pipeline, Assignment, Comments</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Задачи</strong></td>
+                  <td>Спринт 2</td>
+                  <td>CRUD, Канбан конвейер, назначения, комментарии</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Members</strong></td>
-                  <td>Sprint 2</td>
-                  <td>CRUD, Categories, Search, 180+ Records</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Участники</strong></td>
+                  <td>Спринт 2</td>
+                  <td>CRUD, категории, поиск, 180+ записей</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Users</strong></td>
-                  <td>Sprint 2</td>
-                  <td>Admin Panel, DEMO Badges, Delete, Roles</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Пользователи</strong></td>
+                  <td>Спринт 2</td>
+                  <td>Админ-панель, DEMO бейджи, удаление, роли</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Events</strong></td>
-                  <td>Sprint 3</td>
-                  <td>CRUD, Registration, Pricing, 8 Types</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Мероприятия</strong></td>
+                  <td>Спринт 3</td>
+                  <td>CRUD, регистрация, ценообразование, 8 типов</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Finance</strong></td>
-                  <td>Sprint 3</td>
-                  <td>Income/Expense, Dashboard, Approvals</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Финансы</strong></td>
+                  <td>Спринт 3</td>
+                  <td>Доходы/Расходы, дашборд, утверждения</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Sponsors</strong></td>
-                  <td>Sprint 3</td>
-                  <td>Levels, Payments, Benefits, Documents</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Спонсоры</strong></td>
+                  <td>Спринт 3</td>
+                  <td>Уровни, платежи, бенефиты, документы</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Attendance</strong></td>
-                  <td>Sprint 3</td>
-                  <td>Check-in/out, Overtime, Geospatial, Breaks</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Посещаемость</strong></td>
+                  <td>Спринт 3</td>
+                  <td>Приход/уход, сверхурочные, геолокация, перерывы</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Notifications</strong></td>
-                  <td>Sprint 3</td>
-                  <td>Real-time Socket.io, In-app Alerts</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Уведомления</strong></td>
+                  <td>Спринт 3</td>
+                  <td>Real-time Socket.io, алерты в приложении</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Reports</strong></td>
-                  <td>Sprint 3</td>
-                  <td>KPIs, Charts, Access Levels, Workflows</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Отчёты</strong></td>
+                  <td>Спринт 3</td>
+                  <td>KPI, графики, уровни доступа, workflow</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Optimization</strong></td>
-                  <td>Sprint 4</td>
-                  <td>Lazy Loading, Caching, Code Splitting</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><strong>Оптимизация</strong></td>
+                  <td>Спринт 4</td>
+                  <td>Ленивая загрузка, кеширование, разделение кода</td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Deployment</strong></td>
-                  <td>Sprint 4</td>
+                  <td><strong>Развёртывание</strong></td>
+                  <td>Спринт 4</td>
                   <td>Netlify, MongoDB Atlas, CI/CD</td>
-                  <td><span className="dp-status-done">Delivered</span></td>
+                  <td><span className="dp-status-done">Сдано</span></td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Signature Block */}
+        {/* Блок подписей */}
         <div className="dp-section">
           <div className="dp-signatures">
-            <h2>Agreement</h2>
+            <h2>Соглашение</h2>
             <p className="dp-agreement-text">
-              This Delivery Plan constitutes a binding agreement between the Developer and the Client.
-              All deliverables listed above are subject to the penalty clauses outlined in the Penalties & SLA section.
-              Both parties agree to the terms, timelines, and consequences of non-delivery as specified herein.
+              Настоящий План поставки является обязывающим соглашением между Разработчиком и Заказчиком.
+              Все перечисленные выше результаты подпадают под действие штрафных санкций, изложенных в разделе «Штрафы и SLA».
+              Обе стороны соглашаются с условиями, сроками и последствиями невыполнения, указанными в настоящем документе.
             </p>
             <div className="dp-signature-grid">
               <div className="dp-signature-block">
                 <div className="dp-signature-line"></div>
-                <p className="dp-signature-name">Aidos Tazhbenov</p>
-                <p className="dp-signature-role">Developer</p>
-                <p className="dp-signature-date">Date: _______________</p>
+                <p className="dp-signature-name">Айдос Тажбенов</p>
+                <p className="dp-signature-role">Разработчик</p>
+                <p className="dp-signature-date">Дата: _______________</p>
               </div>
               <div className="dp-signature-block">
                 <div className="dp-signature-line"></div>
-                <p className="dp-signature-name">ACIK Organization</p>
-                <p className="dp-signature-role">Client Representative</p>
-                <p className="dp-signature-date">Date: _______________</p>
+                <p className="dp-signature-name">Организация ACIK</p>
+                <p className="dp-signature-role">Представитель заказчика</p>
+                <p className="dp-signature-date">Дата: _______________</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Penalty Modal */}
+        {/* Модальное окно штрафов */}
         {showPenaltyModal && (
           <div className="dp-modal-overlay" onClick={() => setShowPenaltyModal(false)}>
             <div className="dp-modal" onClick={(e) => e.stopPropagation()}>
               <div className="dp-modal-header">
-                <h2>Penalties & SLA Agreement</h2>
+                <h2>Штрафы и SLA соглашение</h2>
                 <button className="dp-modal-close" onClick={() => setShowPenaltyModal(false)}>
                   &times;
                 </button>
               </div>
               <div className="dp-modal-body">
                 <p className="dp-modal-intro">
-                  The following penalties apply if the developer (Aidos Tazhbenov) fails to meet
-                  the agreed-upon deliverables, timelines, or quality standards for the ACIK Management System project.
+                  Следующие штрафные санкции применяются в случае, если разработчик (Айдос Тажбенов) не выполняет
+                  согласованные результаты, сроки или стандарты качества проекта ACIK Management System.
                 </p>
 
                 <div className="dp-penalties-list">
@@ -725,7 +735,7 @@ const DeliveryPlan = () => {
                             className="dp-severity-badge"
                             style={{ background: getSeverityColor(p.severity) }}
                           >
-                            {p.severity.toUpperCase()}
+                            {getSeverityLabel(p.severity)}
                           </span>
                           <span className="dp-penalty-id">{p.id}</span>
                         </div>
@@ -734,11 +744,11 @@ const DeliveryPlan = () => {
                       <p className="dp-penalty-desc">{p.description}</p>
                       <div className="dp-penalty-details">
                         <div className="dp-penalty-row">
-                          <span className="dp-penalty-label">Penalty:</span>
+                          <span className="dp-penalty-label">Штраф:</span>
                           <span className="dp-penalty-val">{p.penalty}</span>
                         </div>
                         <div className="dp-penalty-row">
-                          <span className="dp-penalty-label">Max Penalty:</span>
+                          <span className="dp-penalty-label">Макс. штраф:</span>
                           <span className="dp-penalty-val dp-penalty-max">{p.maxPenalty}</span>
                         </div>
                       </div>
@@ -747,14 +757,14 @@ const DeliveryPlan = () => {
                 </div>
 
                 <div className="dp-penalty-footer">
-                  <h4>General Terms</h4>
+                  <h4>Общие условия</h4>
                   <ul>
-                    <li>All penalties are calculated based on business days only</li>
-                    <li>Force majeure events (natural disasters, infrastructure provider outages) are excluded</li>
-                    <li>Penalties are capped at 50% of total project budget ($6,000)</li>
-                    <li>Bug fix SLA: Critical — 24h, High — 48h, Medium — 72h, Low — 1 week</li>
-                    <li>30-day warranty period after final delivery for bug fixes at no additional cost</li>
-                    <li>Disputes are resolved via written communication first, then arbitration if needed</li>
+                    <li>Все штрафы рассчитываются только по рабочим дням</li>
+                    <li>Форс-мажорные обстоятельства (стихийные бедствия, сбои провайдера инфраструктуры) исключаются</li>
+                    <li>Штрафы ограничены 50% от общего бюджета проекта ($6,000)</li>
+                    <li>SLA по исправлению багов: Критический — 24ч, Высокий — 48ч, Средний — 72ч, Низкий — 1 неделя</li>
+                    <li>30-дневный гарантийный период после финальной поставки для исправления багов без дополнительной оплаты</li>
+                    <li>Споры решаются сначала посредством письменной коммуникации, затем через арбитраж при необходимости</li>
                   </ul>
                 </div>
               </div>
