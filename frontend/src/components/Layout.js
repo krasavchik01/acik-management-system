@@ -44,7 +44,8 @@ const Layout = ({ children, pageTitle = 'Dashboard' }) => {
     {
       title: 'REPORTS',
       items: [
-        { path: '/reports', icon: '📋', label: 'Reports' }
+        { path: '/reports', icon: '📋', label: 'Reports' },
+        { path: '/delivery-plan', icon: '📦', label: 'Delivery Plan' }
       ]
     }
   ];

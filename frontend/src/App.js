@@ -19,6 +19,7 @@ const Finance = lazy(() => import('./pages/Finance'));
 const Sponsors = lazy(() => import('./pages/Sponsors'));
 const Attendance = lazy(() => import('./pages/Attendance'));
 const Reports = lazy(() => import('./pages/Reports'));
+const DeliveryPlan = lazy(() => import('./pages/DeliveryPlan'));
 const Settings = lazy(() => import('./pages/Settings'));
 
 // Loading component
@@ -140,6 +141,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Reports />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/delivery-plan"
+        element={
+          <ProtectedRoute>
+            <DeliveryPlan />
           </ProtectedRoute>
         }
       />
