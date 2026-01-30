@@ -47,6 +47,12 @@ const Layout = ({ children, pageTitle = 'Dashboard' }) => {
         { path: '/reports', icon: '📋', label: 'Reports' },
         { path: '/delivery-plan', icon: '📦', label: 'Delivery Plan' }
       ]
+    },
+    {
+      title: 'ADMIN',
+      items: [
+        { path: '/admin', icon: '⚙️', label: 'Admin Panel' }
+      ]
     }
   ];
 

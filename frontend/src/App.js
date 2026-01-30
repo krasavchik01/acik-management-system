@@ -20,6 +20,7 @@ const Sponsors = lazy(() => import('./pages/Sponsors'));
 const Attendance = lazy(() => import('./pages/Attendance'));
 const Reports = lazy(() => import('./pages/Reports'));
 const DeliveryPlan = lazy(() => import('./pages/DeliveryPlan'));
+const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const Settings = lazy(() => import('./pages/Settings'));
 
 // Loading component
@@ -149,6 +150,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <DeliveryPlan />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminPanel />
           </ProtectedRoute>
         }
       />
