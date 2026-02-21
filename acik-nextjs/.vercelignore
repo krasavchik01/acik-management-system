@@ -1,0 +1,6 @@
+scripts/
+prisma/seed.ts
+prisma/seed-rest.ts
+prisma/init.sql
+prisma/clean_init.sql
+*.md

@@ -1,0 +1,1034 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== ENUMS ====================
+
+enum UserRole {
+  President
+  VicePresident
+  CEO
+  CFO
+  ProjectManager
+  MarketingManager
+  Member
+  Admin
+}
+
+enum Department {
+  Executive
+  Finance
+  Projects
+  Marketing
+  Operations
+  HR
+  IT
+}
+
+enum ProjectStatus {
+  Planning
+  Active
+  OnHold
+  Completed
+  Cancelled
+}
+
+enum ProjectCategory {
+  Technology
+  Innovation
+  Research
+  Community
+  Education
+  Business
+  Other
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+  Critical
+}
+
+enum TaskStatus {
+  TODO
+  InProgress
+  Review
+  Done
+  Blocked
+}
+
+enum MemberCategory {
+  Bronze
+  Silver
+  Gold
+  Platinum
+  Diamond
+}
+
+enum MemberStatus {
+  Active
+  Inactive
+  Suspended
+  Alumni
+}
+
+enum EventType {
+  Conference
+  Workshop
+  Networking
+  Summit
+  Webinar
+  Meeting
+  Social
+  Training
+  Other
+}
+
+enum EventStatus {
+  Planned
+  Active
+  Completed
+  Cancelled
+  Postponed
+}
+
+enum PaymentStatus {
+  Pending
+  Paid
+  Refunded
+  Completed
+  Failed
+  Cancelled
+}
+
+enum FinanceType {
+  Income
+  Expense
+}
+
+enum FinanceCategory {
+  Sponsorship
+  MembershipFees
+  EventRevenue
+  Donations
+  Grants
+  Sales
+  Salaries
+  OfficeRent
+  Utilities
+  Marketing
+  Events
+  Equipment
+  Software
+  Travel
+  Insurance
+  Legal
+  Miscellaneous
+}
+
+enum PaymentMethod {
+  Cash
+  Check
+  CreditCard
+  DebitCard
+  BankTransfer
+  PayPal
+  Stripe
+  Other
+}
+
+enum SponsorLevel {
+  Bronze
+  Silver
+  Gold
+  Platinum
+  Diamond
+}
+
+enum SponsorStatus {
+  Active
+  Inactive
+  Pending
+  Expired
+}
+
+enum SponsorType {
+  Corporate
+  Individual
+  Foundation
+  Government
+  NonProfit
+}
+
+enum SponsorFrequency {
+  OneTime
+  Monthly
+  Quarterly
+  Yearly
+}
+
+enum AttendanceStatus {
+  Present
+  Absent
+  Late
+  HalfDay
+  WorkFromHome
+  OnLeave
+}
+
+enum WorkType {
+  Office
+  Remote
+  Hybrid
+  FieldWork
+  ClientSite
+}
+
+enum CheckMethod {
+  Manual
+  QRCode
+  Biometric
+  RFID
+  MobileApp
+}
+
+enum ReportType {
+  Weekly
+  Monthly
+  Quarterly
+  Annual
+  Project
+  Financial
+  Event
+  Custom
+}
+
+enum ReportCategory {
+  Executive
+  Financial
+  Operations
+  Marketing
+  HR
+  Projects
+  Events
+  Compliance
+}
+
+enum ReportStatus {
+  Draft
+  InReview
+  Approved
+  Published
+  Archived
+}
+
+enum Trend {
+  Up
+  Down
+  Stable
+  NA
+}
+
+enum KPIStatus {
+  OnTrack
+  AtRisk
+  Behind
+  Exceeded
+}
+
+enum ReviewStatus {
+  Pending
+  Approved
+  Rejected
+  ChangesRequested
+}
+
+enum AccessLevel {
+  Public
+  Internal
+  Restricted
+  Confidential
+}
+
+enum ChartType {
+  Line
+  Bar
+  Pie
+  Doughnut
+  Area
+  Scatter
+}
+
+enum DocumentType {
+  Contract
+  Invoice
+  Receipt
+  Agreement
+  Other
+}
+
+// ==================== MODELS ====================
+
+model User {
+  id          String      @id @default(uuid())
+  supabaseId  String      @unique
+  email       String      @unique
+  name        String
+  role        UserRole    @default(Member)
+  avatar      String?
+  department  Department  @default(Operations)
+  phone       String?
+  isActive    Boolean     @default(true)
+  isDemo      Boolean     @default(false)
+  lastLogin   DateTime?
+  permissions String[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  managedProjects    Project[]           @relation("ProjectManager")
+  teamMemberships    ProjectTeamMember[]
+  createdTasks       Task[]              @relation("TaskCreator")
+  assignedTasks      Task[]              @relation("TaskAssignee")
+  taskComments       TaskComment[]
+  projectNotes       ProjectNote[]
+  organizedEvents    Event[]
+  attendance         Attendance[]
+  verifiedAttendance Attendance[]        @relation("AttendanceVerifier")
+  approvedOvertime   Attendance[]        @relation("OvertimeApprover")
+  recordedFinance    Finance[]           @relation("FinanceRecorder")
+  approvedFinance    Finance[]           @relation("FinanceApprover")
+  managedSponsors    Sponsor[]
+  createdReports     Report[]            @relation("ReportCreator")
+  approvedReports    Report[]            @relation("ReportApprover")
+  reportReviews      ReportReviewer[]
+  notifications      Notification[]
+
+  @@index([email])
+  @@index([supabaseId])
+}
+
+model Project {
+  id          String          @id @default(uuid())
+  name        String
+  description String
+  category    ProjectCategory @default(Other)
+  status      ProjectStatus   @default(Planning)
+  priority    Priority        @default(Medium)
+  startDate   DateTime
+  endDate     DateTime?
+  progress    Int             @default(0)
+  tags        String[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  budgetAllocated Float @default(0)
+  budgetSpent     Float @default(0)
+  budgetRemaining Float @default(0)
+
+  managerId String
+  manager   User   @relation("ProjectManager", fields: [managerId], references: [id])
+
+  team            ProjectTeamMember[]
+  tasks           Task[]
+  notes           ProjectNote[]
+  milestones      ProjectMilestone[]
+  attachments     ProjectAttachment[]
+  finance         Finance[]
+  sponsorProjects SponsorProject[]
+  attendance      Attendance[]
+  reportProjects  ReportProject[]
+
+  @@index([status])
+  @@index([managerId])
+}
+
+model ProjectTeamMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      String   @default("Member")
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+model ProjectMilestone {
+  id          String    @id @default(uuid())
+  projectId   String
+  name        String
+  description String?
+  dueDate     DateTime?
+  completed   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectAttachment {
+  id         String   @id @default(uuid())
+  projectId  String
+  name       String
+  url        String
+  uploadedAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectNote {
+  id        String   @id @default(uuid())
+  projectId String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id])
+}
+
+model Task {
+  id             String     @id @default(uuid())
+  title          String
+  description    String?
+  status         TaskStatus @default(TODO)
+  priority       Priority   @default(Medium)
+  dueDate        DateTime?
+  estimatedHours Float      @default(0)
+  actualHours    Float      @default(0)
+  tags           String[]
+  completedAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  projectId    String
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedToId String?
+  assignedTo   User?   @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  createdById  String
+  createdBy    User    @relation("TaskCreator", fields: [createdById], references: [id])
+
+  checklist       TaskChecklistItem[]
+  comments        TaskComment[]
+  attachments     TaskAttachment[]
+  dependencies    TaskDependency[]    @relation("DependentTask")
+  dependentOn     TaskDependency[]    @relation("DependencyTask")
+  attendanceTasks AttendanceTask[]
+
+  @@index([projectId, status])
+  @@index([assignedToId, status])
+  @@index([dueDate])
+}
+
+model TaskChecklistItem {
+  id        String  @id @default(uuid())
+  taskId    String
+  item      String
+  completed Boolean @default(false)
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model TaskComment {
+  id        String   @id @default(uuid())
+  taskId    String
+  authorId  String
+  text      String
+  createdAt DateTime @default(now())
+
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id])
+}
+
+model TaskAttachment {
+  id         String   @id @default(uuid())
+  taskId     String
+  name       String
+  url        String
+  uploadedAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model TaskDependency {
+  id          String @id @default(uuid())
+  taskId      String
+  dependsOnId String
+
+  task      Task @relation("DependentTask", fields: [taskId], references: [id], onDelete: Cascade)
+  dependsOn Task @relation("DependencyTask", fields: [dependsOnId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, dependsOnId])
+}
+
+model Member {
+  id          String         @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String         @unique
+  phone       String
+  category    MemberCategory @default(Bronze)
+  status      MemberStatus   @default(Active)
+  joinDate    DateTime       @default(now())
+  dateOfBirth DateTime?
+  notes       String?
+  avatar      String?
+  interests   String[]
+  skills      String[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  addressStreet  String?
+  addressCity    String?
+  addressState   String?
+  addressZipCode String?
+  addressCountry String? @default("USA")
+
+  companyName     String?
+  companyPosition String?
+
+  educationDegree         String?
+  educationInstitution    String?
+  educationGraduationYear Int?
+
+  linkedinUrl  String?
+  twitterUrl   String?
+  facebookUrl  String?
+  instagramUrl String?
+
+  emergencyName         String?
+  emergencyRelationship String?
+  emergencyPhone        String?
+
+  membershipFeeAmount  Float?
+  membershipPaidDate   DateTime?
+  membershipExpiryDate DateTime?
+
+  eventsAttended     MemberEventAttendance[]
+  eventRegistrations EventRegistration[]
+  eventFeedback      EventFeedback[]
+  finance            Finance[]
+
+  @@index([email])
+  @@index([status])
+}
+
+model MemberEventAttendance {
+  id         String   @id @default(uuid())
+  memberId   String
+  eventId    String
+  attendedAt DateTime @default(now())
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, eventId])
+}
+
+model Event {
+  id          String      @id @default(uuid())
+  title       String
+  description String
+  type        EventType   @default(Other)
+  status      EventStatus @default(Planned)
+  startDate   DateTime
+  endDate     DateTime
+  capacity    Int         @default(0)
+  banner      String?
+  tags        String[]
+  isPublished Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  locationVenue       String
+  locationAddress     String?
+  locationCity        String?
+  locationState       String?
+  locationZipCode     String?
+  locationCountry     String?
+  locationIsVirtual   Boolean  @default(false)
+  locationVirtualLink String?
+
+  pricingIsFree            Boolean   @default(true)
+  pricingMemberPrice       Float?
+  pricingNonMemberPrice    Float?
+  pricingEarlyBirdPrice    Float?
+  pricingEarlyBirdDeadline DateTime?
+
+  budgetEstimated Float @default(0)
+  budgetActual    Float @default(0)
+
+  organizerId String
+  organizer   User   @relation(fields: [organizerId], references: [id])
+
+  speakers         EventSpeaker[]
+  registrations    EventRegistration[]
+  agenda           EventAgendaItem[]
+  attachments      EventAttachment[]
+  feedback         EventFeedback[]
+  memberAttendance MemberEventAttendance[]
+  finance          Finance[]
+  sponsorEvents    SponsorEvent[]
+  reportEvents     ReportEvent[]
+
+  @@index([status])
+  @@index([startDate])
+}
+
+model EventSpeaker {
+  id      String  @id @default(uuid())
+  eventId String
+  name    String
+  title   String?
+  bio     String?
+  photo   String?
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventRegistration {
+  id            String        @id @default(uuid())
+  eventId       String
+  memberId      String
+  registeredAt  DateTime      @default(now())
+  attended      Boolean       @default(false)
+  ticketType    String?
+  paymentStatus PaymentStatus @default(Pending)
+
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, memberId])
+}
+
+model EventAgendaItem {
+  id          String  @id @default(uuid())
+  eventId     String
+  time        String
+  title       String
+  description String?
+  speaker     String?
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventAttachment {
+  id      String @id @default(uuid())
+  eventId String
+  name    String
+  url     String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventFeedback {
+  id          String   @id @default(uuid())
+  eventId     String
+  memberId    String
+  rating      Int
+  comment     String?
+  submittedAt DateTime @default(now())
+
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, memberId])
+}
+
+model Finance {
+  id                 String          @id @default(uuid())
+  type               FinanceType
+  category           FinanceCategory
+  amount             Float
+  description        String
+  date               DateTime        @default(now())
+  paymentMethod      PaymentMethod   @default(Cash)
+  status             PaymentStatus   @default(Completed)
+  reference          String?
+  paidBy             String?
+  paidTo             String?
+  invoiceNumber      String?
+  receiptNumber      String?
+  dueDate            DateTime?
+  notes              String?
+  tags               String[]
+  isRecurring        Boolean         @default(false)
+  recurringFrequency String?
+  approvedAt         DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  projectId    String?
+  project      Project? @relation(fields: [projectId], references: [id])
+  eventId      String?
+  event        Event?   @relation(fields: [eventId], references: [id])
+  sponsorId    String?
+  sponsor      Sponsor? @relation(fields: [sponsorId], references: [id])
+  memberId     String?
+  member       Member?  @relation(fields: [memberId], references: [id])
+  recordedById String
+  recordedBy   User     @relation("FinanceRecorder", fields: [recordedById], references: [id])
+  approvedById String?
+  approvedBy   User?    @relation("FinanceApprover", fields: [approvedById], references: [id])
+
+  attachments FinanceAttachment[]
+
+  @@index([type, date])
+  @@index([category, date])
+  @@index([status])
+}
+
+model FinanceAttachment {
+  id         String   @id @default(uuid())
+  financeId  String
+  name       String
+  url        String
+  uploadedAt DateTime @default(now())
+
+  finance Finance @relation(fields: [financeId], references: [id], onDelete: Cascade)
+}
+
+model Sponsor {
+  id        String        @id @default(uuid())
+  name      String
+  logo      String?
+  level     SponsorLevel  @default(Bronze)
+  status    SponsorStatus @default(Active)
+  type      SponsorType   @default(Corporate)
+  industry  String?
+  notes     String?
+  tags      String[]
+  rating    Int?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  contactName  String
+  contactTitle String?
+  contactEmail String
+  contactPhone String
+
+  companyWebsite     String?
+  companyDescription String?
+  companyStreet      String?
+  companyCity        String?
+  companyState       String?
+  companyZipCode     String?
+  companyCountry     String?
+
+  sponsorshipAmount         Float
+  sponsorshipCurrency       String           @default("USD")
+  sponsorshipFrequency      SponsorFrequency @default(OneTime)
+  sponsorshipStartDate      DateTime
+  sponsorshipEndDate        DateTime?
+  sponsorshipTotalCommitted Float            @default(0)
+  sponsorshipTotalReceived  Float            @default(0)
+
+  linkedinUrl  String?
+  twitterUrl   String?
+  facebookUrl  String?
+  instagramUrl String?
+
+  managedById String?
+  managedBy   User?   @relation(fields: [managedById], references: [id])
+
+  benefits  SponsorBenefit[]
+  events    SponsorEvent[]
+  projects  SponsorProject[]
+  payments  SponsorPayment[]
+  documents SponsorDocument[]
+  finance   Finance[]
+
+  @@index([status])
+  @@index([level])
+}
+
+model SponsorBenefit {
+  id          String  @id @default(uuid())
+  sponsorId   String
+  description String
+  delivered   Boolean @default(false)
+
+  sponsor Sponsor @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+}
+
+model SponsorEvent {
+  id               String  @id @default(uuid())
+  sponsorId        String
+  eventId          String
+  sponsorshipLevel String?
+  amount           Float?
+
+  sponsor Sponsor @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([sponsorId, eventId])
+}
+
+model SponsorProject {
+  id        String @id @default(uuid())
+  sponsorId String
+  projectId String
+  amount    Float?
+
+  sponsor Sponsor @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([sponsorId, projectId])
+}
+
+model SponsorPayment {
+  id        String        @id @default(uuid())
+  sponsorId String
+  amount    Float
+  date      DateTime
+  method    String?
+  reference String?
+  status    PaymentStatus @default(Pending)
+
+  sponsor Sponsor @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+}
+
+model SponsorDocument {
+  id         String       @id @default(uuid())
+  sponsorId  String
+  name       String
+  type       DocumentType @default(Other)
+  url        String
+  uploadedAt DateTime     @default(now())
+
+  sponsor Sponsor @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+}
+
+model Attendance {
+  id           String           @id @default(uuid())
+  date         DateTime         @default(now())
+  status       AttendanceStatus @default(Present)
+  workType     WorkType         @default(Office)
+  hoursWorked  Float            @default(0)
+  notes        String?
+  mood         String?
+  productivity Int?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  checkInTime    DateTime
+  checkInMethod  CheckMethod  @default(Manual)
+  checkInAddress String?
+  checkInLat     Float?
+  checkInLng     Float?
+
+  checkOutTime    DateTime?
+  checkOutMethod  CheckMethod?
+  checkOutAddress String?
+  checkOutLat     Float?
+  checkOutLng     Float?
+
+  overtimeHours    Float   @default(0)
+  overtimeApproved Boolean @default(false)
+
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id])
+  verifiedById         String?
+  verifiedBy           User?    @relation("AttendanceVerifier", fields: [verifiedById], references: [id])
+  overtimeApprovedById String?
+  overtimeApprovedBy   User?    @relation("OvertimeApprover", fields: [overtimeApprovedById], references: [id])
+  projectId            String?
+  project              Project? @relation(fields: [projectId], references: [id])
+
+  breaks AttendanceBreak[]
+  tasks  AttendanceTask[]
+
+  @@index([userId, date])
+}
+
+model AttendanceBreak {
+  id           String    @id @default(uuid())
+  attendanceId String
+  startTime    DateTime
+  endTime      DateTime?
+  duration     Float?
+  type         String    @default("Other")
+
+  attendance Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+}
+
+model AttendanceTask {
+  id           String @id @default(uuid())
+  attendanceId String
+  taskId       String
+  hoursSpent   Float?
+
+  attendance Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  task       Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id              String         @id @default(uuid())
+  title           String
+  type            ReportType
+  category        ReportCategory
+  status          ReportStatus   @default(Draft)
+  summary         String
+  content         String
+  highlights      String[]
+  challenges      String[]
+  recommendations String[]
+  nextSteps       String[]
+  tags            String[]
+  views           Int            @default(0)
+  downloads       Int            @default(0)
+  isConfidential  Boolean        @default(false)
+  accessLevel     AccessLevel    @default(Internal)
+  publishedAt     DateTime?
+  approvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  periodStartDate DateTime
+  periodEndDate   DateTime
+
+  financialsIncome         Float?
+  financialsExpenses       Float?
+  financialsNetIncome      Float?
+  financialsBudget         Float?
+  financialsBudgetVariance Float?
+
+  createdById  String
+  createdBy    User   @relation("ReportCreator", fields: [createdById], references: [id])
+  approvedById String?
+  approvedBy   User?  @relation("ReportApprover", fields: [approvedById], references: [id])
+
+  metrics     ReportMetric[]
+  kpis        ReportKPI[]
+  projects    ReportProject[]
+  events      ReportEvent[]
+  charts      ReportChart[]
+  attachments ReportAttachment[]
+  reviewers   ReportReviewer[]
+
+  @@index([type, periodStartDate])
+  @@index([category, status])
+  @@index([createdById])
+}
+
+model ReportMetric {
+  id       String @id @default(uuid())
+  reportId String
+  name     String
+  value    String
+  unit     String?
+  trend    Trend  @default(NA)
+  change   Float?
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model ReportKPI {
+  id       String    @id @default(uuid())
+  reportId String
+  name     String
+  target   Float?
+  actual   Float?
+  unit     String?
+  status   KPIStatus @default(OnTrack)
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model ReportProject {
+  id         String  @id @default(uuid())
+  reportId   String
+  projectId  String
+  status     String?
+  progress   Int?
+  highlights String?
+
+  report  Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ReportEvent {
+  id         String @id @default(uuid())
+  reportId   String
+  eventId    String
+  attendance Int?
+  feedback   Float?
+  notes      String?
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model ReportChart {
+  id       String    @id @default(uuid())
+  reportId String
+  type     ChartType
+  title    String?
+  data     String
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model ReportAttachment {
+  id         String   @id @default(uuid())
+  reportId   String
+  name       String
+  type       String?
+  url        String
+  uploadedAt DateTime @default(now())
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model ReportReviewer {
+  id         String       @id @default(uuid())
+  reportId   String
+  userId     String
+  status     ReviewStatus @default(Pending)
+  comments   String?
+  reviewedAt DateTime?
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([reportId, userId])
+}
+
+// ==================== NOTIFICATIONS ====================
+
+enum NotificationType {
+  TaskAssigned
+  TaskUpdated
+  TaskCompleted
+  TaskOverdue
+  ProjectUpdate
+  MemberJoined
+  EventReminder
+  AttendanceReminder
+  SystemAlert
+  Message
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  metadata  Json?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
