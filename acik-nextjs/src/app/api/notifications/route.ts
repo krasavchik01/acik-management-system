@@ -123,7 +123,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { notificationIds, markAllRead } = body
+    const { id, notificationIds, markAllRead, isRead } = body
 
     if (markAllRead) {
       // Mark all user notifications as read
@@ -137,6 +137,21 @@ export async function PATCH(request: NextRequest) {
         console.error('Notifications update error:', updateError)
         return NextResponse.json(
           { success: false, message: 'Failed to update notifications' },
+          { status: 500 }
+        )
+      }
+    } else if (id) {
+      // Mark single notification as read
+      const { error: updateError } = await supabaseAdmin
+        .from('Notification')
+        .update({ isRead: isRead !== undefined ? isRead : true })
+        .eq('userId', user.id)
+        .eq('id', id)
+
+      if (updateError) {
+        console.error('Notification update error:', updateError)
+        return NextResponse.json(
+          { success: false, message: 'Failed to update notification' },
           { status: 500 }
         )
       }
@@ -165,6 +180,54 @@ export async function PATCH(request: NextRequest) {
     console.error('Notifications update error:', error)
     return NextResponse.json(
       { success: false, message: 'Failed to update notifications' },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE /api/notifications - Delete notification
+export async function DELETE(request: NextRequest) {
+  try {
+    const { user, error } = await getAuthUser()
+    if (error || !user) {
+      return NextResponse.json(
+        { success: false, message: 'Not authorized' },
+        { status: 401 }
+      )
+    }
+
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: 'Notification ID required' },
+        { status: 400 }
+      )
+    }
+
+    const { error: deleteError } = await supabaseAdmin
+      .from('Notification')
+      .delete()
+      .eq('userId', user.id)
+      .eq('id', id)
+
+    if (deleteError) {
+      console.error('Notification delete error:', deleteError)
+      return NextResponse.json(
+        { success: false, message: 'Failed to delete notification' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Notification deleted'
+    })
+  } catch (error) {
+    console.error('Notification delete error:', error)
+    return NextResponse.json(
+      { success: false, message: 'Failed to delete notification' },
       { status: 500 }
     )
   }

@@ -70,6 +70,7 @@ export const translations = {
     finance: { en: 'Finance', ru: 'Финансы' },
     sponsors: { en: 'Sponsors', ru: 'Спонсоры' },
     attendance: { en: 'Attendance', ru: 'Посещаемость' },
+    notifications: { en: 'Notifications', ru: 'Уведомления' },
     reports: { en: 'Reports', ru: 'Отчёты' },
     settings: { en: 'Settings', ru: 'Настройки' },
     admin: { en: 'Admin', ru: 'Админ' },

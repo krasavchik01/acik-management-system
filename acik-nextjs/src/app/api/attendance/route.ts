@@ -15,6 +15,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const date = searchParams.get('date')
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
     const userId = searchParams.get('userId')
     const status = searchParams.get('status')
     const today = searchParams.get('today') === 'true'
@@ -35,6 +37,9 @@ export async function GET(request: NextRequest) {
     } else if (today) {
       const todayDate = new Date().toISOString().split('T')[0]
       query = query.gte('date', todayDate + 'T00:00:00').lte('date', todayDate + 'T23:59:59')
+    } else if (startDate && endDate) {
+      // Date range query
+      query = query.gte('date', startDate + 'T00:00:00').lte('date', endDate + 'T23:59:59')
     } else if (date) {
       query = query.gte('date', date + 'T00:00:00').lte('date', date + 'T23:59:59')
     }
@@ -64,7 +69,22 @@ export async function GET(request: NextRequest) {
             .single()
           userInfo = data
         }
-        return { ...record, user: userInfo }
+
+        // Map database fields to expected frontend fields
+        return {
+          id: record.id,
+          userId: record.userId,
+          date: record.date?.split('T')[0] || record.date,
+          checkIn: record.checkInTime,
+          checkOut: record.checkOutTime,
+          hoursWorked: record.hoursWorked,
+          status: record.status,
+          location: record.checkInLat && record.checkInLng
+            ? `${record.checkInLat},${record.checkInLng}`
+            : record.checkInAddress,
+          notes: record.notes,
+          user: userInfo
+        }
       })
     )
 
@@ -120,16 +140,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Parse location if provided
+    let lat = null
+    let lng = null
+    if (body.location) {
+      const parts = body.location.split(',')
+      if (parts.length === 2) {
+        lat = parseFloat(parts[0])
+        lng = parseFloat(parts[1])
+      }
+    }
+
     const attendanceData = {
       id: crypto.randomUUID(),
       userId: user.id,
       date: now.toISOString(),
       checkInTime: now.toISOString(),
       checkInMethod: body.method || 'Manual',
-      checkInAddress: body.address || null,
-      checkInLat: body.lat || null,
-      checkInLng: body.lng || null,
-      status: 'Present',
+      checkInAddress: body.locationAddress || null,
+      checkInLat: lat,
+      checkInLng: lng,
+      status: 'Working',
       workType: body.workType || 'Office',
       notes: body.notes || null,
       projectId: body.projectId || null,
@@ -154,8 +185,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Return in expected format
     return NextResponse.json(
-      { success: true, message: 'Checked in successfully', data: attendance },
+      {
+        success: true,
+        message: 'Checked in successfully',
+        data: {
+          id: attendance.id,
+          userId: attendance.userId,
+          date: attendance.date?.split('T')[0],
+          checkIn: attendance.checkInTime,
+          checkOut: attendance.checkOutTime,
+          hoursWorked: attendance.hoursWorked,
+          status: attendance.status,
+          location: lat && lng ? `${lat},${lng}` : attendance.checkInAddress,
+          notes: attendance.notes
+        }
+      },
       { status: 201 }
     )
   } catch (error) {
@@ -182,19 +228,45 @@ export async function PATCH(request: NextRequest) {
     const now = new Date()
     const todayDate = now.toISOString().split('T')[0]
 
-    // Find today's attendance record
-    const { data: existing, error: findError } = await supabaseAdmin
-      .from('Attendance')
-      .select('*')
-      .eq('userId', user.id)
-      .gte('date', todayDate + 'T00:00:00')
-      .lte('date', todayDate + 'T23:59:59')
-      .is('checkOutTime', null)
-      .single()
+    // Find today's attendance record or specific record by id
+    let existing = null
 
-    if (findError || !existing) {
+    if (body.id) {
+      const { data, error: findError } = await supabaseAdmin
+        .from('Attendance')
+        .select('*')
+        .eq('id', body.id)
+        .eq('userId', user.id)
+        .single()
+
+      if (!findError && data) {
+        existing = data
+      }
+    } else {
+      const { data, error: findError } = await supabaseAdmin
+        .from('Attendance')
+        .select('*')
+        .eq('userId', user.id)
+        .gte('date', todayDate + 'T00:00:00')
+        .lte('date', todayDate + 'T23:59:59')
+        .is('checkOutTime', null)
+        .single()
+
+      if (!findError && data) {
+        existing = data
+      }
+    }
+
+    if (!existing) {
       return NextResponse.json(
-        { success: false, message: 'No active check-in found for today' },
+        { success: false, message: 'No active check-in found' },
+        { status: 400 }
+      )
+    }
+
+    if (existing.checkOutTime) {
+      return NextResponse.json(
+        { success: false, message: 'Already checked out' },
         { status: 400 }
       )
     }
@@ -203,15 +275,27 @@ export async function PATCH(request: NextRequest) {
     const checkInTime = new Date(existing.checkInTime)
     const hoursWorked = (now.getTime() - checkInTime.getTime()) / (1000 * 60 * 60)
 
+    // Parse checkout location if provided
+    let lat = null
+    let lng = null
+    if (body.checkOutLocation) {
+      const parts = body.checkOutLocation.split(',')
+      if (parts.length === 2) {
+        lat = parseFloat(parts[0])
+        lng = parseFloat(parts[1])
+      }
+    }
+
     const { data: attendance, error: updateError } = await supabaseAdmin
       .from('Attendance')
       .update({
         checkOutTime: now.toISOString(),
         checkOutMethod: body.method || 'Manual',
-        checkOutAddress: body.address || null,
-        checkOutLat: body.lat || null,
-        checkOutLng: body.lng || null,
+        checkOutAddress: body.checkOutAddress || null,
+        checkOutLat: lat,
+        checkOutLng: lng,
         hoursWorked: Math.round(hoursWorked * 100) / 100,
+        status: 'Present',
         notes: body.notes || existing.notes,
         mood: body.mood || null,
         productivity: body.productivity || null,
@@ -232,7 +316,19 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `Checked out successfully. Worked ${hoursWorked.toFixed(2)} hours.`,
-      data: attendance
+      data: {
+        id: attendance.id,
+        userId: attendance.userId,
+        date: attendance.date?.split('T')[0],
+        checkIn: attendance.checkInTime,
+        checkOut: attendance.checkOutTime,
+        hoursWorked: attendance.hoursWorked,
+        status: attendance.status,
+        location: existing.checkInLat && existing.checkInLng
+          ? `${existing.checkInLat},${existing.checkInLng}`
+          : existing.checkInAddress,
+        notes: attendance.notes
+      }
     })
   } catch (error) {
     console.error('Attendance update error:', error)

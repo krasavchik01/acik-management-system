@@ -23,6 +23,7 @@ import {
   FiGlobe,
   FiMoon,
   FiSun,
+  FiBell,
 } from 'react-icons/fi'
 import { useState } from 'react'
 
@@ -35,6 +36,7 @@ const menuItems = [
   { key: 'finance', href: '/finance', icon: FiDollarSign },
   { key: 'sponsors', href: '/sponsors', icon: FiHeart },
   { key: 'attendance', href: '/attendance', icon: FiClock },
+  { key: 'notifications', href: '/notifications', icon: FiBell },
   { key: 'reports', href: '/reports', icon: FiBarChart2 },
 ]
 
