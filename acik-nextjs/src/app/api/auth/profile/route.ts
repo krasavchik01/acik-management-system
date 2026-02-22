@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-// Use service role for server-side operations
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +13,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const { data: user, error } = await supabase
+    const { data: user, error } = await getSupabaseAdmin()
       .from('User')
       .select('id, supabaseId, email, name, role, department, avatar, phone, isActive, isDemo')
       .eq('supabaseId', supabaseId)
@@ -61,7 +55,7 @@ export async function PUT(request: NextRequest) {
     if (avatar !== undefined) updateData.avatar = avatar
     if (department) updateData.department = department
 
-    const { data: user, error } = await supabase
+    const { data: user, error } = await getSupabaseAdmin()
       .from('User')
       .update(updateData)
       .eq('supabaseId', supabaseId)
