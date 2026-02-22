@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import prisma from '@/lib/prisma/client'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import type { UserProfile } from '@/types'
 
 export async function getAuthUser(): Promise<{ user: UserProfile | null; error?: string }> {
@@ -11,28 +11,21 @@ export async function getAuthUser(): Promise<{ user: UserProfile | null; error?:
       return { user: null, error: 'Not authenticated' }
     }
 
-    const profile = await prisma.user.findUnique({
-      where: { supabaseId: user.id },
-      select: {
-        id: true,
-        supabaseId: true,
-        email: true,
-        name: true,
-        role: true,
-        department: true,
-        avatar: true,
-        phone: true,
-        isActive: true,
-        isDemo: true,
-      }
-    })
+    // Use Supabase admin client instead of Prisma (more reliable connection)
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('User')
+      .select('id, supabaseId, email, name, role, department, avatar, phone, isActive, isDemo')
+      .eq('supabaseId', user.id)
+      .single()
 
-    if (!profile) {
+    if (profileError || !profile) {
+      console.error('Profile fetch error:', profileError?.message)
       return { user: null, error: 'User profile not found' }
     }
 
     return { user: profile as UserProfile }
-  } catch {
+  } catch (err) {
+    console.error('Auth error:', err)
     return { user: null, error: 'Authentication error' }
   }
 }
