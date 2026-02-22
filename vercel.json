@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd acik-nextjs && npm run build",
+  "installCommand": "cd acik-nextjs && npm install",
+  "framework": "nextjs",
+  "outputDirectory": "acik-nextjs/.next"
+}
