@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
 export async function GET() {
@@ -13,7 +13,7 @@ export async function GET() {
     }
 
     // Get tasks assigned to or created by user
-    const { data: tasks, error: fetchError } = await supabaseAdmin
+    const { data: tasks, error: fetchError } = await getSupabaseAdmin()
       .from('Task')
       .select('*')
       .or(`assignedToId.eq.${user.id},createdById.eq.${user.id}`)
@@ -35,7 +35,7 @@ export async function GET() {
         let createdBy = null
 
         if (task.projectId) {
-          const { data } = await supabaseAdmin
+          const { data } = await getSupabaseAdmin()
             .from('Project')
             .select('id, name')
             .eq('id', task.projectId)
@@ -44,7 +44,7 @@ export async function GET() {
         }
 
         if (task.assignedToId) {
-          const { data } = await supabaseAdmin
+          const { data } = await getSupabaseAdmin()
             .from('User')
             .select('id, name, avatar')
             .eq('id', task.assignedToId)
@@ -53,7 +53,7 @@ export async function GET() {
         }
 
         if (task.createdById) {
-          const { data } = await supabaseAdmin
+          const { data } = await getSupabaseAdmin()
             .from('User')
             .select('id, name')
             .eq('id', task.createdById)

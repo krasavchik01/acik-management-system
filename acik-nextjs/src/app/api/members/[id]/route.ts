@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, ADMIN_ROLES } from '@/lib/auth'
 
 // GET /api/members/[id]
@@ -18,7 +18,7 @@ export async function GET(
 
     const { id } = await params
 
-    const { data: member, error: fetchError } = await supabaseAdmin
+    const { data: member, error: fetchError } = await getSupabaseAdmin()
       .from('Member')
       .select('*')
       .eq('id', id)
@@ -86,7 +86,7 @@ export async function PUT(
       if (body.company.position !== undefined) updateData.companyPosition = body.company.position
     }
 
-    const { data: member, error: updateError } = await supabaseAdmin
+    const { data: member, error: updateError } = await getSupabaseAdmin()
       .from('Member')
       .update(updateData)
       .eq('id', id)
@@ -133,7 +133,7 @@ export async function DELETE(
 
     const { id } = await params
 
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('Member')
       .delete()
       .eq('id', id)

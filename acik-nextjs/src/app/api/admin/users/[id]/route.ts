@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, ADMIN_ROLES } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 
@@ -28,7 +28,7 @@ export async function PUT(
     const body = await request.json()
 
     // Get current user data
-    const { data: targetUser } = await supabaseAdmin
+    const { data: targetUser } = await getSupabaseAdmin()
       .from('User')
       .select('supabaseId, email, isDemo')
       .eq('id', id)
@@ -78,7 +78,7 @@ export async function PUT(
       }
     }
 
-    const { data: updatedUser, error: updateError } = await supabaseAdmin
+    const { data: updatedUser, error: updateError } = await getSupabaseAdmin()
       .from('User')
       .update(updateData)
       .eq('id', id)
@@ -126,7 +126,7 @@ export async function DELETE(
     const { id } = await params
 
     // Get user data
-    const { data: targetUser } = await supabaseAdmin
+    const { data: targetUser } = await getSupabaseAdmin()
       .from('User')
       .select('supabaseId, isDemo, email')
       .eq('id', id)
@@ -148,7 +148,7 @@ export async function DELETE(
     }
 
     // Delete from our database first
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('User')
       .delete()
       .eq('id', id)

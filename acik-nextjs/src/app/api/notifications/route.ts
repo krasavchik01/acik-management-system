@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
 // GET /api/notifications - Get user notifications
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const unreadOnly = searchParams.get('unreadOnly') === 'true'
     const limit = parseInt(searchParams.get('limit') || '20')
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('Notification')
       .select('*')
       .eq('userId', user.id)
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get unread count
-    const { count } = await supabaseAdmin
+    const { count } = await getSupabaseAdmin()
       .from('Notification')
       .select('*', { count: 'exact', head: true })
       .eq('userId', user.id)
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     }
 
-    const { data: notification, error: createError } = await supabaseAdmin
+    const { data: notification, error: createError } = await getSupabaseAdmin()
       .from('Notification')
       .insert(notificationData)
       .select()
@@ -127,7 +127,7 @@ export async function PATCH(request: NextRequest) {
 
     if (markAllRead) {
       // Mark all user notifications as read
-      const { error: updateError } = await supabaseAdmin
+      const { error: updateError } = await getSupabaseAdmin()
         .from('Notification')
         .update({ isRead: true })
         .eq('userId', user.id)
@@ -142,7 +142,7 @@ export async function PATCH(request: NextRequest) {
       }
     } else if (id) {
       // Mark single notification as read
-      const { error: updateError } = await supabaseAdmin
+      const { error: updateError } = await getSupabaseAdmin()
         .from('Notification')
         .update({ isRead: isRead !== undefined ? isRead : true })
         .eq('userId', user.id)
@@ -157,7 +157,7 @@ export async function PATCH(request: NextRequest) {
       }
     } else if (notificationIds && notificationIds.length > 0) {
       // Mark specific notifications as read
-      const { error: updateError } = await supabaseAdmin
+      const { error: updateError } = await getSupabaseAdmin()
         .from('Notification')
         .update({ isRead: true })
         .eq('userId', user.id)
@@ -206,7 +206,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('Notification')
       .delete()
       .eq('userId', user.id)

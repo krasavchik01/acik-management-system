@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, MANAGER_ROLES, ADMIN_ROLES } from '@/lib/auth'
 
 // GET /api/projects/[id]
@@ -18,7 +18,7 @@ export async function GET(
 
     const { id } = await params
 
-    const { data: project, error: fetchError } = await supabaseAdmin
+    const { data: project, error: fetchError } = await getSupabaseAdmin()
       .from('Project')
       .select('*')
       .eq('id', id)
@@ -34,7 +34,7 @@ export async function GET(
     // Get manager info
     let manager = null
     if (project.managerId) {
-      const { data: managerData } = await supabaseAdmin
+      const { data: managerData } = await getSupabaseAdmin()
         .from('User')
         .select('id, name, email, role, avatar')
         .eq('id', project.managerId)
@@ -43,7 +43,7 @@ export async function GET(
     }
 
     // Get tasks
-    const { data: tasks } = await supabaseAdmin
+    const { data: tasks } = await getSupabaseAdmin()
       .from('Task')
       .select('*')
       .eq('projectId', id)
@@ -102,7 +102,7 @@ export async function PUT(
     if (body.budget?.spent !== undefined) updateData.budgetSpent = body.budget.spent
     if (body.tags !== undefined) updateData.tags = body.tags
 
-    const { data: project, error: updateError } = await supabaseAdmin
+    const { data: project, error: updateError } = await getSupabaseAdmin()
       .from('Project')
       .update(updateData)
       .eq('id', id)
@@ -150,9 +150,9 @@ export async function DELETE(
     const { id } = await params
 
     // Delete related tasks first
-    await supabaseAdmin.from('Task').delete().eq('projectId', id)
+    await getSupabaseAdmin().from('Task').delete().eq('projectId', id)
 
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('Project')
       .delete()
       .eq('id', id)

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 export async function GET() {
   try {
@@ -48,7 +48,7 @@ export async function GET() {
 
     // Try to run migration
     try {
-      await supabaseAdmin.rpc('exec_sql', { sql: createTableSQL })
+      await getSupabaseAdmin().rpc('exec_sql', { sql: createTableSQL })
     } catch {
       // Ignore migration errors - table might already exist
     }

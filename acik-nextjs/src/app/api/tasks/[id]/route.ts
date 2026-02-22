@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
   try {
-    await supabaseAdmin
+    await getSupabaseAdmin()
       .from('Notification')
       .insert({
         id: crypto.randomUUID(),
@@ -38,7 +38,7 @@ export async function GET(
 
     const { id } = await params
 
-    const { data: task, error: fetchError } = await supabaseAdmin
+    const { data: task, error: fetchError } = await getSupabaseAdmin()
       .from('Task')
       .select('*')
       .eq('id', id)
@@ -57,7 +57,7 @@ export async function GET(
     let createdBy = null
 
     if (task.projectId) {
-      const { data } = await supabaseAdmin
+      const { data } = await getSupabaseAdmin()
         .from('Project')
         .select('id, name')
         .eq('id', task.projectId)
@@ -66,7 +66,7 @@ export async function GET(
     }
 
     if (task.assignedToId) {
-      const { data } = await supabaseAdmin
+      const { data } = await getSupabaseAdmin()
         .from('User')
         .select('id, name, avatar, email')
         .eq('id', task.assignedToId)
@@ -75,7 +75,7 @@ export async function GET(
     }
 
     if (task.createdById) {
-      const { data } = await supabaseAdmin
+      const { data } = await getSupabaseAdmin()
         .from('User')
         .select('id, name')
         .eq('id', task.createdById)
@@ -114,7 +114,7 @@ export async function PUT(
     const body = await request.json()
 
     // Get current task to compare changes
-    const { data: currentTask } = await supabaseAdmin
+    const { data: currentTask } = await getSupabaseAdmin()
       .from('Task')
       .select('*')
       .eq('id', id)
@@ -144,7 +144,7 @@ export async function PUT(
     if (body.assignedToId !== undefined) updateData.assignedToId = body.assignedToId
     if (body.tags !== undefined) updateData.tags = body.tags
 
-    const { data: task, error: updateError } = await supabaseAdmin
+    const { data: task, error: updateError } = await getSupabaseAdmin()
       .from('Task')
       .update(updateData)
       .eq('id', id)
@@ -219,7 +219,7 @@ export async function DELETE(
     const { id } = await params
 
     // Check if task exists and user has permission
-    const { data: task } = await supabaseAdmin
+    const { data: task } = await getSupabaseAdmin()
       .from('Task')
       .select('createdById')
       .eq('id', id)
@@ -240,7 +240,7 @@ export async function DELETE(
       )
     }
 
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('Task')
       .delete()
       .eq('id', id)

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const { data: existingUser } = await supabaseAdmin
+    const { data: existingUser } = await getSupabaseAdmin()
       .from('User')
       .select('id')
       .or(`supabaseId.eq.${supabaseId},email.eq.${email}`)
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
 
-    const { data: user, error: createError } = await supabaseAdmin
+    const { data: user, error: createError } = await getSupabaseAdmin()
       .from('User')
       .insert(userData)
       .select('id, supabaseId, email, name, role, department, avatar, phone, isActive, isDemo')

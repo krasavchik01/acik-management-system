@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
   try {
-    await supabaseAdmin
+    await getSupabaseAdmin()
       .from('Notification')
       .insert({
         id: crypto.randomUUID(),
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
     const myTasks = searchParams.get('my') === 'true'
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('Task')
       .select('*')
       .order('createdAt', { ascending: false })
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         let createdBy = null
 
         if (task.projectId) {
-          const { data } = await supabaseAdmin
+          const { data } = await getSupabaseAdmin()
             .from('Project')
             .select('id, name')
             .eq('id', task.projectId)
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
         }
 
         if (task.assignedToId) {
-          const { data } = await supabaseAdmin
+          const { data } = await getSupabaseAdmin()
             .from('User')
             .select('id, name, avatar, email')
             .eq('id', task.assignedToId)
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
         }
 
         if (task.createdById) {
-          const { data } = await supabaseAdmin
+          const { data } = await getSupabaseAdmin()
             .from('User')
             .select('id, name')
             .eq('id', task.createdById)
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
 
-    const { data: task, error: createError } = await supabaseAdmin
+    const { data: task, error: createError } = await getSupabaseAdmin()
       .from('Task')
       .insert(taskData)
       .select()
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
     // Get project name for notification
     let projectName = 'Unknown Project'
     if (body.projectId) {
-      const { data: project } = await supabaseAdmin
+      const { data: project } = await getSupabaseAdmin()
         .from('Project')
         .select('name')
         .eq('id', body.projectId)

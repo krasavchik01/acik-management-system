@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, MANAGER_ROLES } from '@/lib/auth'
 
 // GET /api/finance
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('Finance')
       .select('*')
       .order('date', { ascending: false })
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
 
-    const { data: transaction, error: createError } = await supabaseAdmin
+    const { data: transaction, error: createError } = await getSupabaseAdmin()
       .from('Finance')
       .insert(financeData)
       .select()

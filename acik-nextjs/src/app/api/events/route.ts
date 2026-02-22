@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
 // GET /api/events
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type')
     const search = searchParams.get('search')
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('Event')
       .select('*')
       .order('startDate', { ascending: false })
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
 
-    const { data: event, error: createError } = await supabaseAdmin
+    const { data: event, error: createError } = await getSupabaseAdmin()
       .from('Event')
       .insert(eventData)
       .select()

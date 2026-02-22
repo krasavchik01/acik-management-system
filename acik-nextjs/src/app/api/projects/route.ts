@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, MANAGER_ROLES } from '@/lib/auth'
 
 // GET /api/projects - Get all projects with filters
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority')
     const search = searchParams.get('search')
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('Project')
       .select('*')
       .order('createdAt', { ascending: false })
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         // Get manager info
         let manager = null
         if (project.managerId) {
-          const { data: managerData } = await supabaseAdmin
+          const { data: managerData } = await getSupabaseAdmin()
             .from('User')
             .select('id, name, email, role, avatar')
             .eq('id', project.managerId)
@@ -54,12 +54,12 @@ export async function GET(request: NextRequest) {
         }
 
         // Get task counts
-        const { count: taskCount } = await supabaseAdmin
+        const { count: taskCount } = await getSupabaseAdmin()
           .from('Task')
           .select('*', { count: 'exact', head: true })
           .eq('projectId', project.id)
 
-        const { count: completedTasks } = await supabaseAdmin
+        const { count: completedTasks } = await getSupabaseAdmin()
           .from('Task')
           .select('*', { count: 'exact', head: true })
           .eq('projectId', project.id)
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
 
-    const { data: project, error: createError } = await supabaseAdmin
+    const { data: project, error: createError } = await getSupabaseAdmin()
       .from('Project')
       .insert(projectData)
       .select()

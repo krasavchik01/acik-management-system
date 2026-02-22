@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
 export async function GET() {
@@ -13,7 +13,7 @@ export async function GET() {
     }
 
     // Get all projects
-    const { data: projects } = await supabaseAdmin
+    const { data: projects } = await getSupabaseAdmin()
       .from('Project')
       .select('status, category, priority, budgetAllocated, budgetSpent, budgetRemaining')
 

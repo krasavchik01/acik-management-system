@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
 // GET /api/members
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category')
     const search = searchParams.get('search')
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('Member')
       .select('*')
       .order('lastName', { ascending: true })
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
 
-    const { data: member, error: createError } = await supabaseAdmin
+    const { data: member, error: createError } = await getSupabaseAdmin()
       .from('Member')
       .insert(memberData)
       .select()

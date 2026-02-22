@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 // GET /api/demo-accounts - получение демо аккаунтов для страницы входа
 export async function GET() {
   try {
-    const { data: demoUsers, error } = await supabaseAdmin
+    const { data: demoUsers, error } = await getSupabaseAdmin()
       .from('User')
       .select('id, name, email, role')
       .eq('isDemo', true)

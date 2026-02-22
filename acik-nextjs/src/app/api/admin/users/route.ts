@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, ADMIN_ROLES } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const department = searchParams.get('department')
     const demoOnly = searchParams.get('demoOnly')
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('User')
       .select('id, supabaseId, email, name, role, department, avatar, phone, isActive, isDemo, permissions, lastLogin, createdAt')
       .order('createdAt', { ascending: false })
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create user in our database
-    const { data: newUser, error: dbError } = await supabaseAdmin
+    const { data: newUser, error: dbError } = await getSupabaseAdmin()
       .from('User')
       .insert({
         supabaseId: authData.user.id,

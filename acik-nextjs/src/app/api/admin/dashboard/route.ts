@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, ADMIN_ROLES } from '@/lib/auth'
 
 export async function GET() {
@@ -28,12 +28,12 @@ export async function GET() {
       eventsRes,
       financeRes,
     ] = await Promise.all([
-      supabaseAdmin.from('User').select('id, isActive'),
-      supabaseAdmin.from('Project').select('id, status'),
-      supabaseAdmin.from('Task').select('id, status'),
-      supabaseAdmin.from('Member').select('id, status'),
-      supabaseAdmin.from('Event').select('id'),
-      supabaseAdmin.from('Finance').select('amount, type'),
+      getSupabaseAdmin().from('User').select('id, isActive'),
+      getSupabaseAdmin().from('Project').select('id, status'),
+      getSupabaseAdmin().from('Task').select('id, status'),
+      getSupabaseAdmin().from('Member').select('id, status'),
+      getSupabaseAdmin().from('Event').select('id'),
+      getSupabaseAdmin().from('Finance').select('amount, type'),
     ])
 
     const users = usersRes.data || []
@@ -56,14 +56,14 @@ export async function GET() {
     const totalIncome = finances.filter(f => f.type === 'Income').reduce((sum, f) => sum + (f.amount || 0), 0)
 
     // Get recent users
-    const { data: recentUsers } = await supabaseAdmin
+    const { data: recentUsers } = await getSupabaseAdmin()
       .from('User')
       .select('id, name, email, role, createdAt')
       .order('createdAt', { ascending: false })
       .limit(5)
 
     // Get recent projects
-    const { data: recentProjects } = await supabaseAdmin
+    const { data: recentProjects } = await getSupabaseAdmin()
       .from('Project')
       .select('id, name, status, createdAt')
       .order('createdAt', { ascending: false })

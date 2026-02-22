@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
 // GET /api/attendance
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const today = searchParams.get('today') === 'true'
     const myToday = searchParams.get('myToday') === 'true'
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('Attendance')
       .select('*')
       .order('date', { ascending: false })
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       (attendance || []).map(async (record) => {
         let userInfo = null
         if (record.userId) {
-          const { data } = await supabaseAdmin
+          const { data } = await getSupabaseAdmin()
             .from('User')
             .select('id, name, email, avatar, role, department')
             .eq('id', record.userId)
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     const todayDate = now.toISOString().split('T')[0]
 
     // Check if already checked in today
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await getSupabaseAdmin()
       .from('Attendance')
       .select('id, checkOutTime')
       .eq('userId', user.id)
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
       updatedAt: now.toISOString(),
     }
 
-    const { data: attendance, error: createError } = await supabaseAdmin
+    const { data: attendance, error: createError } = await getSupabaseAdmin()
       .from('Attendance')
       .insert(attendanceData)
       .select()
@@ -232,7 +232,7 @@ export async function PATCH(request: NextRequest) {
     let existing = null
 
     if (body.id) {
-      const { data, error: findError } = await supabaseAdmin
+      const { data, error: findError } = await getSupabaseAdmin()
         .from('Attendance')
         .select('*')
         .eq('id', body.id)
@@ -243,7 +243,7 @@ export async function PATCH(request: NextRequest) {
         existing = data
       }
     } else {
-      const { data, error: findError } = await supabaseAdmin
+      const { data, error: findError } = await getSupabaseAdmin()
         .from('Attendance')
         .select('*')
         .eq('userId', user.id)
@@ -286,7 +286,7 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    const { data: attendance, error: updateError } = await supabaseAdmin
+    const { data: attendance, error: updateError } = await getSupabaseAdmin()
       .from('Attendance')
       .update({
         checkOutTime: now.toISOString(),
