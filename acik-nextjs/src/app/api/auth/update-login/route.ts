@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma/client'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await prisma.user.update({
-      where: { supabaseId },
-      data: { lastLogin: new Date() }
-    })
+    await supabaseAdmin
+      .from('User')
+      .update({ lastLogin: new Date().toISOString() })
+      .eq('supabaseId', supabaseId)
 
     return NextResponse.json({ success: true })
   } catch (error) {
