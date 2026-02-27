@@ -82,6 +82,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password, name, role, department, isDemo, permissions } = body
 
+    console.log('Creating user with data:', { email, name, role, department, isDemo, permissions })
+
     if (!email || !password || !name) {
       return NextResponse.json(
         { success: false, message: 'Email, password and name are required' },
@@ -111,7 +113,7 @@ export async function POST(request: NextRequest) {
     if (authError) {
       console.error('Auth user creation error:', authError)
       return NextResponse.json(
-        { success: false, message: authError.message || 'Failed to create auth user' },
+        { success: false, message: `Ошибка аутентификации: ${authError.message}` },
         { status: 400 }
       )
     }
@@ -139,7 +141,7 @@ export async function POST(request: NextRequest) {
       await supabaseAuthAdmin.auth.admin.deleteUser(authData.user.id)
       console.error('DB user creation error:', dbError)
       return NextResponse.json(
-        { success: false, message: 'Failed to create user in database' },
+        { success: false, message: `Failed to create user in database: ${dbError.message}` },
         { status: 500 }
       )
     }
