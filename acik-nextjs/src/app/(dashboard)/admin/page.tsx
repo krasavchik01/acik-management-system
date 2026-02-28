@@ -990,6 +990,62 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* Permissions/Modules selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Модули доступа
+                </label>
+                <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-xl p-3 space-y-2">
+                  {Object.entries(permissionsByCategory).map(([category, perms]) => (
+                    <div key={category} className="mb-2">
+                      <div className="text-xs font-semibold text-gray-500 uppercase mb-1">{category}</div>
+                      <div className="grid grid-cols-2 gap-1">
+                        {perms.map((perm) => (
+                          <label
+                            key={perm.key}
+                            className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer text-xs transition-all ${
+                              createForm.permissions.includes(perm.key)
+                                ? 'bg-indigo-100 border border-indigo-500'
+                                : 'bg-gray-50 border border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={createForm.permissions.includes(perm.key)}
+                              onChange={() => {
+                                if (createForm.permissions.includes(perm.key)) {
+                                  setCreateForm({ ...createForm, permissions: createForm.permissions.filter(p => p !== perm.key) })
+                                } else {
+                                  setCreateForm({ ...createForm, permissions: [...createForm.permissions, perm.key] })
+                                }
+                              }}
+                              className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            />
+                            <span className="text-gray-700">{perm.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setCreateForm({ ...createForm, permissions: permissionsList.map(p => p.key) })}
+                    className="text-xs text-indigo-600 hover:text-indigo-800"
+                  >
+                    Выбрать все
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCreateForm({ ...createForm, permissions: [] })}
+                    className="text-xs text-gray-500 hover:text-gray-700"
+                  >
+                    Сбросить
+                  </button>
+                </div>
+              </div>
+
               <div className="flex items-center gap-3 p-4 bg-yellow-50 rounded-xl">
                 <input
                   type="checkbox"
