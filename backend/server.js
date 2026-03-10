@@ -28,8 +28,24 @@ const io = socketIo(server, {
 
 // Middleware
 app.use(helmet()); // Security headers
+
+// Safe CORS Configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:5173' // Just in case you migrate to Vite
+];
+
 app.use(cors({
-  origin: true, // Allow all origins for now
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    // or if the origin is in our allowed list, or if we are in development mode
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' })); // Body parser
@@ -139,6 +155,18 @@ app.get('/api/health', (req, res) => {
 
 // Seed route (for initial database setup)
 app.get('/api/seed', async (req, res) => {
+  // SECURITY FIX: Protect seed route in production
+  const adminKey = req.headers['x-admin-key'];
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.ADMIN_KEY || adminKey !== process.env.ADMIN_KEY) {
+      console.warn('⚠️ Unauthorized attempt to access /api/seed in production');
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden: Seeding is disabled in production without a valid admin key'
+      });
+    }
+  }
+
   try {
     const User = require('./models/User');
     const Project = require('./models/Project');
