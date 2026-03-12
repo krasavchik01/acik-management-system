@@ -243,12 +243,12 @@ export default function AttendancePage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Present': return 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400'
-      case 'Absent': return 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400'
-      case 'Late': return 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400'
-      case 'HalfDay': return 'bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400'
-      case 'Working': return 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400'
-      default: return 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300'
+      case 'Present': return 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200/50 dark:border-green-800/50'
+      case 'Absent': return 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-800/50'
+      case 'Late': return 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200/50 dark:border-yellow-800/50'
+      case 'HalfDay': return 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200/50 dark:border-orange-800/50'
+      case 'Working': return 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/50'
+      default: return 'bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-slate-300 border border-gray-200 overflow-hidden dark:border-slate-700'
     }
   }
 
@@ -316,7 +316,7 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
         title={language === 'ru' ? 'Посещаемость' : 'Attendance'}
         subtitle={new Date().toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US', {
@@ -327,41 +327,38 @@ export default function AttendancePage() {
         })}
       />
 
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        <div className="flex gap-3 mb-8 overflow-x-auto pb-4 custom-scrollbar">
           <button
             onClick={() => setActiveTab('today')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
-              activeTab === 'today'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
-            }`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold whitespace-nowrap transition-all duration-200 ${activeTab === 'today'
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 dark:shadow-indigo-900/30 -translate-y-0.5'
+              : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700/50 hover:border-indigo-200 dark:hover:border-indigo-900'
+              }`}
           >
-            <FiClock size={18} />
+            <FiClock size={18} className={activeTab === 'today' ? 'text-indigo-100' : 'text-gray-400 dark:text-slate-500'} />
             {language === 'ru' ? 'Сегодня' : 'Today'}
           </button>
           <button
             onClick={() => setActiveTab('calendar')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
-              activeTab === 'calendar'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
-            }`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold whitespace-nowrap transition-all duration-200 ${activeTab === 'calendar'
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 dark:shadow-indigo-900/30 -translate-y-0.5'
+              : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700/50 hover:border-indigo-200 dark:hover:border-indigo-900'
+              }`}
           >
-            <FiCalendar size={18} />
+            <FiCalendar size={18} className={activeTab === 'calendar' ? 'text-indigo-100' : 'text-gray-400 dark:text-slate-500'} />
             {language === 'ru' ? 'Календарь' : 'Calendar'}
           </button>
           {canManage && (
             <button
               onClick={() => setActiveTab('team')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
-                activeTab === 'team'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
-              }`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold whitespace-nowrap transition-all duration-200 ${activeTab === 'team'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 dark:shadow-indigo-900/30 -translate-y-0.5'
+                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700/50 hover:border-indigo-200 dark:hover:border-indigo-900'
+                }`}
             >
-              <FiUsers size={18} />
+              <FiUsers size={18} className={activeTab === 'team' ? 'text-indigo-100' : 'text-gray-400 dark:text-slate-500'} />
               {language === 'ru' ? 'Команда' : 'Team'}
             </button>
           )}
@@ -369,56 +366,56 @@ export default function AttendancePage() {
 
         {/* Today Tab */}
         {activeTab === 'today' && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Check In/Out Card */}
-            <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-8 text-white relative overflow-hidden">
-              <div className="absolute -right-20 -top-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
-              <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
+            <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl shadow-indigo-600/20 dark:shadow-indigo-900/30">
+              <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
 
               <div className="relative">
                 <div className="text-center mb-8">
-                  <p className="text-white/70 text-sm mb-2">
+                  <p className="text-white/70 text-sm font-medium uppercase tracking-widest mb-2">
                     {language === 'ru' ? 'Текущее время' : 'Current Time'}
                   </p>
-                  <h1 className="text-5xl font-bold tracking-wider">{time}</h1>
+                  <h1 className="text-6xl font-black tracking-wider drop-shadow-md">{time}</h1>
                 </div>
 
                 {loading ? (
                   <div className="flex justify-center py-8">
-                    <FiLoader className="animate-spin" size={32} />
+                    <FiLoader className="animate-spin text-white/50" size={32} />
                   </div>
                 ) : todayRecord ? (
                   <div className="space-y-6">
                     {/* Status Cards */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center">
-                        <FiLogIn className="mx-auto mb-2" size={24} />
-                        <p className="text-white/70 text-xs mb-1">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center hover:bg-white/20 transition-all">
+                        <FiLogIn className="mx-auto mb-3 text-white/80" size={28} />
+                        <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">
                           {language === 'ru' ? 'Приход' : 'Check In'}
                         </p>
-                        <p className="text-xl font-bold">{formatTime(todayRecord.checkIn)}</p>
+                        <p className="text-2xl font-bold">{formatTime(todayRecord.checkIn)}</p>
                       </div>
-                      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center">
-                        <FiLogOut className="mx-auto mb-2" size={24} />
-                        <p className="text-white/70 text-xs mb-1">
+                      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center hover:bg-white/20 transition-all">
+                        <FiLogOut className="mx-auto mb-3 text-white/80" size={28} />
+                        <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">
                           {language === 'ru' ? 'Уход' : 'Check Out'}
                         </p>
-                        <p className="text-xl font-bold">{formatTime(todayRecord.checkOut)}</p>
+                        <p className="text-2xl font-bold">{formatTime(todayRecord.checkOut)}</p>
                       </div>
-                      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center">
-                        <FiClock className="mx-auto mb-2" size={24} />
-                        <p className="text-white/70 text-xs mb-1">
+                      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center hover:bg-white/20 transition-all">
+                        <FiClock className="mx-auto mb-3 text-white/80" size={28} />
+                        <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">
                           {language === 'ru' ? 'Отработано' : 'Hours'}
                         </p>
-                        <p className="text-xl font-bold">{formatHours(todayRecord.hoursWorked)}</p>
+                        <p className="text-2xl font-bold">{formatHours(todayRecord.hoursWorked)}</p>
                       </div>
                     </div>
 
                     {/* Location Info */}
                     {todayRecord.location && (
-                      <div className="flex items-center justify-center gap-2 text-white/70 text-sm">
+                      <div className="flex items-center justify-center gap-2 text-white/80 text-sm bg-white/5 py-2 px-4 rounded-full w-max mx-auto border border-white/10">
                         <FiMapPin size={16} />
-                        <span>{language === 'ru' ? 'Геолокация зафиксирована' : 'Location recorded'}</span>
+                        <span className="font-medium">{language === 'ru' ? 'Геолокация зафиксирована' : 'Location recorded'}</span>
                       </div>
                     )}
 
@@ -427,11 +424,11 @@ export default function AttendancePage() {
                       <button
                         onClick={handleCheckOut}
                         disabled={checkingOut}
-                        className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-bold text-lg hover:bg-white/90 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                        className="w-full py-4 mt-2 bg-white text-indigo-700 rounded-2xl font-black text-lg hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-3 shadow-xl"
                       >
                         {checkingOut ? (
                           <>
-                            <FiLoader className="animate-spin" size={20} />
+                            <FiLoader className="animate-spin" size={22} />
                             {gettingLocation
                               ? (language === 'ru' ? 'Получение геолокации...' : 'Getting location...')
                               : (language === 'ru' ? 'Отметка...' : 'Checking out...')
@@ -439,7 +436,7 @@ export default function AttendancePage() {
                           </>
                         ) : (
                           <>
-                            <FiLogOut size={20} />
+                            <FiLogOut size={22} />
                             {language === 'ru' ? 'Отметить уход' : 'Check Out'}
                           </>
                         )}
@@ -448,9 +445,11 @@ export default function AttendancePage() {
 
                     {/* Already checked out message */}
                     {todayRecord.checkOut && (
-                      <div className="text-center py-4">
-                        <FiCheckCircle className="mx-auto mb-2" size={32} />
-                        <p className="font-medium">
+                      <div className="text-center py-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm mt-4">
+                        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <FiCheckCircle className="text-white" size={32} />
+                        </div>
+                        <p className="font-bold text-lg">
                           {language === 'ru' ? 'Рабочий день завершён' : 'Work day completed'}
                         </p>
                       </div>
@@ -459,45 +458,53 @@ export default function AttendancePage() {
                 ) : (
                   <div className="space-y-6">
                     {/* Location Status */}
-                    <div className="flex items-center justify-center gap-3 py-4">
-                      {gettingLocation ? (
-                        <>
-                          <FiLoader className="animate-spin" size={20} />
-                          <span className="text-white/80">
-                            {language === 'ru' ? 'Получение геолокации...' : 'Getting location...'}
-                          </span>
-                        </>
-                      ) : locationError ? (
-                        <>
-                          <FiAlertCircle size={20} className="text-yellow-300" />
-                          <span className="text-yellow-200 text-sm">{locationError}</span>
-                        </>
-                      ) : location ? (
-                        <>
-                          <FiMapPin size={20} className="text-green-300" />
-                          <span className="text-green-200 text-sm">
-                            {language === 'ru' ? 'Геолокация доступна' : 'Location available'}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <FiMapPin size={20} className="text-white/60" />
-                          <span className="text-white/60 text-sm">
-                            {language === 'ru' ? 'Геолокация будет запрошена' : 'Location will be requested'}
-                          </span>
-                        </>
-                      )}
+                    <div className="flex items-center justify-center py-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
+                      <div className="flex items-center gap-3 px-4">
+                        {gettingLocation ? (
+                          <>
+                            <FiLoader className="animate-spin text-white" size={20} />
+                            <span className="text-white/90 font-medium">
+                              {language === 'ru' ? 'Получение геолокации...' : 'Getting location...'}
+                            </span>
+                          </>
+                        ) : locationError ? (
+                          <>
+                            <div className="p-2 bg-yellow-400/20 rounded-full">
+                              <FiAlertCircle size={20} className="text-yellow-300" />
+                            </div>
+                            <span className="text-yellow-200 font-medium text-sm">{locationError}</span>
+                          </>
+                        ) : location ? (
+                          <>
+                            <div className="p-2 bg-green-400/20 rounded-full">
+                              <FiMapPin size={20} className="text-green-300" />
+                            </div>
+                            <span className="text-green-200 font-medium text-sm">
+                              {language === 'ru' ? 'Геолокация доступна' : 'Location available'}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <div className="p-2 bg-white/10 rounded-full">
+                              <FiMapPin size={20} className="text-white/60" />
+                            </div>
+                            <span className="text-white/60 font-medium text-sm">
+                              {language === 'ru' ? 'Геолокация будет запрошена' : 'Location will be requested'}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     {/* Check In Button */}
                     <button
                       onClick={handleCheckIn}
                       disabled={checkingIn}
-                      className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-bold text-lg hover:bg-white/90 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                      className="w-full py-4 mt-2 bg-white text-indigo-700 rounded-2xl font-black text-lg hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-3 shadow-xl"
                     >
                       {checkingIn ? (
                         <>
-                          <FiLoader className="animate-spin" size={20} />
+                          <FiLoader className="animate-spin" size={22} />
                           {gettingLocation
                             ? (language === 'ru' ? 'Получение геолокации...' : 'Getting location...')
                             : (language === 'ru' ? 'Отметка...' : 'Checking in...')
@@ -505,7 +512,7 @@ export default function AttendancePage() {
                         </>
                       ) : (
                         <>
-                          <FiLogIn size={20} />
+                          <FiLogIn size={22} />
                           {language === 'ru' ? 'Отметить приход' : 'Check In'}
                         </>
                       )}
@@ -516,56 +523,56 @@ export default function AttendancePage() {
             </div>
 
             {/* Month Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-xl">
-                    <FiCheckCircle className="text-green-600 dark:text-green-400" size={20} />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-gray-100 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:-translate-y-1 dark:hover:shadow-indigo-900/20 transition-all duration-300 group">
+                <div className="flex items-center gap-4">
+                  <div className="p-3.5 bg-green-50 dark:bg-green-900/30 rounded-2xl group-hover:scale-110 transition-transform">
+                    <FiCheckCircle className="text-green-600 dark:text-green-400" size={24} />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{monthStats.present}</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-400">
+                    <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                       {language === 'ru' ? 'Присутствий' : 'Present'}
                     </p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{monthStats.present}</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-100 dark:bg-red-900/50 rounded-xl">
-                    <FiAlertCircle className="text-red-600 dark:text-red-400" size={20} />
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-gray-100 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:-translate-y-1 dark:hover:shadow-indigo-900/20 transition-all duration-300 group">
+                <div className="flex items-center gap-4">
+                  <div className="p-3.5 bg-red-50 dark:bg-red-900/30 rounded-2xl group-hover:scale-110 transition-transform">
+                    <FiAlertCircle className="text-red-600 dark:text-red-400" size={24} />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{monthStats.absent}</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-400">
+                    <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                       {language === 'ru' ? 'Пропусков' : 'Absent'}
                     </p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{monthStats.absent}</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-yellow-100 dark:bg-yellow-900/50 rounded-xl">
-                    <FiClock className="text-yellow-600 dark:text-yellow-400" size={20} />
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-gray-100 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:-translate-y-1 dark:hover:shadow-indigo-900/20 transition-all duration-300 group">
+                <div className="flex items-center gap-4">
+                  <div className="p-3.5 bg-yellow-50 dark:bg-yellow-900/30 rounded-2xl group-hover:scale-110 transition-transform">
+                    <FiClock className="text-yellow-600 dark:text-yellow-400" size={24} />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{monthStats.late}</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-400">
+                    <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                       {language === 'ru' ? 'Опозданий' : 'Late'}
                     </p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{monthStats.late}</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl">
-                    <FiClock className="text-indigo-600 dark:text-indigo-400" size={20} />
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-gray-100 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:-translate-y-1 dark:hover:shadow-indigo-900/20 transition-all duration-300 group">
+                <div className="flex items-center gap-4">
+                  <div className="p-3.5 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl group-hover:scale-110 transition-transform">
+                    <FiClock className="text-indigo-600 dark:text-indigo-400" size={24} />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{Math.round(monthStats.totalHours)}</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-400">
+                    <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                       {language === 'ru' ? 'Часов' : 'Hours'}
                     </p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{Math.round(monthStats.totalHours)}</p>
                   </div>
                 </div>
               </div>
@@ -575,40 +582,40 @@ export default function AttendancePage() {
 
         {/* Calendar Tab */}
         {activeTab === 'calendar' && (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Calendar Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-slate-700">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700/50">
               <button
                 onClick={prevMonth}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
+                className="p-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 rounded-xl transition-all border border-transparent hover:border-gray-200 dark:hover:border-slate-600 hover:shadow-sm"
               >
-                <FiChevronLeft size={20} className="text-gray-600 dark:text-slate-400" />
+                <FiChevronLeft size={20} />
               </button>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize tracking-wide">
                 {monthName}
               </h2>
               <button
                 onClick={nextMonth}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
+                className="p-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 rounded-xl transition-all border border-transparent hover:border-gray-200 dark:hover:border-slate-600 hover:shadow-sm"
               >
-                <FiChevronRight size={20} className="text-gray-600 dark:text-slate-400" />
+                <FiChevronRight size={20} />
               </button>
             </div>
 
             {/* Day Names */}
-            <div className="grid grid-cols-7 border-b border-gray-100 dark:border-slate-700">
+            <div className="grid grid-cols-7 border-b border-gray-100 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800/80">
               {dayNames.map(day => (
-                <div key={day} className="p-3 text-center text-xs font-medium text-gray-500 dark:text-slate-400">
+                <div key={day} className="py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400">
                   {day}
                 </div>
               ))}
             </div>
 
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7">
+            <div className="grid grid-cols-7 bg-gray-50/50 dark:bg-slate-900/20 gap-[1px]">
               {/* Empty cells for days before start of month */}
               {Array.from({ length: (firstDayOfMonth + 6) % 7 }).map((_, i) => (
-                <div key={`empty-${i}`} className="p-2 h-24 border-b border-r border-gray-50 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800/50" />
+                <div key={`empty-${i}`} className="p-3 min-h-[120px] bg-white dark:bg-slate-800/50" />
               ))}
 
               {/* Days */}
@@ -616,37 +623,35 @@ export default function AttendancePage() {
                 const day = i + 1
                 const dayAttendance = getAttendanceForDay(day)
                 const isToday = new Date().getDate() === day &&
-                               new Date().getMonth() === currentMonth.getMonth() &&
-                               new Date().getFullYear() === currentMonth.getFullYear()
+                  new Date().getMonth() === currentMonth.getMonth() &&
+                  new Date().getFullYear() === currentMonth.getFullYear()
                 const isWeekend = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day).getDay() % 6 === 0
 
                 return (
                   <div
                     key={day}
-                    className={`p-2 h-24 border-b border-r border-gray-50 dark:border-slate-700/50 transition-colors ${
-                      isToday ? 'bg-indigo-50 dark:bg-indigo-900/20' :
-                      isWeekend ? 'bg-gray-50 dark:bg-slate-800/50' : ''
-                    }`}
+                    className={`p-3 min-h-[120px] bg-white dark:bg-slate-800 transition-colors relative group hover:bg-gray-50/80 dark:hover:bg-slate-700/50 ${isToday ? 'bg-indigo-50/30 dark:bg-indigo-900/10' :
+                      isWeekend ? 'bg-gray-50/30 dark:bg-slate-800/80' : ''
+                      }`}
                   >
-                    <div className={`text-sm font-medium mb-1 ${
-                      isToday ? 'text-indigo-600 dark:text-indigo-400' :
+                    <div className={`text-sm font-bold mb-2 flex items-center justify-center w-8 h-8 rounded-full ${isToday ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' :
                       isWeekend ? 'text-gray-400 dark:text-slate-500' :
-                      'text-gray-700 dark:text-slate-300'
-                    }`}>
+                        'text-gray-700 dark:text-slate-300'
+                      }`}>
                       {day}
                     </div>
                     {dayAttendance && (
-                      <div className="space-y-1">
-                        <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-medium ${getStatusColor(dayAttendance.status)}`}>
+                      <div className="space-y-1.5 mt-2">
+                        <span className={`flex w-full px-2 py-1 rounded-md text-xs font-bold justify-center items-center shadow-sm ${getStatusColor(dayAttendance.status)}`}>
                           {dayAttendance.status === 'Present' ? (language === 'ru' ? 'Был' : 'P') :
-                           dayAttendance.status === 'Late' ? (language === 'ru' ? 'Опозд' : 'L') :
-                           dayAttendance.status === 'Working' ? (language === 'ru' ? 'Работ' : 'W') :
-                           dayAttendance.status === 'Absent' ? (language === 'ru' ? 'Нет' : 'A') : dayAttendance.status}
+                            dayAttendance.status === 'Late' ? (language === 'ru' ? 'Опозд' : 'L') :
+                              dayAttendance.status === 'Working' ? (language === 'ru' ? 'Работ' : 'W') :
+                                dayAttendance.status === 'Absent' ? (language === 'ru' ? 'Нет' : 'A') : dayAttendance.status}
                         </span>
                         {dayAttendance.hoursWorked && (
-                          <p className="text-xs text-gray-500 dark:text-slate-400">
+                          <div className="text-[11px] font-medium text-gray-500 dark:text-slate-400 text-center bg-gray-50 dark:bg-slate-700/50 rounded-md py-1 border border-gray-100 dark:border-slate-600/50">
                             {formatHours(dayAttendance.hoursWorked)}
-                          </p>
+                          </div>
                         )}
                       </div>
                     )}
@@ -656,28 +661,28 @@ export default function AttendancePage() {
             </div>
 
             {/* Legend */}
-            <div className="flex flex-wrap gap-4 p-4 border-t border-gray-100 dark:border-slate-700">
+            <div className="flex flex-wrap gap-6 p-6 border-t border-gray-100 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800/80">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded bg-green-500" />
-                <span className="text-xs text-gray-600 dark:text-slate-400">
+                <span className="w-3 h-3 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
+                <span className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
                   {language === 'ru' ? 'Присутствовал' : 'Present'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded bg-yellow-500" />
-                <span className="text-xs text-gray-600 dark:text-slate-400">
+                <span className="w-3 h-3 rounded-full bg-yellow-500 shadow-sm shadow-yellow-500/50" />
+                <span className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
                   {language === 'ru' ? 'Опоздание' : 'Late'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded bg-blue-500" />
-                <span className="text-xs text-gray-600 dark:text-slate-400">
+                <span className="w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />
+                <span className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
                   {language === 'ru' ? 'Работает' : 'Working'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded bg-red-500" />
-                <span className="text-xs text-gray-600 dark:text-slate-400">
+                <span className="w-3 h-3 rounded-full bg-red-500 shadow-sm shadow-red-500/50" />
+                <span className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
                   {language === 'ru' ? 'Отсутствовал' : 'Absent'}
                 </span>
               </div>
@@ -687,51 +692,69 @@ export default function AttendancePage() {
 
         {/* Team Tab (for managers) */}
         {activeTab === 'team' && canManage && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Date Selector */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-gray-100 dark:border-slate-700/50 shadow-sm flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <FiCalendar className="text-gray-400 dark:text-slate-500" size={20} />
+                <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+                  <FiCalendar className="text-indigo-600 dark:text-indigo-400" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    {language === 'ru' ? 'Журнал команды' : 'Team Register'}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-slate-400">
+                    {language === 'ru' ? 'Просмотр посещаемости за выбранный день' : 'View attendance for the selected date'}
+                  </p>
+                </div>
+              </div>
+              <div className="relative group">
                 <input
                   type="date"
                   value={selectedDate.toISOString().split('T')[0]}
                   onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                  className="px-4 py-2 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                  className="pl-4 pr-10 py-3 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700/50 text-gray-900 dark:text-white font-medium hover:border-gray-300 dark:hover:border-slate-500 transition-colors w-full sm:w-auto appearance-none cursor-pointer"
                 />
+                <FiCalendar className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-indigo-500 transition-colors" size={18} />
               </div>
             </div>
 
             {/* Team Attendance Table */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-slate-700/50">
+                  <thead className="bg-gray-50/50 dark:bg-slate-800/80 border-b border-gray-100 dark:border-slate-700/50">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
                         {language === 'ru' ? 'Сотрудник' : 'Employee'}
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
                         {language === 'ru' ? 'Приход' : 'Check In'}
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
                         {language === 'ru' ? 'Уход' : 'Check Out'}
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
                         {language === 'ru' ? 'Часы' : 'Hours'}
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
                         {language === 'ru' ? 'Статус' : 'Status'}
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                      <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
                         {language === 'ru' ? 'Место' : 'Location'}
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                  <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
                     {attendance.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-6 py-12 text-center">
-                          <FiUsers size={32} className="mx-auto text-gray-300 dark:text-slate-600 mb-3" />
+                        <td colSpan={6} className="px-6 py-16 text-center">
+                          <div className="w-20 h-20 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FiUsers size={32} className="text-gray-400 dark:text-slate-500" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            {language === 'ru' ? 'Нет записей' : 'No Records'}
+                          </h3>
                           <p className="text-gray-500 dark:text-slate-400">
                             {language === 'ru' ? 'Нет записей за эту дату' : 'No attendance records for this date'}
                           </p>
@@ -739,19 +762,19 @@ export default function AttendancePage() {
                       </tr>
                     ) : (
                       attendance.map((record) => (
-                        <tr key={record.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                        <tr key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors group">
                           <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                                <span className="text-white font-medium">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl shadow-inner flex items-center justify-center transform group-hover:scale-105 transition-transform">
+                                <span className="text-white font-bold">
                                   {record.user?.name?.charAt(0) || 'U'}
                                 </span>
                               </div>
                               <div>
-                                <p className="font-medium text-gray-900 dark:text-white">
+                                <p className="font-bold text-gray-900 dark:text-white">
                                   {record.user?.name || 'Unknown'}
                                 </p>
-                                <p className="text-sm text-gray-500 dark:text-slate-400">
+                                <p className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider font-medium mt-0.5">
                                   {record.user?.role || '-'}
                                 </p>
                               </div>
@@ -759,43 +782,59 @@ export default function AttendancePage() {
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <FiLogIn className="text-green-500" size={16} />
-                              <span className="text-gray-900 dark:text-white font-medium">
-                                {formatTime(record.checkIn)}
-                              </span>
+                              {record.checkIn ? (
+                                <>
+                                  <div className="p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                                    <FiLogIn className="text-green-600 dark:text-green-400" size={14} />
+                                  </div>
+                                  <span className="text-gray-900 dark:text-white font-semibold">
+                                    {formatTime(record.checkIn)}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-gray-400 dark:text-slate-500">—</span>
+                              )}
                             </div>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <FiLogOut className="text-red-500" size={16} />
-                              <span className="text-gray-900 dark:text-white font-medium">
-                                {formatTime(record.checkOut)}
-                              </span>
+                              {record.checkOut ? (
+                                <>
+                                  <div className="p-1.5 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                                    <FiLogOut className="text-red-600 dark:text-red-400" size={14} />
+                                  </div>
+                                  <span className="text-gray-900 dark:text-white font-semibold">
+                                    {formatTime(record.checkOut)}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-gray-400 dark:text-slate-500">—</span>
+                              )}
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-gray-900 dark:text-white font-medium">
+                            <span className="text-gray-900 dark:text-white font-bold bg-gray-50 dark:bg-slate-700/50 px-2 py-1 rounded-lg border border-gray-100 dark:border-slate-600">
                               {formatHours(record.hoursWorked)}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(record.status)}`}>
+                            <span className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(record.status)}`}>
                               {record.status}
                             </span>
                           </td>
                           <td className="px-6 py-4">
                             {record.workType === 'Office' ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-xl text-[11px] font-bold uppercase tracking-wider border border-green-200/50 dark:border-green-800/50 shadow-sm">
                                 <FiMapPin size={12} />
                                 {language === 'ru' ? 'В офисе' : 'Office'}
                               </span>
                             ) : record.workType === 'Remote' ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-medium">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-xl text-[11px] font-bold uppercase tracking-wider border border-blue-200/50 dark:border-blue-800/50 shadow-sm">
                                 <FiClock size={12} />
                                 {language === 'ru' ? 'Удалённо' : 'Remote'}
                               </span>
                             ) : (
-                              <span className="text-gray-400 dark:text-slate-500 text-xs">
+                              <span className="text-gray-400 dark:text-slate-500 text-xs font-medium">
                                 {record.workType || '—'}
                               </span>
                             )}

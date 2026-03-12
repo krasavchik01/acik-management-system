@@ -61,6 +61,7 @@ export default function DashboardPage() {
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>([])
   const [recentTasks, setRecentTasks] = useState<RecentTask[]>([])
   const [loading, setLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
     fetchDashboardData()
@@ -138,6 +139,12 @@ export default function DashboardPage() {
     return 'Good evening'
   }
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    await fetchDashboardData()
+    setIsRefreshing(false)
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Active': return 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400'
@@ -180,15 +187,24 @@ export default function DashboardPage() {
     : 0
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
         title={`${getGreeting()}, ${profile?.name?.split(' ')[0] || 'User'}!`}
         subtitle={new Date().toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        action={
+          <button
+            onClick={handleRefresh}
+            className="flex items-center justify-center p-2 text-gray-500 hover:text-indigo-600 bg-white hover:bg-indigo-50 border border-gray-200 rounded-xl transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-indigo-400"
+            disabled={isRefreshing}
+          >
+            <FiActivity className={isRefreshing ? 'animate-spin' : ''} size={20} />
+          </button>
+        }
       />
 
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Main Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Projects Card */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg transition-all group">
             <div className="flex items-center justify-between mb-4">
@@ -283,7 +299,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Progress Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Task Completion */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700">
             <div className="flex items-center justify-between mb-6">
@@ -440,7 +456,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent Activity Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Projects */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
             <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700">
@@ -518,9 +534,8 @@ export default function DashboardPage() {
                     className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                        task.status === 'Done' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-blue-100 dark:bg-blue-900/50'
-                      }`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-blue-100 dark:bg-blue-900/50'
+                        }`}>
                         <FiCheckSquare className={task.status === 'Done' ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'} size={18} />
                       </div>
                       <div>
@@ -544,9 +559,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('dashboard', 'quickActions')}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl text-indigo-600 dark:text-indigo-400">
+              <FiZap size={20} />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('dashboard', 'quickActions')}</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
             <Link
               href="/projects"
               className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50 transition-all group"
@@ -599,7 +619,7 @@ export default function DashboardPage() {
               <div className="p-3 bg-cyan-500 rounded-xl mb-2 group-hover:scale-110 transition-transform">
                 <FiAward className="text-white" size={20} />
               </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('nav', 'sponsors')}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-cyan-700 dark:group-hover:text-cyan-300 transition-colors">{t('nav', 'sponsors')}</span>
             </Link>
           </div>
         </div>

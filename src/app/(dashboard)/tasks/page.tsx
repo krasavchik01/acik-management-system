@@ -36,17 +36,17 @@ interface Task {
 }
 
 const statusColumns = [
-  { key: 'TODO', label: 'To Do', color: 'bg-gray-100', headerColor: 'bg-gray-500', icon: FiList },
-  { key: 'InProgress', label: 'In Progress', color: 'bg-blue-50', headerColor: 'bg-blue-500', icon: FiClock },
-  { key: 'Review', label: 'Review', color: 'bg-purple-50', headerColor: 'bg-purple-500', icon: FiCheckCircle },
-  { key: 'Done', label: 'Done', color: 'bg-green-50', headerColor: 'bg-green-500', icon: FiCheckCircle },
+  { key: 'TODO', label: 'To Do', color: 'bg-gray-50/50 dark:bg-slate-800/50', headerColor: 'bg-gray-500 dark:bg-slate-400', icon: FiList },
+  { key: 'InProgress', label: 'In Progress', color: 'bg-blue-50/50 dark:bg-blue-900/20', headerColor: 'bg-blue-500 dark:bg-blue-400', icon: FiClock },
+  { key: 'Review', label: 'Review', color: 'bg-purple-50/50 dark:bg-purple-900/20', headerColor: 'bg-purple-500 dark:bg-purple-400', icon: FiCheckCircle },
+  { key: 'Done', label: 'Done', color: 'bg-emerald-50/50 dark:bg-emerald-900/20', headerColor: 'bg-emerald-500 dark:bg-emerald-400', icon: FiCheckCircle },
 ]
 
 const priorityOptions = [
-  { value: 'Low', label: 'Low', color: 'bg-green-100 text-green-700', dot: 'bg-green-500' },
-  { value: 'Medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-700', dot: 'bg-yellow-500' },
-  { value: 'High', label: 'High', color: 'bg-orange-100 text-orange-700', dot: 'bg-orange-500' },
-  { value: 'Critical', label: 'Critical', color: 'bg-red-100 text-red-700', dot: 'bg-red-500' },
+  { value: 'Low', label: 'Low', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', dot: 'bg-green-500' },
+  { value: 'Medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', dot: 'bg-yellow-500' },
+  { value: 'High', label: 'High', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', dot: 'bg-orange-500' },
+  { value: 'Critical', label: 'Critical', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', dot: 'bg-red-500' },
 ]
 
 export default function TasksPage() {
@@ -270,12 +270,12 @@ export default function TasksPage() {
     const diffTime = d.getTime() - today.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-    if (diffDays < 0) return { text: 'Overdue', color: 'text-red-600 bg-red-50' }
-    if (diffDays === 0) return { text: 'Today', color: 'text-orange-600 bg-orange-50' }
-    if (diffDays === 1) return { text: 'Tomorrow', color: 'text-yellow-600 bg-yellow-50' }
+    if (diffDays < 0) return { text: 'Overdue', color: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30' }
+    if (diffDays === 0) return { text: 'Today', color: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30' }
+    if (diffDays === 1) return { text: 'Tomorrow', color: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30' }
     return {
       text: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      color: 'text-gray-600 bg-gray-50'
+      color: 'text-gray-600 dark:text-slate-300 bg-gray-50 dark:bg-slate-700/50'
     }
   }
 
@@ -297,82 +297,82 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header title="Tasks" subtitle="Manage and track all your tasks" />
 
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-xl">
-                <FiList className="text-indigo-600" size={20} />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiList className="text-indigo-600 dark:text-indigo-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                <p className="text-sm text-gray-500">Total Tasks</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.total}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Tasks</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-xl">
-                <FiClock className="text-gray-600" size={20} />
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gray-100 dark:bg-slate-700 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiClock className="text-gray-600 dark:text-slate-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.todo}</p>
-                <p className="text-sm text-gray-500">To Do</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.todo}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">To Do</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-xl">
-                <FiClock className="text-blue-600" size={20} />
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiClock className="text-blue-600 dark:text-blue-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.inProgress}</p>
-                <p className="text-sm text-gray-500">In Progress</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.inProgress}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">In Progress</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-xl">
-                <FiCheckCircle className="text-green-600" size={20} />
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiCheckCircle className="text-emerald-600 dark:text-emerald-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.done}</p>
-                <p className="text-sm text-gray-500">Completed</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.done}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Completed</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 rounded-xl">
-                <FiAlertCircle className="text-red-600" size={20} />
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiAlertCircle className="text-red-600 dark:text-red-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.overdue}</p>
-                <p className="text-sm text-gray-500">Overdue</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.overdue}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Overdue</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Toolbar */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
               {/* Search */}
-              <div className="flex items-center bg-gray-50 rounded-xl px-4 py-2 min-w-[200px]">
-                <FiSearch className="text-gray-400" size={18} />
+              <div className="flex-1 lg:flex-none flex items-center bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/20 transition-all min-w-[200px]">
+                <FiSearch className="text-gray-400 dark:text-slate-400" size={18} />
                 <input
                   type="text"
                   placeholder="Search tasks..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="bg-transparent border-none outline-none ml-2 w-full text-sm"
+                  className="bg-transparent border-none outline-none ml-2 w-full text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                 />
               </div>
 
@@ -380,7 +380,7 @@ export default function TasksPage() {
               <select
                 value={projectFilter}
                 onChange={(e) => setProjectFilter(e.target.value)}
-                className="bg-gray-50 border-none rounded-xl px-4 py-2 text-sm outline-none cursor-pointer"
+                className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all cursor-pointer text-gray-900 dark:text-white"
               >
                 <option value="">All Projects</option>
                 {projects.map(project => (
@@ -392,40 +392,42 @@ export default function TasksPage() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="bg-gray-50 border-none rounded-xl px-4 py-2 text-sm outline-none cursor-pointer"
+                className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all cursor-pointer text-gray-900 dark:text-white"
               >
                 <option value="">All Priorities</option>
                 {priorityOptions.map(p => (
                   <option key={p.value} value={p.value}>{p.label}</option>
                 ))}
               </select>
+            </div>
 
+            <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
               {/* View Toggle */}
-              <div className="flex items-center bg-gray-50 rounded-xl p-1">
+              <div className="flex items-center bg-gray-100 dark:bg-slate-700/50 rounded-xl p-1">
                 <button
                   onClick={() => setViewMode('kanban')}
-                  className={`p-2 rounded-lg transition-all ${viewMode === 'kanban' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'kanban' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white'}`}
                 >
                   <FiGrid size={18} />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white'}`}
                 >
                   <FiList size={18} />
                 </button>
               </div>
-            </div>
 
-            {canManage && (
-              <button
-                onClick={() => openCreateModal()}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all font-medium shadow-lg shadow-indigo-200"
-              >
-                <FiPlus size={18} />
-                <span>New Task</span>
-              </button>
-            )}
+              {canManage && (
+                <button
+                  onClick={() => openCreateModal()}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 font-medium"
+                >
+                  <FiPlus size={18} />
+                  <span className="hidden sm:inline">New Task</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -441,20 +443,20 @@ export default function TasksPage() {
           /* Kanban Board */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {statusColumns.map(column => (
-              <div key={column.key} className={`${column.color} rounded-2xl p-4 min-h-[500px]`}>
-                <div className="flex items-center justify-between mb-4">
+              <div key={column.key} className={`${column.color} rounded-3xl p-5 min-h-[500px] border border-transparent dark:border-slate-700/30`}>
+                <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2">
                     <div className={`w-3 h-3 ${column.headerColor} rounded-full`} />
-                    <h3 className="font-semibold text-gray-700">{column.label}</h3>
+                    <h3 className="font-semibold text-gray-700 dark:text-slate-300">{column.label}</h3>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 bg-white px-2 py-1 rounded-lg">
+                    <span className="text-sm font-medium text-gray-600 dark:text-slate-400 bg-white/60 dark:bg-slate-800/60 px-2.5 py-1 rounded-lg">
                       {groupedTasks[column.key]?.length || 0}
                     </span>
                     {canManage && (
                       <button
                         onClick={() => openCreateModal(column.key as Task['status'])}
-                        className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-all"
+                        className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
                       >
                         <FiPlus size={16} />
                       </button>
@@ -470,11 +472,11 @@ export default function TasksPage() {
                     return (
                       <div
                         key={task.id}
-                        className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100 group"
+                        className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_2px_10px_rgb(0,0,0,0.02)] dark:shadow-[0_2px_10px_rgb(0,0,0,0.1)] hover:shadow-lg dark:hover:shadow-indigo-900/20 transition-all cursor-pointer border border-gray-100 dark:border-slate-700/50 hover:-translate-y-1 group"
                         onClick={() => canManage && openEditModal(task)}
                       >
-                        <div className="flex items-start justify-between mb-2">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${priorityStyle.color}`}>
+                        <div className="flex items-start justify-between mb-3">
+                          <span className={`px-2.5 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold ${priorityStyle.color}`}>
                             {task.priority}
                           </span>
 
@@ -536,36 +538,36 @@ export default function TasksPage() {
                           )}
                         </div>
 
-                        <h4 className="font-medium text-gray-900 mb-2 line-clamp-2">{task.title}</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">{task.title}</h4>
 
                         {task.description && (
-                          <p className="text-sm text-gray-500 line-clamp-2 mb-3">{task.description}</p>
+                          <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-2 mb-3">{task.description}</p>
                         )}
 
-                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-700/50">
                           <div className="flex items-center gap-2">
                             {task.project && (
-                              <span className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-lg">
-                                <FiFolder size={12} />
+                              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-700/30 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-slate-700/50">
+                                <FiFolder size={12} className="text-gray-400" />
                                 {task.project.name.substring(0, 12)}
                               </span>
                             )}
                           </div>
                           <div className="flex items-center gap-2">
                             {dateInfo && (
-                              <span className={`text-xs px-2 py-1 rounded-lg ${dateInfo.color}`}>
+                              <span className={`text-xs font-medium px-2 py-1.5 rounded-lg ${dateInfo.color}`}>
                                 {dateInfo.text}
                               </span>
                             )}
                             {task.assignedTo ? (
-                              <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center" title={task.assignedTo.name}>
-                                <span className="text-xs font-medium text-white">
+                              <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm" title={task.assignedTo.name}>
+                                <span className="text-xs font-bold text-white">
                                   {task.assignedTo.name.charAt(0)}
                                 </span>
                               </div>
                             ) : (
-                              <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-                                <FiUser className="text-gray-400" size={12} />
+                              <div className="w-7 h-7 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800">
+                                <FiUser className="text-gray-400 dark:text-slate-500" size={12} />
                               </div>
                             )}
                           </div>
@@ -594,114 +596,116 @@ export default function TasksPage() {
           </div>
         ) : (
           /* List View */
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Task</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Project</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Status</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Priority</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Assignee</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Due Date</th>
-                  {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-600">Actions</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {tasks.map(task => {
-                  const dateInfo = formatDate(task.dueDate)
-                  const priorityStyle = getPriorityStyle(task.priority)
-                  const statusCol = statusColumns.find(c => c.key === task.status)
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700/50">
+                  <tr>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Task</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Project</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Priority</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Assignee</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Due Date</th>
+                    {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+                  {tasks.map(task => {
+                    const dateInfo = formatDate(task.dueDate)
+                    const priorityStyle = getPriorityStyle(task.priority)
+                    const statusCol = statusColumns.find(c => c.key === task.status)
 
-                  return (
-                    <tr key={task.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6">
-                        <div>
-                          <p className="font-medium text-gray-900">{task.title}</p>
-                          {task.description && (
-                            <p className="text-sm text-gray-500 line-clamp-1">{task.description}</p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        {task.project ? (
-                          <span className="text-sm text-gray-600">{task.project.name}</span>
-                        ) : (
-                          <span className="text-sm text-gray-400">—</span>
-                        )}
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusCol?.color || 'bg-gray-100'}`}>
-                          <div className={`w-2 h-2 ${statusCol?.headerColor || 'bg-gray-500'} rounded-full`} />
-                          {statusCol?.label || task.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${priorityStyle.color}`}>
-                          {task.priority}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        {task.assignedTo ? (
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                              <span className="text-xs font-medium text-white">{task.assignedTo.name.charAt(0)}</span>
-                            </div>
-                            <span className="text-sm text-gray-600">{task.assignedTo.name}</span>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-400">Unassigned</span>
-                        )}
-                      </td>
-                      <td className="py-4 px-6">
-                        {dateInfo ? (
-                          <span className={`text-xs px-2 py-1 rounded-lg ${dateInfo.color}`}>{dateInfo.text}</span>
-                        ) : (
-                          <span className="text-sm text-gray-400">—</span>
-                        )}
-                      </td>
-                      {canManage && (
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => openEditModal(task)}
-                              className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                            >
-                              <FiEdit2 size={16} />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setDeletingTask(task)
-                                setShowDeleteModal(true)
-                              }}
-                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                            >
-                              <FiTrash2 size={16} />
-                            </button>
+                    return (
+                      <tr key={task.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors group">
+                        <td className="py-4 px-6">
+                          <div>
+                            <p className="font-semibold text-gray-900 dark:text-white">{task.title}</p>
+                            {task.description && (
+                              <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-1 mt-0.5">{task.description}</p>
+                            )}
                           </div>
                         </td>
-                      )}
+                        <td className="py-4 px-6">
+                          {task.project ? (
+                            <span className="text-sm font-medium text-gray-600 dark:text-slate-300">{task.project.name}</span>
+                          ) : (
+                            <span className="text-sm text-gray-400 dark:text-slate-500">—</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusCol?.color || 'bg-gray-100'}`}>
+                            <div className={`w-2 h-2 ${statusCol?.headerColor || 'bg-gray-500'} rounded-full`} />
+                            {statusCol?.label || task.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${priorityStyle.color}`}>
+                            {task.priority}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          {task.assignedTo ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <span className="text-xs font-medium text-white">{task.assignedTo.name.charAt(0)}</span>
+                              </div>
+                              <span className="text-sm text-gray-600">{task.assignedTo.name}</span>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">Unassigned</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6">
+                          {dateInfo ? (
+                            <span className={`text-xs px-2 py-1 rounded-lg ${dateInfo.color}`}>{dateInfo.text}</span>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </td>
+                        {canManage && (
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => openEditModal(task)}
+                                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                              >
+                                <FiEdit2 size={16} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDeletingTask(task)
+                                  setShowDeleteModal(true)
+                                }}
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                              >
+                                <FiTrash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    )
+                  })}
+                  {tasks.length === 0 && (
+                    <tr>
+                      <td colSpan={canManage ? 7 : 6} className="py-20 text-center">
+                        <FiList size={48} className="mx-auto text-gray-300 mb-4" />
+                        <p className="text-gray-500">No tasks found</p>
+                        {canManage && (
+                          <button
+                            onClick={() => openCreateModal()}
+                            className="mt-4 text-indigo-600 hover:underline"
+                          >
+                            Create your first task
+                          </button>
+                        )}
+                      </td>
                     </tr>
-                  )
-                })}
-                {tasks.length === 0 && (
-                  <tr>
-                    <td colSpan={canManage ? 7 : 6} className="py-20 text-center">
-                      <FiList size={48} className="mx-auto text-gray-300 mb-4" />
-                      <p className="text-gray-500">No tasks found</p>
-                      {canManage && (
-                        <button
-                          onClick={() => openCreateModal()}
-                          className="mt-4 text-indigo-600 hover:underline"
-                        >
-                          Create your first task
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
@@ -855,15 +859,15 @@ export default function TasksPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && deletingTask && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md p-8 animate-in zoom-in-95 duration-200">
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiTrash2 className="text-red-600" size={28} />
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FiTrash2 className="text-red-600 dark:text-red-400" size={28} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Task</h3>
-              <p className="text-gray-500 mb-6">
-                Are you sure you want to delete <span className="font-medium text-gray-900">"{deletingTask.title}"</span>?
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Delete Task</h3>
+              <p className="text-gray-500 dark:text-slate-400 mb-8">
+                Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">&quot;{deletingTask?.title}&quot;</span>?
                 This action cannot be undone.
               </p>
               <div className="flex gap-3">

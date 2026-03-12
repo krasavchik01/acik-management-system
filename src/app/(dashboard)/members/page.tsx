@@ -27,18 +27,18 @@ interface Member {
 }
 
 const categoryOptions = [
-  { value: 'Diamond', label: 'Diamond', color: 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-300', icon: '💎' },
-  { value: 'Platinum', label: 'Platinum', color: 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-700 border-gray-400', icon: '🥈' },
-  { value: 'Gold', label: 'Gold', color: 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700 border-yellow-400', icon: '🥇' },
-  { value: 'Silver', label: 'Silver', color: 'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-300', icon: '🥈' },
-  { value: 'Bronze', label: 'Bronze', color: 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 border-orange-300', icon: '🥉' },
+  { value: 'Diamond', label: 'Diamond', color: 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-300 dark:from-purple-900/40 dark:to-pink-900/40 dark:text-purple-300 dark:border-purple-700/50', icon: '💎' },
+  { value: 'Platinum', label: 'Platinum', color: 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-700 border-gray-400 dark:from-gray-800/40 dark:to-slate-800/40 dark:text-gray-300 dark:border-gray-600/50', icon: '🥈' },
+  { value: 'Gold', label: 'Gold', color: 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700 border-yellow-400 dark:from-yellow-900/40 dark:to-amber-900/40 dark:text-yellow-300 dark:border-yellow-700/50', icon: '🥇' },
+  { value: 'Silver', label: 'Silver', color: 'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-300 dark:from-blue-900/40 dark:to-cyan-900/40 dark:text-blue-300 dark:border-blue-700/50', icon: '🥈' },
+  { value: 'Bronze', label: 'Bronze', color: 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 border-orange-300 dark:from-orange-900/40 dark:to-amber-900/40 dark:text-orange-300 dark:border-orange-700/50', icon: '🥉' },
 ]
 
 const statusOptions = [
-  { value: 'Active', label: 'Active', color: 'bg-green-100 text-green-700', dot: 'bg-green-500' },
-  { value: 'Inactive', label: 'Inactive', color: 'bg-gray-100 text-gray-700', dot: 'bg-gray-400' },
-  { value: 'Suspended', label: 'Suspended', color: 'bg-red-100 text-red-700', dot: 'bg-red-500' },
-  { value: 'Alumni', label: 'Alumni', color: 'bg-blue-100 text-blue-700', dot: 'bg-blue-500' },
+  { value: 'Active', label: 'Active', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', dot: 'bg-green-500' },
+  { value: 'Inactive', label: 'Inactive', color: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-gray-400', dot: 'bg-gray-400' },
+  { value: 'Suspended', label: 'Suspended', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', dot: 'bg-red-500' },
+  { value: 'Alumni', label: 'Alumni', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', dot: 'bg-blue-500' },
 ]
 
 export default function MembersPage() {
@@ -221,82 +221,82 @@ export default function MembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header title="Members" subtitle="Manage organization members" />
 
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-xl">
-                <FiUsers className="text-indigo-600" size={20} />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiUsers className="text-indigo-600 dark:text-indigo-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                <p className="text-sm text-gray-500">Total Members</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.total}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Members</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-xl">
-                <FiUserCheck className="text-green-600" size={20} />
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiUserCheck className="text-green-600 dark:text-green-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-                <p className="text-sm text-gray-500">Active</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.active}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Active</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-xl">
-                <FiUserX className="text-gray-600" size={20} />
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gray-100 dark:bg-slate-700 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiUserX className="text-gray-600 dark:text-slate-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>
-                <p className="text-sm text-gray-500">Inactive</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.inactive}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Inactive</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-xl">
-                <FiAward className="text-purple-600" size={20} />
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiAward className="text-purple-600 dark:text-purple-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.diamond}</p>
-                <p className="text-sm text-gray-500">Diamond</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.diamond}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Diamond</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-slate-100 rounded-xl">
-                <FiStar className="text-slate-600" size={20} />
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-slate-100 dark:bg-slate-700/50 rounded-xl group-hover:scale-110 transition-transform flex items-center justify-center">
+                <FiStar className="text-slate-600 dark:text-slate-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.platinum}</p>
-                <p className="text-sm text-gray-500">Platinum</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.platinum}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Platinum</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Toolbar */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
               {/* Search */}
-              <div className="flex items-center bg-gray-50 rounded-xl px-4 py-2 min-w-[200px]">
-                <FiSearch className="text-gray-400" size={18} />
+              <div className="flex-1 lg:flex-none flex items-center bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/20 transition-all min-w-[200px]">
+                <FiSearch className="text-gray-400 dark:text-slate-400" size={18} />
                 <input
                   type="text"
                   placeholder="Search members..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="bg-transparent border-none outline-none ml-2 w-full text-sm"
+                  className="bg-transparent border-none outline-none ml-2 w-full text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                 />
               </div>
 
@@ -304,7 +304,7 @@ export default function MembersPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-gray-50 border-none rounded-xl px-4 py-2 text-sm outline-none cursor-pointer"
+                className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all cursor-pointer text-gray-900 dark:text-white"
               >
                 <option value="">All Status</option>
                 {statusOptions.map(s => (
@@ -316,40 +316,42 @@ export default function MembersPage() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="bg-gray-50 border-none rounded-xl px-4 py-2 text-sm outline-none cursor-pointer"
+                className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all cursor-pointer text-gray-900 dark:text-white"
               >
                 <option value="">All Categories</option>
                 {categoryOptions.map(c => (
                   <option key={c.value} value={c.value}>{c.icon} {c.label}</option>
                 ))}
               </select>
+            </div>
 
+            <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
               {/* View Toggle */}
-              <div className="flex items-center bg-gray-50 rounded-xl p-1">
+              <div className="flex items-center bg-gray-100 dark:bg-slate-700/50 rounded-xl p-1">
                 <button
                   onClick={() => setView('grid')}
-                  className={`p-2 rounded-lg transition-all ${view === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`p-2 rounded-lg transition-all ${view === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white'}`}
                 >
                   <FiGrid size={18} />
                 </button>
                 <button
                   onClick={() => setView('list')}
-                  className={`p-2 rounded-lg transition-all ${view === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`p-2 rounded-lg transition-all ${view === 'list' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white'}`}
                 >
                   <FiList size={18} />
                 </button>
               </div>
-            </div>
 
-            {canManage && (
-              <button
-                onClick={openCreateModal}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all font-medium shadow-lg shadow-indigo-200"
-              >
-                <FiPlus size={18} />
-                <span>Add Member</span>
-              </button>
-            )}
+              {canManage && (
+                <button
+                  onClick={openCreateModal}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 font-medium"
+                >
+                  <FiPlus size={18} />
+                  <span className="hidden sm:inline">Add Member</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -384,22 +386,22 @@ export default function MembersPage() {
               return (
                 <div
                   key={member.id}
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all group relative"
+                  className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-[0_2px_10px_rgb(0,0,0,0.02)] dark:shadow-[0_2px_10px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50 hover:shadow-lg dark:hover:shadow-indigo-900/20 hover:-translate-y-1 transition-all group relative"
                 >
                   {canManage && (
                     <div className="absolute top-4 right-4">
                       <button
                         onClick={() => setOpenDropdown(openDropdown === member.id ? null : member.id)}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl opacity-0 group-hover:opacity-100 transition-all"
                       >
                         <FiMoreVertical size={18} />
                       </button>
 
                       {openDropdown === member.id && (
-                        <div className="absolute right-0 top-10 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20 min-w-[140px]">
+                        <div className="absolute right-0 top-10 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700/50 py-2 z-20 min-w-[140px] animate-in zoom-in-95 duration-200">
                           <button
                             onClick={() => openEditModal(member)}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 flex items-center gap-2"
                           >
                             <FiEdit2 size={14} />
                             Edit
@@ -410,7 +412,7 @@ export default function MembersPage() {
                               setShowDeleteModal(true)
                               setOpenDropdown(null)
                             }}
-                            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                            className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2"
                           >
                             <FiTrash2 size={14} />
                             Remove
@@ -420,50 +422,56 @@ export default function MembersPage() {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 border-2 border-white dark:border-slate-800">
                       <span className="text-white font-bold text-xl">
                         {member.firstName.charAt(0)}{member.lastName.charAt(0)}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-900 truncate text-lg">
+                      <h3 className="font-bold text-gray-900 dark:text-white truncate text-lg">
                         {member.firstName} {member.lastName}
                       </h3>
-                      <p className="text-sm text-gray-500 truncate">
+                      <p className="text-sm font-medium text-gray-500 dark:text-slate-400 truncate">
                         {member.companyPosition || 'Member'}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${categoryStyle.color}`}>
+                  <div className="flex items-center gap-2 mb-5">
+                    <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${categoryStyle.color}`}>
                       {categoryStyle.icon} {member.category}
                     </span>
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${statusStyle.color}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${statusStyle.color}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
                       {member.status}
                     </span>
                   </div>
 
                   {member.companyName && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                      <FiBriefcase size={14} className="text-gray-400" />
+                    <div className="flex items-center gap-2.5 text-sm font-medium text-gray-600 dark:text-slate-300 mb-3 bg-gray-50 dark:bg-slate-700/30 px-3 py-2 rounded-xl border border-gray-100 dark:border-slate-700/50">
+                      <FiBriefcase size={16} className="text-gray-400 dark:text-slate-500" />
                       <span className="truncate">{member.companyName}</span>
                     </div>
                   )}
 
-                  <div className="space-y-2 pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <FiMail size={14} className="text-gray-400" />
+                  <div className="space-y-3 pt-5 border-t border-gray-100 dark:border-slate-700/50 mt-auto">
+                    <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-slate-400">
+                      <div className="p-1.5 bg-gray-50 dark:bg-slate-700/30 rounded-lg">
+                        <FiMail size={14} className="text-gray-400 dark:text-slate-500" />
+                      </div>
                       <span className="truncate">{member.email}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <FiPhone size={14} className="text-gray-400" />
-                      <span>{member.phone}</span>
+                    <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-slate-400">
+                      <div className="p-1.5 bg-gray-50 dark:bg-slate-700/30 rounded-lg">
+                        <FiPhone size={14} className="text-gray-400 dark:text-slate-500" />
+                      </div>
+                      <span>{member.phone || '—'}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <FiCalendar size={14} />
+                    <div className="flex items-center gap-3 text-sm text-gray-400 dark:text-slate-500">
+                      <div className="p-1.5 bg-gray-50 dark:bg-slate-700/30 rounded-lg">
+                        <FiCalendar size={14} />
+                      </div>
                       <span>Joined {new Date(member.joinDate).toLocaleDateString()}</span>
                     </div>
                   </div>
@@ -473,105 +481,108 @@ export default function MembersPage() {
           </div>
         ) : (
           /* List View */
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Member</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Contact</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Company</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Category</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Status</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Joined</th>
-                  {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-600">Actions</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {members.map((member) => {
-                  const categoryStyle = getCategoryStyle(member.category)
-                  const statusStyle = getStatusStyle(member.status)
+          /* List View */
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700/50">
+                  <tr>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Member</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Contact</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Company</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Category</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Joined</th>
+                    {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+                  {members.map((member) => {
+                    const categoryStyle = getCategoryStyle(member.category)
+                    const statusStyle = getStatusStyle(member.status)
 
-                  return (
-                    <tr key={member.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                            <span className="text-white font-medium text-sm">
-                              {member.firstName.charAt(0)}{member.lastName.charAt(0)}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {member.firstName} {member.lastName}
-                            </p>
-                            <p className="text-sm text-gray-500">{member.companyPosition || 'Member'}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="text-sm">
-                          <p className="text-gray-900">{member.email}</p>
-                          <p className="text-gray-500">{member.phone}</p>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className="text-sm text-gray-600">{member.companyName || '—'}</span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${categoryStyle.color}`}>
-                          {categoryStyle.icon} {member.category}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${statusStyle.color}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
-                          {member.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-sm text-gray-500">
-                        {new Date(member.joinDate).toLocaleDateString()}
-                      </td>
-                      {canManage && (
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => openEditModal(member)}
-                              className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                            >
-                              <FiEdit2 size={16} />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setDeletingMember(member)
-                                setShowDeleteModal(true)
-                              }}
-                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                            >
-                              <FiTrash2 size={16} />
-                            </button>
+                    return (
+                      <tr key={member.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors group">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
+                              <span className="text-white font-bold text-sm">
+                                {member.firstName.charAt(0)}{member.lastName.charAt(0)}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-900 dark:text-white">
+                                {member.firstName} {member.lastName}
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-slate-400 font-medium">{member.companyPosition || 'Member'}</p>
+                            </div>
                           </div>
                         </td>
-                      )}
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+                        <td className="py-4 px-6">
+                          <div className="text-sm">
+                            <p className="text-gray-900 dark:text-slate-300 font-medium">{member.email}</p>
+                            <p className="text-gray-500 dark:text-slate-500">{member.phone || '—'}</p>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="text-sm font-medium text-gray-600 dark:text-slate-300">{member.companyName || '—'}</span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`px-3 py-1.5 rounded-full text-[11px] uppercase tracking-wider font-bold border ${categoryStyle.color}`}>
+                            {categoryStyle.icon} {member.category}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] uppercase tracking-wider font-bold ${statusStyle.color}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
+                            {member.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-sm font-medium text-gray-500 dark:text-slate-400">
+                          {new Date(member.joinDate).toLocaleDateString()}
+                        </td>
+                        {canManage && (
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => openEditModal(member)}
+                                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                              >
+                                <FiEdit2 size={16} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDeletingMember(member)
+                                  setShowDeleteModal(true)
+                                }}
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                              >
+                                <FiTrash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700/50">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700/50">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 {editingMember ? 'Edit Member' : 'Add New Member'}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all"
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 rounded-xl transition-all"
               >
                 <FiX size={20} />
               </button>
@@ -580,27 +591,27 @@ export default function MembersPage() {
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     First Name *
                   </label>
                   <input
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     placeholder="John"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Last Name *
                   </label>
                   <input
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     placeholder="Doe"
                     required
                   />
@@ -609,7 +620,7 @@ export default function MembersPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiMail className="inline mr-2" size={14} />
                     Email *
                   </label>
@@ -617,13 +628,13 @@ export default function MembersPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     placeholder="john@example.com"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiPhone className="inline mr-2" size={14} />
                     Phone
                   </label>
@@ -631,7 +642,7 @@ export default function MembersPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     placeholder="+7 (XXX) XXX-XXXX"
                   />
                 </div>
@@ -639,7 +650,7 @@ export default function MembersPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiBriefcase className="inline mr-2" size={14} />
                     Company Name
                   </label>
@@ -647,19 +658,19 @@ export default function MembersPage() {
                     type="text"
                     value={formData.companyName}
                     onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     placeholder="Company Inc."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Position
                   </label>
                   <input
                     type="text"
                     value={formData.companyPosition}
                     onChange={(e) => setFormData({ ...formData, companyPosition: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     placeholder="CEO, Director, etc."
                   />
                 </div>
@@ -667,13 +678,13 @@ export default function MembersPage() {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Category
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as Member['category'] })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
                     {categoryOptions.map(c => (
                       <option key={c.value} value={c.value}>{c.icon} {c.label}</option>
@@ -681,13 +692,13 @@ export default function MembersPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Status
                   </label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as Member['status'] })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
                     {statusOptions.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
@@ -695,7 +706,7 @@ export default function MembersPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiCalendar className="inline mr-2" size={14} />
                     Join Date
                   </label>
@@ -703,13 +714,13 @@ export default function MembersPage() {
                     type="date"
                     value={formData.joinDate}
                     onChange={(e) => setFormData({ ...formData, joinDate: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   <FiMapPin className="inline mr-2" size={14} />
                   Address
                 </label>
@@ -717,20 +728,20 @@ export default function MembersPage() {
                   type="text"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   placeholder="Full address"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Notes
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   placeholder="Additional notes about this member..."
                 />
               </div>
@@ -739,14 +750,14 @@ export default function MembersPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
+                  className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-95"
                 >
                   {saving ? 'Saving...' : editingMember ? 'Update Member' : 'Add Member'}
                 </button>
@@ -758,15 +769,15 @@ export default function MembersPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && deletingMember && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md p-8 animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700/50">
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiTrash2 className="text-red-600" size={28} />
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FiTrash2 className="text-red-600 dark:text-red-400" size={28} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Remove Member</h3>
-              <p className="text-gray-500 mb-6">
-                Are you sure you want to remove <span className="font-medium text-gray-900">"{deletingMember.firstName} {deletingMember.lastName}"</span>?
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Remove Member</h3>
+              <p className="text-gray-500 dark:text-slate-400 mb-8">
+                Are you sure you want to remove <span className="font-semibold text-gray-900 dark:text-white">&quot;{deletingMember?.firstName} {deletingMember?.lastName}&quot;</span>?
                 This action cannot be undone.
               </p>
               <div className="flex gap-3">
@@ -775,14 +786,14 @@ export default function MembersPage() {
                     setShowDeleteModal(false)
                     setDeletingMember(null)
                   }}
-                  className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
+                  className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={saving}
-                  className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all disabled:opacity-50 active:scale-95"
                 >
                   {saving ? 'Removing...' : 'Remove'}
                 </button>

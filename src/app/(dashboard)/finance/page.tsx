@@ -141,7 +141,7 @@ export default function FinancePage() {
   const balance = totalIncome - totalExpenses
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
         title="Finance"
         subtitle="Manage organization finances"
@@ -151,39 +151,39 @@ export default function FinancePage() {
         } : undefined}
       />
 
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg dark:hover:shadow-indigo-900/20 transition-all group">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <FiTrendingUp className="text-green-600" size={24} />
+              <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-2xl group-hover:scale-110 transition-transform">
+                <FiTrendingUp className="text-green-600 dark:text-green-400" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Income</p>
-                <p className="text-2xl font-bold text-green-600">${totalIncome.toLocaleString()}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Income</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">${totalIncome.toLocaleString()}</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg dark:hover:shadow-indigo-900/20 transition-all group">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-100 rounded-xl">
-                <FiTrendingDown className="text-red-600" size={24} />
+              <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-2xl group-hover:scale-110 transition-transform">
+                <FiTrendingDown className="text-red-600 dark:text-red-400" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Expenses</p>
-                <p className="text-2xl font-bold text-red-600">${totalExpenses.toLocaleString()}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Expenses</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">${totalExpenses.toLocaleString()}</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg dark:hover:shadow-indigo-900/20 transition-all group">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <FiDollarSign className="text-blue-600" size={24} />
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl group-hover:scale-110 transition-transform">
+                <FiDollarSign className="text-indigo-600 dark:text-indigo-400" size={24} />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Balance</p>
-                <p className={`text-2xl font-bold ${balance >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Balance</p>
+                <p className={`text-3xl font-bold mt-1 ${balance >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}`}>
                   ${balance.toLocaleString()}
                 </p>
               </div>
@@ -191,13 +191,16 @@ export default function FinancePage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6">
-          <div className="flex flex-wrap gap-4">
+        {/* Toolbar */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50">
+          <div className="flex flex-wrap items-center gap-4 relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+              <FiFilter className="text-gray-400 dark:text-slate-500" size={16} />
+            </div>
             <select
               value={filter.type}
               onChange={(e) => setFilter({ ...filter, type: e.target.value })}
-              className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500"
+              className="pl-10 pr-8 py-2.5 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium text-gray-700 dark:text-slate-300 outline-none cursor-pointer"
             >
               <option value="">All Types</option>
               <option value="Income">Income</option>
@@ -206,7 +209,7 @@ export default function FinancePage() {
             <select
               value={filter.status}
               onChange={(e) => setFilter({ ...filter, status: e.target.value })}
-              className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500"
+              className="pl-4 pr-8 py-2.5 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium text-gray-700 dark:text-slate-300 outline-none cursor-pointer"
             >
               <option value="">All Statuses</option>
               <option value="Pending">Pending</option>
@@ -219,112 +222,123 @@ export default function FinancePage() {
 
         {/* Transactions Table */}
         {loading ? (
-          <div className="text-center py-12">Loading...</div>
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-12 h-12 border-4 border-indigo-200 dark:border-indigo-900 border-t-indigo-600 dark:border-t-indigo-500 rounded-full animate-spin"></div>
+            <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium">Loading transactions...</p>
+          </div>
+        ) : transactions.length === 0 ? (
+          <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50 shadow-sm">
+            <div className="w-20 h-20 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FiDollarSign className="text-gray-400 dark:text-slate-500" size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Transactions Found</h3>
+            <p className="text-gray-500 dark:text-slate-400">There are no financial records matching your criteria.</p>
+          </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
-                  {canManage && <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {transactions.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">No transactions yet</td>
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700/50">
+                    <th className="px-6 py-5 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-5 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Description</th>
+                    <th className="px-6 py-5 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Category</th>
+                    <th className="px-6 py-5 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-5 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-5 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider text-right">Amount</th>
+                    {canManage && <th className="px-6 py-5 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider text-right">Actions</th>}
                   </tr>
-                ) : (
-                  transactions.map((t) => (
-                    <tr key={t.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-600">{new Date(t.date).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{t.description}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{t.category}</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          t.type === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+                  {transactions.map((t) => (
+                    <tr key={t.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors group">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-400">
+                        {new Date(t.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-white">
+                        {t.description}
+                        {t.reference && <div className="text-xs font-normal text-gray-400 dark:text-slate-500 mt-1">Ref: {t.reference}</div>}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-400">{t.category}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${t.type === 'Income' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                          }`}>
                           {t.type}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          t.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                          t.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                          t.status === 'Approved' ? 'bg-blue-100 text-blue-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${t.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                            t.status === 'Pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' :
+                              t.status === 'Approved' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                          }`}>
                           {t.status}
                         </span>
                       </td>
-                      <td className={`px-6 py-4 text-sm font-medium text-right ${
-                        t.type === 'Income' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString()}
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold text-right ${t.type === 'Income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                        }`}>
+                        {t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
                       {canManage && (
-                        <td className="px-6 py-4 text-right">
-                          <button onClick={() => openEditModal(t)} className="p-2 text-gray-400 hover:text-blue-600">
-                            <FiEdit2 size={16} />
-                          </button>
-                          <button onClick={() => handleDelete(t.id)} className="p-2 text-gray-400 hover:text-red-600">
-                            <FiTrash2 size={16} />
-                          </button>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => openEditModal(t)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all" title="Edit">
+                              <FiEdit2 size={16} />
+                            </button>
+                            <button onClick={() => handleDelete(t.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all" title="Delete">
+                              <FiTrash2 size={16} />
+                            </button>
+                          </div>
                         </td>
                       )}
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{editingTransaction ? 'Edit Transaction' : 'New Transaction'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700/50">
+            <div className="p-6 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{editingTransaction ? 'Edit Transaction' : 'New Transaction'}</h2>
+              <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 rounded-xl transition-all">
                 <FiX size={20} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Description *</label>
                 <input
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   required
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Amount ($) *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Amount ($) *</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Type *</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as 'Income' | 'Expense' })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
                     <option value="Income">Income</option>
                     <option value="Expense">Expense</option>
@@ -333,11 +347,11 @@ export default function FinancePage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Category</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
                     <option value="Sponsorship">Sponsorship</option>
                     <option value="Membership">Membership</option>
@@ -349,11 +363,11 @@ export default function FinancePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Status</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
                     <option value="Pending">Pending</option>
                     <option value="Approved">Approved</option>
@@ -363,30 +377,30 @@ export default function FinancePage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Date</label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Reference</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Reference</label>
                 <input
                   type="text"
                   value={formData.reference}
                   onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   placeholder="Invoice #, Receipt #, etc."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   rows={3}
                 />
               </div>
@@ -394,15 +408,15 @@ export default function FinancePage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700"
+                  className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-95"
                 >
-                  {editingTransaction ? 'Update' : 'Create'}
+                  {editingTransaction ? 'Update Transaction' : 'Create Transaction'}
                 </button>
               </div>
             </form>

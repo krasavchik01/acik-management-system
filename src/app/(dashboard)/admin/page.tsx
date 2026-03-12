@@ -444,14 +444,14 @@ export default function AdminPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
         <Header title="Админ панель" subtitle="Доступ запрещён" />
-        <div className="p-6">
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-12 text-center">
-            <FiShield size={48} className="mx-auto text-red-400 mb-4" />
-            <h2 className="text-xl font-bold text-red-800 mb-2">Доступ запрещён</h2>
-            <p className="text-red-600">У вас нет прав для доступа к админ панели.</p>
-            <p className="text-red-500 text-sm mt-2">Обратитесь к администратору.</p>
+        <div className="p-6 max-w-[800px] mx-auto animate-in fade-in duration-500">
+          <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-3xl p-12 text-center shadow-sm">
+            <FiShield size={48} className="mx-auto text-red-500 mb-4" />
+            <h2 className="text-2xl font-black text-red-800 dark:text-red-400 mb-2 tracking-tight">Доступ запрещён</h2>
+            <p className="text-red-600 dark:text-red-300 font-medium">У вас нет прав для доступа к админ панели.</p>
+            <p className="text-red-500 dark:text-red-400/80 text-sm mt-3 bg-red-100 dark:bg-red-500/10 w-max mx-auto px-3 py-1.5 rounded-xl font-medium">Обратитесь к администратору.</p>
           </div>
         </div>
       </div>
@@ -461,12 +461,12 @@ export default function AdminPage() {
   const filteredUsers = users
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header title="Админ панель" subtitle="Управление системой и пользователями" />
 
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-6 inline-flex gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-2 inline-flex gap-2 overflow-x-auto max-w-full custom-scrollbar">
           {[
             { id: 'overview', label: 'Обзор', icon: FiActivity },
             { id: 'users', label: 'Пользователи', icon: FiUsers },
@@ -476,9 +476,9 @@ export default function AdminPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as 'overview' | 'users' | 'office' | 'system')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${activeTab === tab.id
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200'
-                : 'text-gray-600 hover:bg-gray-50'
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl font-bold transition-all whitespace-nowrap ${activeTab === tab.id
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/20 dark:shadow-indigo-900/30 -translate-y-0.5'
+                : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400'
                 }`}
             >
               <tab.icon size={18} />
@@ -497,89 +497,91 @@ export default function AdminPage() {
         ) : activeTab === 'overview' ? (
           <>
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-200">
+                  <div className="p-3.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
                     <FiUsers className="text-white" size={24} />
                   </div>
-                  <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full">
+                  <span className="text-xs text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-full uppercase tracking-wider">
                     {stats?.stats.users.active || 0} активных
                   </span>
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900">{stats?.stats.users.total || 0}</h3>
-                <p className="text-gray-500 text-sm">Пользователей</p>
+                <h3 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{stats?.stats.users.total || 0}</h3>
+                <p className="text-gray-500 dark:text-slate-400 text-sm font-medium mt-1">Пользователей</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg shadow-green-200">
+                  <div className="p-3.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
                     <FiFolder className="text-white" size={24} />
                   </div>
-                  <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded-full">
+                  <span className="text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full uppercase tracking-wider">
                     {stats?.stats.projects.active || 0} активных
                   </span>
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900">{stats?.stats.projects.total || 0}</h3>
-                <p className="text-gray-500 text-sm">Проектов</p>
+                <h3 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{stats?.stats.projects.total || 0}</h3>
+                <p className="text-gray-500 dark:text-slate-400 text-sm font-medium mt-1">Проектов</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg shadow-purple-200">
+                  <div className="p-3.5 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
                     <FiCheckSquare className="text-white" size={24} />
                   </div>
-                  <span className="text-xs text-purple-600 font-medium bg-purple-50 px-2 py-1 rounded-full">
+                  <span className="text-xs text-purple-600 dark:text-purple-400 font-bold bg-purple-50 dark:bg-purple-900/30 px-3 py-1 rounded-full uppercase tracking-wider">
                     {stats?.stats.tasks.completed || 0} завершено
                   </span>
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900">{stats?.stats.tasks.total || 0}</h3>
-                <p className="text-gray-500 text-sm">Задач</p>
+                <h3 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{stats?.stats.tasks.total || 0}</h3>
+                <p className="text-gray-500 dark:text-slate-400 text-sm font-medium mt-1">Задач</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl shadow-lg shadow-orange-200">
+                  <div className="p-3.5 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
                     <FiDollarSign className="text-white" size={24} />
                   </div>
-                  <span className="text-xs text-orange-600 font-medium bg-orange-50 px-2 py-1 rounded-full">
+                  <span className="text-xs text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-900/30 px-3 py-1 rounded-full uppercase tracking-wider">
                     Доход
                   </span>
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900">
+                <h3 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
                   ${(stats?.stats.finance.totalIncome || 0).toLocaleString()}
                 </h3>
-                <p className="text-gray-500 text-sm">Общий доход</p>
+                <p className="text-gray-500 dark:text-slate-400 text-sm font-medium mt-1">Общий доход</p>
               </div>
             </div>
 
             {/* Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-                <div className="p-6 border-b border-gray-100">
-                  <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                    <FiUserPlus className="text-indigo-600" size={20} />
+              <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800/50">
+                  <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
+                      <FiUserPlus className="text-indigo-600 dark:text-indigo-400" size={20} />
+                    </div>
                     Новые пользователи
                   </h3>
                 </div>
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-gray-50 dark:divide-slate-700/50">
                   {stats?.recent.users.length === 0 ? (
-                    <div className="p-6 text-center text-gray-500">Нет пользователей</div>
+                    <div className="p-12 text-center text-gray-500 dark:text-slate-400 font-medium">Нет пользователей</div>
                   ) : (
                     stats?.recent.users.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                            <span className="text-white font-medium">{user.name.charAt(0)}</span>
+                      <div key={user.id} className="flex items-center justify-between p-5 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors group cursor-pointer">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                            <span className="text-white font-bold text-lg">{user.name.charAt(0)}</span>
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">{user.name}</p>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${getRoleStyle(user.role).color}`}>
+                            <p className="font-bold text-gray-900 dark:text-white mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{user.name}</p>
+                            <span className={`text-[10px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider ${getRoleStyle(user.role).color.replace('bg-', 'bg-').replace('text-', 'text-')} dark:bg-opacity-20`}>
                               {getRoleStyle(user.role).label}
                             </span>
                           </div>
                         </div>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs font-medium text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-700 px-3 py-1.5 rounded-xl">
                           {new Date(user.createdAt).toLocaleDateString('ru-RU')}
                         </span>
                       </div>
@@ -588,30 +590,32 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-                <div className="p-6 border-b border-gray-100">
-                  <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                    <FiFolder className="text-green-600" size={20} />
+              <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800/50">
+                  <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-lg">
+                      <FiFolder className="text-green-600 dark:text-green-400" size={20} />
+                    </div>
                     Последние проекты
                   </h3>
                 </div>
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-gray-50 dark:divide-slate-700/50">
                   {stats?.recent.projects.length === 0 ? (
-                    <div className="p-6 text-center text-gray-500">Нет проектов</div>
+                    <div className="p-12 text-center text-gray-500 dark:text-slate-400 font-medium">Нет проектов</div>
                   ) : (
                     stats?.recent.projects.map((project) => (
-                      <div key={project.id} className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                      <div key={project.id} className="flex items-center justify-between p-5 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors group cursor-pointer">
                         <div>
-                          <p className="font-medium text-gray-900">{project.name}</p>
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${project.status === 'Active' ? 'bg-green-100 text-green-700' :
-                            project.status === 'Completed' ? 'bg-blue-100 text-blue-700' :
-                              'bg-gray-100 text-gray-700'
+                          <p className="font-bold text-gray-900 dark:text-white mb-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">{project.name}</p>
+                          <span className={`text-[10px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider ${project.status === 'Active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                            project.status === 'Completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                              'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300'
                             }`}>
                             {project.status === 'Active' ? 'Активный' :
                               project.status === 'Completed' ? 'Завершён' : project.status}
                           </span>
                         </div>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs font-medium text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-700 px-3 py-1.5 rounded-xl">
                           {new Date(project.createdAt).toLocaleDateString('ru-RU')}
                         </span>
                       </div>
@@ -624,24 +628,24 @@ export default function AdminPage() {
         ) : activeTab === 'users' ? (
           <>
             {/* Users Toolbar */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-5 mb-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center bg-gray-50 rounded-xl px-4 py-2 min-w-[250px]">
-                    <FiSearch className="text-gray-400" size={18} />
+                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                  <div className="flex items-center bg-gray-50 dark:bg-slate-900/50 rounded-2xl px-4 py-2.5 min-w-[280px] border border-gray-200 dark:border-slate-700/50 focus-within:ring-2 focus-within:ring-indigo-500/50 transition-all">
+                    <FiSearch className="text-gray-400 dark:text-slate-500" size={18} />
                     <input
                       type="text"
                       placeholder="Поиск по имени или email..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="bg-transparent border-none outline-none ml-2 w-full text-sm"
+                      className="bg-transparent border-none outline-none ml-3 w-full text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     />
                   </div>
 
                   <select
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value)}
-                    className="bg-gray-50 border-none rounded-xl px-4 py-2 text-sm outline-none cursor-pointer"
+                    className="bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700/50 rounded-2xl px-4 py-2.5 text-sm outline-none cursor-pointer text-gray-700 dark:text-slate-300 focus:ring-2 focus:ring-indigo-500/50 transition-all"
                   >
                     <option value="">Все роли</option>
                     {roleOptions.map(r => (
@@ -649,37 +653,37 @@ export default function AdminPage() {
                     ))}
                   </select>
 
-                  <label className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl cursor-pointer">
+                  <label className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700/50 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
                     <input
                       type="checkbox"
                       checked={demoFilter}
                       onChange={(e) => setDemoFilter(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-slate-800"
                     />
-                    <span className="text-sm text-gray-600">Только демо</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Только демо</span>
                   </label>
 
                   <button
                     onClick={() => fetchData()}
-                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                    className="p-3 text-gray-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-xl transition-all border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900/50 ml-auto lg:ml-0"
                     title="Обновить"
                   >
                     <FiRefreshCw size={18} />
                   </button>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-500">
-                    Найдено: {filteredUsers.length}
+                <div className="flex items-center justify-between lg:justify-end gap-5 w-full lg:w-auto pt-4 lg:pt-0 border-t lg:border-t-0 border-gray-100 dark:border-slate-700/50">
+                  <span className="text-sm font-bold text-gray-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-900/50 px-3 py-1.5 rounded-xl">
+                    Найдено: <span className="text-gray-900 dark:text-white">{filteredUsers.length}</span>
                   </span>
                   <button
                     onClick={() => {
                       resetCreateForm()
                       setShowCreateModal(true)
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-600/20 dark:shadow-indigo-900/30 hover:-translate-y-0.5"
                   >
-                    <FiPlus size={18} />
+                    <FiPlus size={20} />
                     Добавить
                   </button>
                 </div>
@@ -687,151 +691,155 @@ export default function AdminPage() {
             </div>
 
             {/* Users Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-100">
-                  <tr>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Пользователь</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Роль</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Модули</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Статус</th>
-                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-600">Действия</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map((user) => {
-                    const roleStyle = getRoleStyle(user.role)
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50/80 dark:bg-slate-800/80 border-b border-gray-100 dark:border-slate-700/50">
+                    <tr>
+                      <th className="text-left py-4 px-6 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Пользователь</th>
+                      <th className="text-left py-4 px-6 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Роль</th>
+                      <th className="text-left py-4 px-6 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Модули</th>
+                      <th className="text-left py-4 px-6 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Статус</th>
+                      <th className="text-right py-4 px-6 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
+                    {filteredUsers.map((user) => {
+                      const roleStyle = getRoleStyle(user.role)
 
-                    return (
-                      <tr key={user.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                              <span className="text-white font-medium">{user.name.charAt(0)}</span>
+                      return (
+                        <tr key={user.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors group">
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
+                                <span className="text-white font-bold">{user.name.charAt(0)}</span>
+                              </div>
+                              <div>
+                                <p className="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-0.5">
+                                  {user.name}
+                                  {user.isDemo && (
+                                    <span className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-[10px] rounded-md font-bold uppercase tracking-wider">
+                                      ДЕМО
+                                    </span>
+                                  )}
+                                </p>
+                                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{user.email}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-medium text-gray-900 flex items-center gap-2">
-                                {user.name}
-                                {user.isDemo && (
-                                  <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium">
-                                    ДЕМО
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${roleStyle.color.replace('bg-', 'bg-').replace('text-', 'text-')} dark:bg-opacity-20`}>
+                              {roleStyle.label}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex flex-wrap gap-1.5 max-w-[280px]">
+                              {(user.permissions || []).length > 0 ? (
+                                (user.permissions || []).map((mod: string) => (
+                                  <span key={mod} className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-[10px] rounded-md font-bold uppercase tracking-wider border border-indigo-100 dark:border-indigo-800/50">
+                                    {permissionsList.find(m => m.key === mod)?.label || mod}
                                   </span>
-                                )}
-                              </p>
-                              <p className="text-sm text-gray-500">{user.email}</p>
+                                ))
+                              ) : (
+                                <span className="text-gray-400 dark:text-slate-500 text-sm font-medium">—</span>
+                              )}
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${roleStyle.color}`}>
-                            {roleStyle.label}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex flex-wrap gap-1">
-                            {(user.permissions || []).length > 0 ? (
-                              (user.permissions || []).map((mod: string) => (
-                                <span key={mod} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded-full font-medium">
-                                  {permissionsList.find(m => m.key === mod)?.label || mod}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-gray-400 text-sm">—</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                            }`}>
-                            {user.isActive ? <FiCheck size={12} /> : <FiX size={12} />}
-                            {user.isActive ? 'Активен' : 'Неактивен'}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center justify-end gap-1">
-                            <button
-                              onClick={() => openPasswordModal(user)}
-                              className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
-                              title="Сменить пароль"
-                            >
-                              <FiKey size={16} />
-                            </button>
+                          </td>
+                          <td className="py-4 px-6">
                             <button
                               onClick={() => handleToggleActive(user)}
-                              className={`p-2 rounded-lg transition-all ${user.isActive
-                                ? 'text-gray-400 hover:text-red-600 hover:bg-red-50'
-                                : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
-                                }`}
-                              title={user.isActive ? 'Деактивировать' : 'Активировать'}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${user.isActive 
+                                ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50 hover:bg-green-100 dark:hover:bg-green-900/40' 
+                                : 'bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700'}
+                              `}
+                              title={user.isActive ? 'Нажмите чтобы деактивировать' : 'Нажмите чтобы активировать'}
                             >
-                              {user.isActive ? <FiLock size={16} /> : <FiCheck size={16} />}
+                              <div className={`w-2 h-2 rounded-full ${user.isActive ? 'bg-green-500' : 'bg-gray-400 dark:bg-slate-500'}`} />
+                              {user.isActive ? 'Активен' : 'Неактивен'}
                             </button>
-                            <button
-                              onClick={() => openEditModal(user)}
-                              className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                              title="Редактировать"
-                            >
-                              <FiEdit2 size={16} />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setDeletingUser(user)
-                                setShowDeleteModal(true)
-                              }}
-                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                              title="Удалить"
-                            >
-                              <FiTrash2 size={16} />
-                            </button>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => openPasswordModal(user)}
+                                className="p-2 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-xl transition-all"
+                                title="Сменить пароль"
+                              >
+                                <FiKey size={18} />
+                              </button>
+                              <button
+                                onClick={() => openEditModal(user)}
+                                className="p-2 text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-xl transition-all"
+                                title="Редактировать"
+                              >
+                                <FiEdit2 size={18} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDeletingUser(user)
+                                  setShowDeleteModal(true)
+                                }}
+                                className="p-2 text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
+                                title="Удалить"
+                              >
+                                <FiTrash2 size={18} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                    {filteredUsers.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-24 text-center">
+                          <div className="w-20 h-20 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FiUsers size={32} className="text-gray-400 dark:text-slate-500" />
                           </div>
+                          <p className="text-lg font-bold text-gray-900 dark:text-white mb-2">Пользователи не найдены</p>
+                          <p className="text-gray-500 dark:text-slate-400 mb-6">Измените параметры поиска или добавьте нового</p>
+                          <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                          >
+                            <FiPlus size={18} />
+                            Создать пользователя
+                          </button>
                         </td>
                       </tr>
-                    )
-                  })}
-                  {filteredUsers.length === 0 && (
-                    <tr>
-                      <td colSpan={5} className="py-20 text-center">
-                        <FiUsers size={48} className="mx-auto text-gray-300 mb-4" />
-                        <p className="text-gray-500">Пользователи не найдены</p>
-                        <button
-                          onClick={() => setShowCreateModal(true)}
-                          className="mt-4 text-indigo-600 hover:text-indigo-700 font-medium"
-                        >
-                          Добавить первого пользователя
-                        </button>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         ) : activeTab === 'office' ? (
           /* Office Tab */
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-6">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-6 sm:p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <FiMapPin className="text-indigo-600" size={22} />
+                  <h3 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-3 mb-2">
+                    <div className="p-2.5 bg-indigo-50 dark:bg-indigo-900/50 rounded-xl">
+                      <FiMapPin className="text-indigo-600 dark:text-indigo-400" size={24} />
+                    </div>
                     Расположение офиса
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
                     Кликните на карту или перетащите маркер для выбора местоположения офиса.
                   </p>
                 </div>
                 <button
                   onClick={handleSaveOffice}
                   disabled={savingOffice}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-600/20 dark:shadow-indigo-900/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none w-full sm:w-auto"
                 >
-                  <FiSave size={18} />
+                  <FiSave size={20} />
                   {savingOffice ? 'Сохранение...' : 'Сохранить'}
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 rounded-2xl overflow-hidden shadow-inner border border-gray-100 dark:border-slate-700/50 bg-gray-50 dark:bg-slate-900/50 min-h-[400px]">
                   {officeLoaded && (
                     <OfficeMap
                       latitude={officeForm.latitude}
@@ -842,74 +850,74 @@ export default function AdminPage() {
                   )}
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Название офиса</label>
+                    <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Название офиса</label>
                     <input
                       type="text"
                       value={officeForm.name}
                       onChange={(e) => setOfficeForm(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                       placeholder="Главный офис"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Адрес</label>
+                    <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Адрес</label>
                     <input
                       type="text"
                       value={officeForm.address}
                       onChange={(e) => setOfficeForm(prev => ({ ...prev, address: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                       placeholder="ул. Примерная, д. 1"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Широта</label>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Широта</label>
                       <input
                         type="number"
                         step="0.0001"
                         value={officeForm.latitude}
                         onChange={(e) => setOfficeForm(prev => ({ ...prev, latitude: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+                        className="w-full px-4 py-3 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-sm text-gray-900 dark:text-white font-mono"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Долгота</label>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Долгота</label>
                       <input
                         type="number"
                         step="0.0001"
                         value={officeForm.longitude}
                         onChange={(e) => setOfficeForm(prev => ({ ...prev, longitude: parseFloat(e.target.value) || 0 }))}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+                        className="w-full px-4 py-3 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-sm text-gray-900 dark:text-white font-mono"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Радиус (метры)</label>
+                    <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Радиус (метры)</label>
                     <input
                       type="number"
                       value={officeForm.radius}
                       onChange={(e) => setOfficeForm(prev => ({ ...prev, radius: parseInt(e.target.value) || 100 }))}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white font-mono"
                       min="10"
                       max="1000"
                     />
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mt-2">
                       Сотрудники в пределах этого радиуса будут отмечены как &quot;в офисе&quot;
                     </p>
                   </div>
 
-                  <div className="bg-indigo-50 rounded-xl p-4">
+                  <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-5 border border-indigo-100 dark:border-indigo-900/50">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-3 h-3 bg-indigo-500 rounded-full" />
-                      <span className="text-sm font-medium text-indigo-700">Зона офиса</span>
+                      <div className="w-3 h-3 bg-indigo-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)] animate-pulse" />
+                      <span className="text-sm font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">Зона офиса</span>
                     </div>
-                    <p className="text-xs text-indigo-600">
-                      Радиус {officeForm.radius}м от маркера. Чекин в этой зоне = &quot;В офисе&quot;.
+                    <p className="text-sm font-medium text-indigo-600 dark:text-indigo-300 leading-relaxed">
+                      Радиус <strong className="font-bold">{officeForm.radius}м</strong> от маркера. Чекин в этой зоне = &quot;В офисе&quot;.
                     </p>
                   </div>
                 </div>
@@ -921,111 +929,118 @@ export default function AdminPage() {
           <div className="space-y-6">
             {/* System Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-blue-100 rounded-xl">
-                    <FiServer className="text-blue-600" size={24} />
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                <div className="flex items-center gap-5 mb-6">
+                  <div className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                    <FiServer className="text-white" size={28} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Сервер</h3>
-                    <p className="text-sm text-gray-500">Vercel Edge</p>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Сервер</h3>
+                    <p className="text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Vercel Edge</p>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Статус</span>
-                    <span className="text-green-600 font-medium">Онлайн</span>
+                <div className="space-y-3 bg-gray-50/50 dark:bg-slate-900/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-700/50">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 dark:text-slate-400 font-medium">Статус</span>
+                    <span className="text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-green-900/30 px-2.5 py-1 rounded-lg">Онлайн</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Регион</span>
-                    <span className="text-gray-900">Global Edge</span>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 dark:text-slate-400 font-medium">Регион</span>
+                    <span className="text-gray-900 dark:text-white font-bold">Global Edge</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-green-100 rounded-xl">
-                    <FiDatabase className="text-green-600" size={24} />
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                <div className="flex items-center gap-5 mb-6">
+                  <div className="p-4 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                    <FiDatabase className="text-white" size={28} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">База данных</h3>
-                    <p className="text-sm text-gray-500">Supabase Postgres</p>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">База данных</h3>
+                    <p className="text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Supabase Postgres</p>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Статус</span>
-                    <span className="text-green-600 font-medium">Подключено</span>
+                <div className="space-y-3 bg-gray-50/50 dark:bg-slate-900/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-700/50">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 dark:text-slate-400 font-medium">Статус</span>
+                    <span className="text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-green-900/30 px-2.5 py-1 rounded-lg">Подключено</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Таблиц</span>
-                    <span className="text-gray-900">9</span>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 dark:text-slate-400 font-medium">Таблиц</span>
+                    <span className="text-gray-900 dark:text-white font-bold text-base">9</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-purple-100 rounded-xl">
-                    <FiShield className="text-purple-600" size={24} />
+              <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                <div className="flex items-center gap-5 mb-6">
+                  <div className="p-4 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                    <FiShield className="text-white" size={28} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Аутентификация</h3>
-                    <p className="text-sm text-gray-500">Supabase Auth</p>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Аутентификация</h3>
+                    <p className="text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Supabase Auth</p>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Статус</span>
-                    <span className="text-green-600 font-medium">Активна</span>
+                <div className="space-y-3 bg-gray-50/50 dark:bg-slate-900/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-700/50">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 dark:text-slate-400 font-medium">Статус</span>
+                    <span className="text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-green-900/30 px-2.5 py-1 rounded-lg">Активна</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Провайдеры</span>
-                    <span className="text-gray-900">Email/Пароль</span>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 dark:text-slate-400 font-medium">Провайдеры</span>
+                    <span className="text-gray-900 dark:text-white font-bold">Email / Pass</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Tech Stack */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-900 mb-4">Технологии</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-700/50">
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-6">Технологии</h3>
+              <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
                 {[
-                  { name: 'Next.js 15', color: 'bg-black text-white' },
-                  { name: 'React 19', color: 'bg-cyan-500 text-white' },
-                  { name: 'TypeScript', color: 'bg-blue-600 text-white' },
-                  { name: 'Supabase', color: 'bg-green-600 text-white' },
-                  { name: 'Prisma', color: 'bg-gray-800 text-white' },
-                  { name: 'Tailwind CSS', color: 'bg-sky-500 text-white' },
+                  { name: 'Next.js 15', sub: 'Framework', color: 'from-gray-800 to-black', darkColor: 'from-gray-700 to-gray-900' },
+                  { name: 'React 19', sub: 'Library', color: 'from-cyan-400 to-cyan-600', darkColor: 'from-cyan-600 to-cyan-800' },
+                  { name: 'TypeScript', sub: 'Language', color: 'from-blue-500 to-blue-700', darkColor: 'from-blue-600 to-blue-900' },
+                  { name: 'Supabase', sub: 'Backend', color: 'from-green-500 to-green-700', darkColor: 'from-green-600 to-green-900' },
+                  { name: 'Prisma', sub: 'ORM', color: 'from-slate-700 to-slate-900', darkColor: 'from-slate-800 to-black' },
+                  { name: 'Tailwind', sub: 'Styling', color: 'from-sky-400 to-sky-600', darkColor: 'from-sky-600 to-sky-900' },
                 ].map((tech) => (
-                  <div key={tech.name} className={`${tech.color} rounded-xl p-4 text-center font-medium`}>
-                    {tech.name}
+                  <div key={tech.name} className={`bg-gradient-to-br ${tech.color} dark:${tech.darkColor} rounded-2xl p-5 text-white shadow-lg transform hover:-translate-y-2 hover:shadow-xl transition-all duration-300`}>
+                    <p className="text-xs text-white/70 font-bold uppercase tracking-widest mb-1">{tech.sub}</p>
+                    <p className="font-black text-lg">{tech.name}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Environment Info */}
-            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-6 text-white">
-              <h3 className="font-bold text-lg mb-4">Окружение</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                  <p className="text-white/60 text-sm">Node.js</p>
-                  <p className="font-semibold">v22+</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                  <p className="text-white/60 text-sm">Платформа</p>
-                  <p className="font-semibold">Vercel</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                  <p className="text-white/60 text-sm">База данных</p>
-                  <p className="font-semibold">Supabase</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                  <p className="text-white/60 text-sm">Сборка</p>
-                  <p className="font-semibold">Production</p>
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-6 md:p-10 shadow-xl overflow-hidden relative group">
+              <div className="absolute inset-0 bg-white/5 group-hover:bg-white/10 transition-colors duration-500" />
+              <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/10 blur-3xl rounded-full" />
+              <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-white/10 blur-3xl rounded-full" />
+              
+              <div className="relative z-10">
+                <h3 className="text-3xl font-black text-white mb-8 tracking-tight">Окружение</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-colors">
+                    <p className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Node.js</p>
+                    <p className="text-2xl font-black text-white">v22+</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-colors">
+                    <p className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Платформа</p>
+                    <p className="text-2xl font-black text-white">Vercel</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-colors">
+                    <p className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">База данных</p>
+                    <p className="text-2xl font-black text-white">Supabase</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-colors">
+                    <p className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Сборка</p>
+                    <p className="text-2xl font-black text-white">Prod</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1035,44 +1050,45 @@ export default function AdminPage() {
 
       {/* Create User Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white">
-              <h2 className="text-xl font-bold text-gray-900">Создать пользователя</h2>
+        <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-indigo-900/20 w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden custom-scrollbar border border-gray-100 dark:border-slate-700/50 animate-in zoom-in-95 duration-300">
+            <div className="flex items-center justify-between p-6 md:p-8 border-b border-gray-100 dark:border-slate-700/50 sticky top-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm z-10">
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Создать пользователя</h2>
               <button
+                type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all"
+                className="p-2.5 text-gray-400 dark:text-slate-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700/50 rounded-2xl transition-all"
               >
-                <FiX size={20} />
+                <FiX size={22} />
               </button>
             </div>
 
-            <form onSubmit={handleCreateUser} className="p-6 space-y-5">
+            <form onSubmit={handleCreateUser} className="p-6 md:p-8 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Имя <span className="text-red-500">*</span>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">
+                  Имя <span className="text-indigo-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={createForm.name}
                   onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  className="w-full px-5 py-3.5 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   placeholder="Иван Иванов"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email <span className="text-red-500">*</span>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">
+                  Email <span className="text-indigo-500">*</span>
                 </label>
                 <div className="relative">
-                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <FiMail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" size={20} />
                   <input
                     type="email"
                     value={createForm.email}
                     onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full pl-13 pr-5 py-3.5 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     placeholder="email@example.com"
                     required
                   />
@@ -1080,37 +1096,37 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Пароль <span className="text-red-500">*</span>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">
+                  Пароль <span className="text-indigo-500">*</span>
                 </label>
                 <div className="relative">
-                  <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <FiLock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" size={20} />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={createForm.password}
                     onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-                    className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full pl-13 pr-14 py-3.5 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                     placeholder="Минимум 6 символов"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-900 dark:hover:text-white transition-colors"
                   >
-                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">
                   Роль
                 </label>
                 <select
                   value={createForm.role}
                   onChange={(e) => setCreateForm({ ...createForm, role: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  className="w-full px-5 py-3.5 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white appearance-none cursor-pointer"
                 >
                   {roleOptions.map(r => (
                     <option key={r.value} value={r.value}>{r.label}</option>
@@ -1120,16 +1136,16 @@ export default function AdminPage() {
 
               {/* Modules selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-3">
                   Доступные модули
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {permissionsList.map((module) => (
                     <label
                       key={module.key}
-                      className={`flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all border-2 ${createForm.modules.includes(module.key)
-                        ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+                      className={`flex items-center gap-3 p-3.5 rounded-2xl cursor-pointer transition-all border-2 ${createForm.modules.includes(module.key)
+                        ? 'bg-indigo-50/50 dark:bg-indigo-900/20 border-indigo-500 text-indigo-700 dark:text-indigo-300'
+                        : 'bg-gray-50/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:border-gray-300 dark:hover:border-slate-600'
                         }`}
                     >
                       <input
@@ -1142,303 +1158,300 @@ export default function AdminPage() {
                             setCreateForm({ ...createForm, modules: createForm.modules.filter(m => m !== module.key) })
                           }
                         }}
-                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        className="w-5 h-5 rounded-md border-gray-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-slate-800"
                       />
-                      <span className="text-sm font-medium">{module.label}</span>
+                      <span className="text-sm font-bold">{module.label}</span>
                     </label>
-                  ))
-                  }
+                  ))}
                 </div>
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-4 mt-4 px-1">
                   <button
                     type="button"
                     onClick={() => setCreateForm({ ...createForm, modules: permissionsList.map(m => m.key) })}
-                    className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                    className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold transition-colors"
                   >
                     Выбрать все
                   </button>
                   <button
                     type="button"
                     onClick={() => setCreateForm({ ...createForm, modules: [] })}
-                    className="text-xs text-gray-500 hover:text-gray-700 font-medium"
+                    className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white font-bold transition-colors"
                   >
                     Снять все
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-4 bg-yellow-50 rounded-xl">
+              <label className="flex items-center gap-4 p-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-2xl cursor-pointer transition-colors hover:bg-amber-100 dark:hover:bg-amber-900/30">
                 <input
                   type="checkbox"
-                  id="isDemo"
                   checked={createForm.isDemo}
                   onChange={(e) => setCreateForm({ ...createForm, isDemo: e.target.checked })}
-                  className="w-5 h-5 rounded border-gray-300 text-yellow-600 focus:ring-yellow-500"
+                  className="w-5 h-5 rounded-md border-gray-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-800"
                 />
-                <label htmlFor="isDemo" className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-bold text-amber-800 dark:text-amber-400">
                   Демо аккаунт (появится на странице входа)
-                </label>
-              </div>
+                </span>
+              </label>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-6 border-t border-gray-100 dark:border-slate-700/50">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
+                  className="w-full sm:w-1/2 px-6 py-3.5 border-2 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-slate-800 transition-all"
                 >
                   Отмена
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50"
+                  className="w-full sm:w-1/2 px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-600/20 dark:shadow-indigo-900/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
                 >
                   {saving ? 'Создание...' : 'Создать'}
                 </button>
               </div>
-            </form >
-          </div >
-        </div >
-      )
-      }
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit User Modal */}
-      {
-        showEditModal && editingUser && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900">Редактировать</h2>
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all"
-                >
-                  <FiX size={20} />
-                </button>
+      {showEditModal && editingUser && (
+        <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-indigo-900/20 w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden custom-scrollbar border border-gray-100 dark:border-slate-700/50 animate-in zoom-in-95 duration-300">
+            <div className="flex items-center justify-between p-6 md:p-8 border-b border-gray-100 dark:border-slate-700/50 sticky top-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm z-10">
+              <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Редактировать {editingUser.name}</h2>
+              <button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                className="p-2.5 text-gray-400 dark:text-slate-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700/50 rounded-2xl transition-all"
+              >
+                <FiX size={22} />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateUser} className="p-6 md:p-8 space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">
+                  Имя
+                </label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full px-5 py-3.5 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white"
+                />
               </div>
 
-              <form onSubmit={handleUpdateUser} className="p-6 space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Имя
-                  </label>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">
+                  Роль
+                </label>
+                <select
+                  value={editForm.role}
+                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                  className="w-full px-5 py-3.5 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white cursor-pointer"
+                >
+                  {roleOptions.map(r => (
+                    <option key={r.value} value={r.value}>{r.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-3">
+                  Доступные модули
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {permissionsList.map((mod) => (
+                    <label
+                      key={mod.key}
+                      className={`flex items-center gap-3 p-3.5 rounded-2xl cursor-pointer transition-all border-2 ${editForm.modules.includes(mod.key)
+                        ? 'bg-indigo-50/50 dark:bg-indigo-900/20 border-indigo-500 text-indigo-700 dark:text-indigo-300'
+                        : 'bg-gray-50/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:border-gray-300 dark:hover:border-slate-600'
+                        }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={editForm.modules.includes(mod.key)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setEditForm({ ...editForm, modules: [...editForm.modules, mod.key] })
+                          } else {
+                            setEditForm({ ...editForm, modules: editForm.modules.filter(m => m !== mod.key) })
+                          }
+                        }}
+                        className="w-5 h-5 rounded-md border-gray-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-slate-800"
+                      />
+                      <span className="text-sm font-bold">{mod.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-colors cursor-pointer ${editForm.isActive 
+                  ? 'bg-green-50/50 dark:bg-green-900/20 border-green-500 text-green-700 dark:text-green-300' 
+                  : 'bg-gray-50/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400'}`}>
                   <input
-                    type="text"
-                    value={editForm.name}
-                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    type="checkbox"
+                    checked={editForm.isActive}
+                    onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })}
+                    className="w-5 h-5 rounded-md border-gray-300 dark:border-slate-600 text-green-500 focus:ring-green-500 bg-white dark:bg-slate-800"
                   />
-                </div>
+                  <span className="text-sm font-bold text-inherit">Активен</span>
+                </label>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Роль
-                  </label>
-                  <select
-                    value={editForm.role}
-                    onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  >
-                    {roleOptions.map(r => (
-                      <option key={r.value} value={r.value}>{r.label}</option>
-                    ))}
-                  </select>
-                </div>
+                <label className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-colors cursor-pointer ${editForm.isDemo 
+                  ? 'bg-amber-50/50 dark:bg-amber-900/20 border-amber-500 text-amber-700 dark:text-amber-300' 
+                  : 'bg-gray-50/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400'}`}>
+                  <input
+                    type="checkbox"
+                    checked={editForm.isDemo}
+                    onChange={(e) => setEditForm({ ...editForm, isDemo: e.target.checked })}
+                    className="w-5 h-5 rounded-md border-gray-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-800"
+                  />
+                  <span className="text-sm font-bold text-inherit">Демо</span>
+                </label>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Доступные модули
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {permissionsList.map((mod) => (
-                      <label
-                        key={mod.key}
-                        className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all border-2 ${editForm.modules.includes(mod.key)
-                          ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                          : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
-                          }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={editForm.modules.includes(mod.key)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setEditForm({ ...editForm, modules: [...editForm.modules, mod.key] })
-                            } else {
-                              setEditForm({ ...editForm, modules: editForm.modules.filter(m => m !== mod.key) })
-                            }
-                          }}
-                          className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <span className="text-sm font-medium">{mod.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={editForm.isActive}
-                      onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })}
-                      className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Активен</span>
-                  </label>
-
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={editForm.isDemo}
-                      onChange={(e) => setEditForm({ ...editForm, isDemo: e.target.checked })}
-                      className="w-5 h-5 rounded border-gray-300 text-yellow-600 focus:ring-yellow-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Демо</span>
-                  </label>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowEditModal(false)}
-                    className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
-                  >
-                    Отмена
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50"
-                  >
-                    {saving ? 'Сохранение...' : 'Сохранить'}
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-6 border-t border-gray-100 dark:border-slate-700/50">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="w-full sm:w-1/2 px-6 py-3.5 border-2 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-slate-800 transition-all"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="w-full sm:w-1/2 px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-600/20 dark:shadow-indigo-900/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
+                >
+                  {saving ? 'Сохранение...' : 'Сохранить'}
+                </button>
+              </div>
+            </form>
           </div>
-        )
-      }
+        </div>
+      )}
 
       {/* Password Modal */}
-      {
-        showPasswordModal && editingUser && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Сменить пароль</h2>
-                  <p className="text-sm text-gray-500">{editingUser.name}</p>
-                </div>
-                <button
-                  onClick={() => setShowPasswordModal(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all"
-                >
-                  <FiX size={20} />
-                </button>
+      {showPasswordModal && editingUser && (
+        <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-indigo-900/20 w-full max-w-md border border-gray-100 dark:border-slate-700/50 animate-in zoom-in-95 duration-300">
+            <div className="flex items-center justify-between p-6 md:p-8 border-b border-gray-100 dark:border-slate-700/50">
+              <div>
+                <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Сменить пароль</h2>
+                <p className="text-sm font-bold text-indigo-500 dark:text-indigo-400 mt-1">{editingUser.name}</p>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowPasswordModal(false)}
+                className="p-2.5 text-gray-400 dark:text-slate-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700/50 rounded-2xl transition-all"
+              >
+                <FiX size={22} />
+              </button>
+            </div>
 
-              <form onSubmit={handleChangePassword} className="p-6 space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Новый пароль
-                  </label>
-                  <div className="relative">
-                    <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={passwordForm.password}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, password: e.target.value })}
-                      className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                      placeholder="Минимум 6 символов"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Подтвердите пароль
-                  </label>
-                  <div className="relative">
-                    <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                      placeholder="Повторите пароль"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-4">
+            <form onSubmit={handleChangePassword} className="p-6 md:p-8 space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">
+                  Новый пароль
+                </label>
+                <div className="relative">
+                  <FiLock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" size={20} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordForm.password}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, password: e.target.value })}
+                    className="w-full pl-13 pr-14 py-3.5 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
+                    placeholder="Минимум 6 символов"
+                    required
+                  />
                   <button
                     type="button"
-                    onClick={() => setShowPasswordModal(false)}
-                    className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-900 dark:hover:text-white transition-colors"
                   >
-                    Отмена
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-medium hover:from-amber-600 hover:to-orange-700 transition-all disabled:opacity-50"
-                  >
-                    {saving ? 'Смена...' : 'Сменить пароль'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )
-      }
-
-      {/* Delete User Modal */}
-      {
-        showDeleteModal && deletingUser && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FiTrash2 className="text-red-600" size={28} />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Удалить пользователя</h3>
-                <p className="text-gray-500 mb-6">
-                  Вы уверены, что хотите удалить <span className="font-medium text-gray-900">&quot;{deletingUser.name}&quot;</span>?
-                  Это также удалит аккаунт аутентификации.
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      setShowDeleteModal(false)
-                      setDeletingUser(null)
-                    }}
-                    className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
-                  >
-                    Отмена
-                  </button>
-                  <button
-                    onClick={handleDeleteUser}
-                    disabled={saving}
-                    className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all disabled:opacity-50"
-                  >
-                    {saving ? 'Удаление...' : 'Удалить'}
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                   </button>
                 </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">
+                  Подтвердите пароль
+                </label>
+                <div className="relative">
+                  <FiLock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" size={20} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                    className="w-full pl-13 pr-5 py-3.5 bg-gray-50/50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
+                    placeholder="Повторите пароль"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-6 border-t border-gray-100 dark:border-slate-700/50">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordModal(false)}
+                  className="w-full sm:w-1/2 px-6 py-3.5 border-2 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-slate-800 transition-all"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="w-full sm:w-1/2 px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-2xl font-bold hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:transform-none"
+                >
+                  {saving ? 'Смена...' : 'Сменить'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete User Modal */}
+      {showDeleteModal && deletingUser && (
+        <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-red-900/20 w-full max-w-md p-8 text-center border border-gray-100 dark:border-slate-700/50 animate-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-500/10">
+              <FiTrash2 className="text-red-600 dark:text-red-400" size={36} />
+            </div>
+            <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">Удалить пользователя</h3>
+            <p className="text-gray-500 dark:text-slate-400 mb-8 font-medium leading-relaxed">
+              Вы уверены, что хотите удалить <span className="font-bold text-gray-900 dark:text-white px-2 py-0.5 bg-gray-100 dark:bg-slate-700 rounded-md">&quot;{deletingUser.name}&quot;</span>?
+              Это также удалит аккаунт аутентификации.
+            </p>
+            <div className="flex flex-col-reverse sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteModal(false)
+                  setDeletingUser(null)
+                }}
+                className="w-full sm:w-1/2 px-6 py-3.5 border-2 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-slate-800 transition-all"
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteUser}
+                disabled={saving}
+                className="w-full sm:w-1/2 px-6 py-3.5 bg-red-600 dark:bg-red-500 text-white rounded-2xl font-bold hover:bg-red-700 dark:hover:bg-red-600 transition-all disabled:opacity-50 shadow-lg shadow-red-600/20 dark:shadow-red-900/30 hover:-translate-y-0.5"
+              >
+                {saving ? 'Удаление...' : 'Да, Удалить'}
+              </button>
             </div>
           </div>
-        )
-      }
+        </div>
+      )}
     </div>
   )
 }

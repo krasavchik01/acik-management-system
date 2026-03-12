@@ -190,75 +190,75 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
         title="Projects"
         subtitle="Manage and track all your projects"
       />
 
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
-                <FiGrid className="text-indigo-600" size={24} />
+              <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FiGrid className="text-indigo-600 dark:text-indigo-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
-                <p className="text-sm text-gray-500 dark:text-slate-400">Total Projects</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.total}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Projects</p>
               </div>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <FiClock className="text-emerald-600" size={24} />
+              <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FiClock className="text-emerald-600 dark:text-emerald-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
-                <p className="text-sm text-gray-500 dark:text-slate-400">Active</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.active}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Active</p>
               </div>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <FiCheckCircle className="text-blue-600" size={24} />
+              <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FiCheckCircle className="text-blue-600 dark:text-blue-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
-                <p className="text-sm text-gray-500 dark:text-slate-400">Completed</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.completed}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Completed</p>
               </div>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <FiDollarSign className="text-purple-600" size={24} />
+              <div className="w-14 h-14 bg-purple-50 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FiDollarSign className="text-purple-600 dark:text-purple-400" size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">${stats.totalBudget.toLocaleString()}</p>
-                <p className="text-sm text-gray-500 dark:text-slate-400">Total Budget</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">${stats.totalBudget.toLocaleString()}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Budget</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Toolbar */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-slate-700 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
               {/* Search */}
-              <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
-                <FiSearch className="text-gray-400" size={18} />
+              <div className="flexflex-1 lg:flex-none items-center bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/20 transition-all">
+                <FiSearch className="text-gray-400 dark:text-slate-400" size={18} />
                 <input
                   type="text"
                   placeholder="Search projects..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && fetchProjects()}
-                  className="bg-transparent border-none outline-none ml-2 w-48 text-sm"
+                  className="bg-transparent border-none outline-none ml-2 w-full lg:w-64 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                 />
               </div>
 
@@ -266,7 +266,7 @@ export default function ProjectsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+                className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all text-gray-900 dark:text-white"
               >
                 <option value="">All Status</option>
                 <option value="Planning">Planning</option>
@@ -276,18 +276,18 @@ export default function ProjectsPage() {
               </select>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
               {/* View Toggle */}
-              <div className="flex bg-gray-100 rounded-xl p-1">
+              <div className="flex bg-gray-100 dark:bg-slate-700/50 p-1 rounded-xl">
                 <button
                   onClick={() => setView('grid')}
-                  className={`p-2.5 rounded-lg transition-all ${view === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'}`}
+                  className={`p-2 rounded-lg transition-all ${view === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-600/50'}`}
                 >
                   <FiGrid size={18} />
                 </button>
                 <button
                   onClick={() => setView('list')}
-                  className={`p-2.5 rounded-lg transition-all ${view === 'list' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700'}`}
+                  className={`p-2 rounded-lg transition-all ${view === 'list' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-600/50'}`}
                 >
                   <FiList size={18} />
                 </button>
@@ -297,10 +297,10 @@ export default function ProjectsPage() {
               {canManage && (
                 <button
                   onClick={() => { resetForm(); setShowModal(true) }}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200 font-medium"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 font-medium"
                 >
                   <FiPlus size={18} />
-                  <span>New Project</span>
+                  <span className="hidden sm:inline">New Project</span>
                 </button>
               )}
             </div>
@@ -335,13 +335,13 @@ export default function ProjectsPage() {
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg hover:border-indigo-100 transition-all group"
+                className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all group"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className={`w-3 h-3 rounded-full ${getPriorityColor(project.priority)}`} />
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(project.status)}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(project.status)}`}>
                       {project.status}
                     </span>
                   </div>
@@ -349,13 +349,15 @@ export default function ProjectsPage() {
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                       <button
                         onClick={() => openEditModal(project)}
-                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                        title="Edit Project"
                       >
                         <FiEdit2 size={16} />
                       </button>
                       <button
                         onClick={() => setShowDeleteConfirm(project.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                        title="Delete Project"
                       >
                         <FiTrash2 size={16} />
                       </button>
@@ -418,92 +420,98 @@ export default function ProjectsPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-slate-700">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Project</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Progress</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Budget</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Manager</th>
-                  {canManage && <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {projects.map((project) => (
-                  <tr key={project.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${getPriorityColor(project.priority)}`} />
-                        <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">{project.name}</p>
-                          <p className="text-sm text-gray-500 dark:text-slate-400">{project.category}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(project.status)}`}>
-                        {project.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="w-32">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="font-medium text-gray-900 dark:text-white">{project.progress || 0}%</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${getProgressColor(project.progress || 0)}`}
-                            style={{ width: `${project.progress || 0}%` }}
-                          />
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="font-medium text-gray-900 dark:text-white">${(project.budgetAllocated || 0).toLocaleString()}</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      {project.manager && (
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                            <span className="text-xs font-medium text-white">
-                              {project.manager.name.charAt(0)}
-                            </span>
-                          </div>
-                          <span className="text-sm text-gray-600">{project.manager.name}</span>
-                        </div>
-                      )}
-                    </td>
-                    {canManage && (
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => openEditModal(project)}
-                          className="p-2 text-gray-400 hover:text-indigo-600 transition-colors"
-                        >
-                          <FiEdit2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => setShowDeleteConfirm(project.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                        >
-                          <FiTrash2 size={16} />
-                        </button>
-                      </td>
-                    )}
+          <div className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700/50">
+                  <tr>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Project</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Progress</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Budget</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Manager</th>
+                    {canManage && <th className="px-6 py-4 text-right font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+                  {projects.map((project) => (
+                    <tr key={project.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full ${getPriorityColor(project.priority)}`} />
+                          <div>
+                            <p className="font-semibold text-gray-900 dark:text-white">{project.name}</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">{project.category}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(project.status)}`}>
+                          {project.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="w-32">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-medium text-gray-900 dark:text-white">{project.progress || 0}%</span>
+                          </div>
+                          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${getProgressColor(project.progress || 0)}`}
+                              style={{ width: `${project.progress || 0}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="font-medium text-gray-900 dark:text-white">${(project.budgetAllocated || 0).toLocaleString()}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        {project.manager && (
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                              <span className="text-xs font-medium text-white">
+                                {project.manager.name.charAt(0)}
+                              </span>
+                            </div>
+                            <span className="text-sm text-gray-600">{project.manager.name}</span>
+                          </div>
+                        )}
+                      </td>
+                      {canManage && (
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => openEditModal(project)}
+                              className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                              title="Edit"
+                            >
+                              <FiEdit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => setShowDeleteConfirm(project.id)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                              title="Delete"
+                            >
+                              <FiTrash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white px-8 py-6 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="sticky top-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md px-8 py-6 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between z-10">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{editingProject ? 'Edit Project' : 'Create New Project'}</h2>
                 <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Fill in the details below</p>
@@ -642,8 +650,8 @@ export default function ProjectsPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md p-8 shadow-2xl">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FiTrash2 className="text-red-600" size={28} />
             </div>

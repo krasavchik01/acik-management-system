@@ -145,16 +145,16 @@ export default function EventsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Planned': return 'bg-blue-100 text-blue-800'
-      case 'Ongoing': return 'bg-green-100 text-green-800'
-      case 'Completed': return 'bg-gray-100 text-gray-800'
-      case 'Cancelled': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'Planned': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+      case 'Ongoing': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+      case 'Completed': return 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-gray-400'
+      case 'Cancelled': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+      default: return 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-gray-400'
     }
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
         title="Events"
         subtitle="Manage organization events"
@@ -164,28 +164,37 @@ export default function EventsPage() {
         } : undefined}
       />
 
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {loading ? (
-          <div className="text-center py-12">Loading...</div>
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-12 h-12 border-4 border-indigo-200 dark:border-indigo-900 border-t-indigo-600 dark:border-t-indigo-500 rounded-full animate-spin"></div>
+            <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium">Loading events...</p>
+          </div>
         ) : events.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">No events yet</div>
+          <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50 shadow-sm">
+            <div className="w-20 h-20 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FiCalendar className="text-gray-400 dark:text-slate-500" size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Events Found</h3>
+            <p className="text-gray-500 dark:text-slate-400">There are no events scheduled at the moment.</p>
+          </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
-              <div key={event.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-start justify-between mb-4">
+              <div key={event.id} className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg dark:hover:shadow-indigo-900/20 hover:-translate-y-1 transition-all group relative">
+                <div className="flex items-start justify-between mb-5">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                    <span className={`inline-block mt-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
+                    <h3 className="font-bold text-gray-900 dark:text-white text-lg">{event.title}</h3>
+                    <span className={`inline-block mt-2 px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold ${getStatusColor(event.status)}`}>
                       {event.status}
                     </span>
                   </div>
                   {canManage && (
-                    <div className="flex gap-1">
-                      <button onClick={() => openEditModal(event)} className="p-2 text-gray-400 hover:text-blue-600">
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => openEditModal(event)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all">
                         <FiEdit2 size={16} />
                       </button>
-                      <button onClick={() => handleDelete(event.id)} className="p-2 text-gray-400 hover:text-red-600">
+                      <button onClick={() => handleDelete(event.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all">
                         <FiTrash2 size={16} />
                       </button>
                     </div>
@@ -193,38 +202,46 @@ export default function EventsPage() {
                 </div>
 
                 {event.description && (
-                  <p className="text-sm text-gray-500 mb-4 line-clamp-2">{event.description}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mb-5 line-clamp-2">{event.description}</p>
                 )}
 
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <FiCalendar size={14} />
+                <div className="space-y-3 text-sm text-gray-600 dark:text-slate-300">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-gray-50 dark:bg-slate-700/30 rounded-lg">
+                      <FiCalendar size={14} className="text-gray-400 dark:text-slate-500" />
+                    </div>
                     <span>{new Date(event.startDate).toLocaleDateString()}</span>
                   </div>
                   {event.location && (
-                    <div className="flex items-center gap-2">
-                      <FiMapPin size={14} />
-                      <span>{event.location}</span>
+                    <div className="flex items-center gap-3 w-full">
+                      <div className="p-1.5 bg-gray-50 dark:bg-slate-700/30 rounded-lg flex-shrink-0">
+                        <FiMapPin size={14} className="text-gray-400 dark:text-slate-500" />
+                      </div>
+                      <span className="truncate">{event.location}</span>
                     </div>
                   )}
                   {event.isVirtual && (
-                    <div className="flex items-center gap-2">
-                      <FiVideo size={14} />
-                      <span>Virtual Event</span>
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+                        <FiVideo size={14} className="text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <span className="text-purple-600 dark:text-purple-400 font-medium">Virtual Event</span>
                     </div>
                   )}
                   {event.maxAttendees && (
-                    <div className="flex items-center gap-2">
-                      <FiUsers size={14} />
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                        <FiUsers size={14} className="text-blue-600 dark:text-blue-400" />
+                      </div>
                       <span>Max {event.maxAttendees} attendees</span>
                     </div>
                   )}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded-full">{event.type}</span>
+                <div className="mt-6 pt-5 border-t border-gray-100 dark:border-slate-700/50 flex items-center justify-between">
+                  <span className="text-[11px] px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-full uppercase tracking-wider font-bold border border-indigo-100 dark:border-indigo-800/50">{event.type}</span>
                   {event.budget > 0 && (
-                    <span className="text-sm font-medium text-gray-700">${event.budget.toLocaleString()}</span>
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">${event.budget.toLocaleString()}</span>
                   )}
                 </div>
               </div>
@@ -235,41 +252,41 @@ export default function EventsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{editingEvent ? 'Edit Event' : 'New Event'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700/50">
+            <div className="p-6 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{editingEvent ? 'Edit Event' : 'New Event'}</h2>
+              <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 rounded-xl transition-all">
                 <FiX size={20} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Title *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   rows={3}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Type</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
                     <option value="Meeting">Meeting</option>
                     <option value="Workshop">Workshop</option>
@@ -280,11 +297,11 @@ export default function EventsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Status</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
                     <option value="Planned">Planned</option>
                     <option value="Ongoing">Ongoing</option>
@@ -295,74 +312,74 @@ export default function EventsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Start Date *</label>
                   <input
                     type="date"
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">End Date</label>
                   <input
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Location</label>
                 <input
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   placeholder="Event location"
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-700/30 p-4 rounded-xl border border-gray-100 dark:border-slate-600">
                 <input
                   type="checkbox"
                   id="isVirtual"
                   checked={formData.isVirtual}
                   onChange={(e) => setFormData({ ...formData, isVirtual: e.target.checked })}
-                  className="rounded"
+                  className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                <label htmlFor="isVirtual" className="text-sm text-gray-700">Virtual Event</label>
+                <label htmlFor="isVirtual" className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer">This is a virtual event</label>
               </div>
               {formData.isVirtual && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Virtual Link</label>
+                <div className="animate-in slide-in-from-top-2 duration-200">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Virtual Link</label>
                   <input
                     type="url"
                     value={formData.virtualLink}
                     onChange={(e) => setFormData({ ...formData, virtualLink: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="https://..."
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
+                    placeholder="https://zoom.us/j/..."
                   />
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Attendees</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Max Attendees</label>
                   <input
                     type="number"
                     value={formData.maxAttendees}
                     onChange={(e) => setFormData({ ...formData, maxAttendees: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Budget ($)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Budget ($)</label>
                   <input
                     type="number"
                     value={formData.budget}
                     onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -370,15 +387,15 @@ export default function EventsPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700"
+                  className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-95"
                 >
-                  {editingEvent ? 'Update' : 'Create'}
+                  {editingEvent ? 'Update Event' : 'Create Event'}
                 </button>
               </div>
             </form>

@@ -22,7 +22,7 @@ interface HeaderProps {
   action?: {
     label: string
     onClick: () => void
-  }
+  } | React.ReactNode
 }
 
 export function Header({ title, subtitle, action }: HeaderProps) {
@@ -136,13 +136,19 @@ export function Header({ title, subtitle, action }: HeaderProps) {
 
         <div className="flex items-center gap-4">
           {action && (
-            <button
-              onClick={action.onClick}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium"
-            >
-              <FiPlus size={18} />
-              {action.label}
-            </button>
+            <>
+              {typeof action === 'object' && 'label' in action && 'onClick' in action ? (
+                <button
+                  onClick={(action as { onClick: () => void }).onClick}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium"
+                >
+                  <FiPlus size={18} />
+                  {(action as { label: string }).label}
+                </button>
+              ) : (
+                action
+              )}
+            </>
           )}
 
           {/* Search */}
@@ -215,9 +221,8 @@ export function Header({ title, subtitle, action }: HeaderProps) {
                             window.location.href = notification.link
                           }
                         }}
-                        className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors ${
-                          !notification.isRead ? 'bg-indigo-50/50 dark:bg-indigo-900/20' : ''
-                        }`}
+                        className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors ${!notification.isRead ? 'bg-indigo-50/50 dark:bg-indigo-900/20' : ''
+                          }`}
                       >
                         <div className="flex-shrink-0 mt-1">
                           {getNotificationIcon(notification.type)}
