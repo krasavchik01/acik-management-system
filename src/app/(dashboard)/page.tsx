@@ -624,34 +624,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Info Banner */}
-        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-black/10" />
-          <div className="absolute -right-20 -top-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
-
-          <div className="relative">
-            <div className="flex items-center gap-2 mb-4">
-              <FiZap size={24} />
-              <span className="text-lg font-semibold">ACIK Management System</span>
-            </div>
-            <h2 className="text-2xl font-bold mb-3">
-              {language === 'ru' ? 'Добро пожаловать в новую эру управления' : 'Welcome to the new era of management'}
-            </h2>
-            <p className="text-white/80 mb-6 max-w-2xl">
-              {language === 'ru'
-                ? 'Создано на Next.js 15, Supabase и развёрнуто на Vercel. Быстрая загрузка, обновления в реальном времени и современный интерфейс.'
-                : 'Powered by Next.js 15, Supabase, and deployed on Vercel. Experience faster load times, real-time updates, and a beautiful modern interface.'}
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">Next.js 15</span>
-              <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">Supabase</span>
-              <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">TypeScript</span>
-              <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">Vercel Edge</span>
-              <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">Tailwind CSS</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )
