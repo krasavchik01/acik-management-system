@@ -73,7 +73,7 @@ export default function MembersPage() {
     notes: '',
   })
 
-  const canManage = profile?.role && ['Admin', 'President', 'CEO'].includes(profile.role)
+  const canManage = profile?.role && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
 
   const fetchMembers = useCallback(async () => {
     try {

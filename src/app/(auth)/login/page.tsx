@@ -19,8 +19,6 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [demoAccounts, setDemoAccounts] = useState<DemoAccount[]>([])
-  const [loadingDemo, setLoadingDemo] = useState(true)
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking')
   const [showLangMenu, setShowLangMenu] = useState(false)
   const [formData, setFormData] = useState({
@@ -40,27 +38,6 @@ export default function LoginPage() {
         }
       } catch {
         setServerStatus('offline')
-      }
-
-      try {
-        const res = await fetch('/api/demo-accounts')
-        const data = await res.json()
-        if (data.success && data.data.length > 0) {
-          setDemoAccounts(data.data)
-        } else {
-          setDemoAccounts([
-            { label: 'Admin', email: 'admin@acik.org', password: 'Demo123!', name: 'Admin' },
-            { label: 'President', email: 'president@acik.org', password: 'Demo123!', name: 'President' },
-            { label: 'CEO', email: 'ceo@acik.org', password: 'Demo123!', name: 'CEO' },
-            { label: 'PM', email: 'pm@acik.org', password: 'Demo123!', name: 'PM' },
-          ])
-        }
-      } catch {
-        setDemoAccounts([
-          { label: 'Admin', email: 'admin@acik.org', password: 'Demo123!', name: 'Admin' },
-        ])
-      } finally {
-        setLoadingDemo(false)
       }
     }
 
@@ -84,11 +61,6 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  const handleDemoLogin = async (email: string, password: string) => {
-    setLoading(true)
-    await login(email, password)
-    setLoading(false)
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center p-4">
@@ -259,40 +231,6 @@ export default function LoginPage() {
               {isLogin ? t('auth', 'noAccount') : t('auth', 'hasAccount')}
             </button>
           </div>
-
-          {isLogin && (
-            <>
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500">{t('auth', 'demoAccounts')}</span>
-                </div>
-              </div>
-
-              {loadingDemo ? (
-                <div className="flex items-center justify-center py-4">
-                  <FiLoader className="animate-spin text-gray-400" size={20} />
-                  <span className="ml-2 text-gray-500 text-sm">{t('common', 'loading')}</span>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  {demoAccounts.map((account) => (
-                    <button
-                      key={account.email}
-                      onClick={() => handleDemoLogin(account.email, account.password)}
-                      disabled={loading}
-                      className="px-4 py-2.5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-indigo-50 hover:to-purple-50 border border-gray-200 hover:border-indigo-200 rounded-xl text-sm font-medium text-gray-700 hover:text-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      <FiZap size={14} className="text-indigo-500" />
-                      {account.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
         </div>
 
         <p className="text-center text-white/60 text-sm mt-6">

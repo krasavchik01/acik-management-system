@@ -117,9 +117,9 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
 
-    if (!body.title || !body.projectId) {
+    if (!body.title) {
       return NextResponse.json(
-        { success: false, message: 'Title and project are required' },
+        { success: false, message: 'Title is required' },
         { status: 400 }
       )
     }
