@@ -1095,57 +1095,9 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Tech Stack */}
-            <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-700/50">
-              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-6">Технологии</h3>
-              <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
-                {[
-                  { name: 'Next.js 15', sub: 'Framework', color: 'from-gray-800 to-black', darkColor: 'from-gray-700 to-gray-900' },
-                  { name: 'React 19', sub: 'Library', color: 'from-cyan-400 to-cyan-600', darkColor: 'from-cyan-600 to-cyan-800' },
-                  { name: 'TypeScript', sub: 'Language', color: 'from-blue-500 to-blue-700', darkColor: 'from-blue-600 to-blue-900' },
-                  { name: 'Supabase', sub: 'Backend', color: 'from-green-500 to-green-700', darkColor: 'from-green-600 to-green-900' },
-                  { name: 'Prisma', sub: 'ORM', color: 'from-slate-700 to-slate-900', darkColor: 'from-slate-800 to-black' },
-                  { name: 'Tailwind', sub: 'Styling', color: 'from-sky-400 to-sky-600', darkColor: 'from-sky-600 to-sky-900' },
-                ].map((tech) => (
-                  <div key={tech.name} className={`bg-gradient-to-br ${tech.color} dark:${tech.darkColor} rounded-2xl p-5 text-white shadow-lg transform hover:-translate-y-2 hover:shadow-xl transition-all duration-300`}>
-                    <p className="text-xs text-white/70 font-bold uppercase tracking-widest mb-1">{tech.sub}</p>
-                    <p className="font-black text-lg">{tech.name}</p>
-                  </div>
-                ))}
-              </div>
             </div>
-
-            {/* Environment Info */}
-            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-6 md:p-10 shadow-xl overflow-hidden relative group">
-              <div className="absolute inset-0 bg-white/5 group-hover:bg-white/10 transition-colors duration-500" />
-              <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/10 blur-3xl rounded-full" />
-              <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-white/10 blur-3xl rounded-full" />
-              
-              <div className="relative z-10">
-                <h3 className="text-3xl font-black text-white mb-8 tracking-tight">Окружение</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-colors">
-                    <p className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Node.js</p>
-                    <p className="text-2xl font-black text-white">v22+</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-colors">
-                    <p className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Платформа</p>
-                    <p className="text-2xl font-black text-white">Vercel</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-colors">
-                    <p className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">База данных</p>
-                    <p className="text-2xl font-black text-white">Supabase</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-colors">
-                    <p className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Сборка</p>
-                    <p className="text-2xl font-black text-white">Prod</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
       {/* Create User Modal */}
       {showCreateModal && (
@@ -1319,7 +1271,7 @@ export default function AdminPage() {
         <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
           <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-indigo-900/20 w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden custom-scrollbar border border-gray-100 dark:border-slate-700/50 animate-in zoom-in-95 duration-300">
             <div className="flex items-center justify-between p-6 md:p-8 border-b border-gray-100 dark:border-slate-700/50 sticky top-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm z-10">
-              <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Редактировать {editingUser.name}</h2>
+              <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Редактировать {editingUser?.name}</h2>
               <button
                 type="button"
                 onClick={() => setShowEditModal(false)}
@@ -1442,7 +1394,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between p-6 md:p-8 border-b border-gray-100 dark:border-slate-700/50">
               <div>
                 <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Сменить пароль</h2>
-                <p className="text-sm font-bold text-indigo-500 dark:text-indigo-400 mt-1">{editingUser.name}</p>
+                <p className="text-sm font-bold text-indigo-500 dark:text-indigo-400 mt-1">{editingUser?.name}</p>
               </div>
               <button
                 type="button"
@@ -1525,7 +1477,7 @@ export default function AdminPage() {
             </div>
             <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">Удалить пользователя</h3>
             <p className="text-gray-500 dark:text-slate-400 mb-8 font-medium leading-relaxed">
-              Вы уверены, что хотите удалить <span className="font-bold text-gray-900 dark:text-white px-2 py-0.5 bg-gray-100 dark:bg-slate-700 rounded-md">&quot;{deletingUser.name}&quot;</span>?
+              Вы уверены, что хотите удалить <span className="font-bold text-gray-900 dark:text-white px-2 py-0.5 bg-gray-100 dark:bg-slate-700 rounded-md">&quot;{deletingUser?.name}&quot;</span>?
               Это также удалит аккаунт аутентификации.
             </p>
             <div className="flex flex-col-reverse sm:flex-row gap-3">

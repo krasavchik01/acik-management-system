@@ -59,6 +59,7 @@ export default function TasksPage() {
   const [projectFilter, setProjectFilter] = useState('')
   const [priorityFilter, setPriorityFilter] = useState('')
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban')
+  const [activeTab, setActiveTab] = useState<'my' | 'assignedByMe' | 'all'>('my')
 
   // Modal states
   const [showModal, setShowModal] = useState(false)
@@ -90,6 +91,12 @@ export default function TasksPage() {
       if (projectFilter) params.append('projectId', projectFilter)
       if (priorityFilter) params.append('priority', priorityFilter)
 
+      if (activeTab === 'my') {
+        params.append('my', 'true')
+      } else if (activeTab === 'assignedByMe' && profile?.id) {
+        params.append('createdBy', profile.id)
+      }
+
       const res = await fetch(`/api/tasks?${params}`)
       const data = await res.json()
       if (data.success) {
@@ -101,7 +108,7 @@ export default function TasksPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, projectFilter, priorityFilter])
+  }, [search, projectFilter, priorityFilter, activeTab, profile?.id])
 
   const fetchProjects = async () => {
     try {
@@ -140,7 +147,7 @@ export default function TasksPage() {
       }, 300)
       return () => clearTimeout(debounce)
     }
-  }, [search, projectFilter, priorityFilter]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [search, projectFilter, priorityFilter, activeTab]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const openCreateModal = (status?: Task['status']) => {
     setEditingTask(null)
@@ -358,6 +365,37 @@ export default function TasksPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex bg-gray-100 dark:bg-slate-800/50 p-1 rounded-xl w-fit">
+          <button
+            onClick={() => setActiveTab('my')}
+            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'my'
+                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+          >
+            Мои задачи
+          </button>
+          <button
+            onClick={() => setActiveTab('assignedByMe')}
+            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'assignedByMe'
+                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+          >
+            Порученные мной
+          </button>
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'all'
+                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+          >
+            Все задачи
+          </button>
         </div>
 
         {/* Toolbar */}

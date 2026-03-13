@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
+import { sendWebPushNotification } from '@/lib/web-push'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
@@ -17,6 +18,9 @@ async function createNotification(userId: string, type: string, title: string, m
         isRead: false,
         createdAt: new Date().toISOString(),
       })
+
+    // Also send Mobile Web Push
+    await sendWebPushNotification(userId, { title, body: message, url: link })
   } catch (error) {
     console.error('Failed to create notification:', error)
   }
@@ -38,6 +42,7 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority')
     const projectId = searchParams.get('project')
     const assignedToId = searchParams.get('assignedTo')
+    const createdById = searchParams.get('createdBy')
     const search = searchParams.get('search')
     const myTasks = searchParams.get('my') === 'true'
 
@@ -51,6 +56,7 @@ export async function GET(request: NextRequest) {
     if (priority) query = query.eq('priority', priority)
     if (projectId) query = query.eq('projectId', projectId)
     if (assignedToId) query = query.eq('assignedToId', assignedToId)
+    if (createdById) query = query.eq('createdById', createdById)
     if (search) query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
 
     const { data: tasks, error: fetchError } = await query

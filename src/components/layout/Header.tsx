@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useRealtime } from '@/hooks/useRealtime'
 import { useLanguage } from '@/lib/i18n'
 import Link from 'next/link'
 import { FiBell, FiSearch, FiPlus, FiCheck, FiCheckCircle, FiClock, FiX } from 'react-icons/fi'
+import { toast } from 'react-toastify'
 
 interface Notification {
   id: string
@@ -31,16 +33,62 @@ export function Header({ title, subtitle, action }: HeaderProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showNotifications, setShowNotifications] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [pushEnabled, setPushEnabled] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const unreadCount = notifications.filter(n => !n.isRead).length
 
+
+  // Play a simple notification "pop" sound
+  const playNotificationSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
+      
+      gainNode.gain.setValueAtTime(0, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.15);
+    } catch (e) {
+      console.log('Audio error:', e);
+    }
+  }
+
+  // Real-time notification subscription
+  useRealtime<Notification>({
+    table: 'Notification',
+    filter: profile?.id ? `userId=eq.${profile.id}` : undefined,
+    onInsert: (newNotif: Notification) => {
+      setNotifications(prev => [newNotif, ...prev])
+      playNotificationSound()
+      toast.info(newNotif.title, { hideProgressBar: true, position: 'bottom-right' })
+    },
+    onUpdate: (updatedNotif: Notification) => {
+      setNotifications(prev =>
+        prev.map(n => n.id === updatedNotif.id ? updatedNotif : n)
+      )
+    },
+    onDelete: (deletedNotif: Notification) => {
+      setNotifications(prev => prev.filter(n => n.id !== deletedNotif.id))
+    }
+  })
+
   useEffect(() => {
-    fetchNotifications()
-    // Poll for new notifications every 30 seconds
-    const interval = setInterval(fetchNotifications, 30000)
-    return () => clearInterval(interval)
-  }, [])
+    if (profile?.id) {
+      fetchNotifications()
+    }
+  }, [profile?.id])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -92,6 +140,41 @@ export function Header({ title, subtitle, action }: HeaderProps) {
       console.error('Error marking all as read:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const subscribeToPushWorker = async () => {
+    try {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        toast.error('Push notifications are not supported in this browser.');
+        return;
+      }
+      
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+      });
+
+      const response = await fetch('/api/web-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription })
+      });
+
+      if (response.ok) {
+        setPushEnabled(true);
+        toast.success(language === 'ru' ? 'Уведомления включены!' : 'Push Notifications enabled!');
+      } else {
+        toast.error('Failed to save subscription.');
+      }
+    } catch (error: any) {
+      if (error.name === 'NotAllowedError') {
+        toast.error(language === 'ru' ? 'Разрешение на уведомления отклонено.' : 'Notification permission denied.');
+      } else {
+        console.error('Push subscription error:', error);
+        toast.error('Could not subscribe to push notifications.');
+      }
     }
   }
 
@@ -248,7 +331,16 @@ export function Header({ title, subtitle, action }: HeaderProps) {
 
                 {/* Footer */}
                 {notifications.length > 0 && (
-                  <div className="border-t border-gray-100 dark:border-slate-700 p-2">
+                  <div className="border-t border-gray-100 dark:border-slate-700 p-2 space-y-2">
+                    {!pushEnabled && (
+                      <button
+                        onClick={subscribeToPushWorker}
+                        className="w-full flex items-center justify-center gap-2 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl font-medium transition-colors"
+                      >
+                        <FiBell className="animate-pulse" />
+                        {language === 'ru' ? 'Включить Push-уведомления' : 'Enable Push Notifications'}
+                      </button>
+                    )}
                     <Link
                       href="/notifications"
                       onClick={() => setShowNotifications(false)}

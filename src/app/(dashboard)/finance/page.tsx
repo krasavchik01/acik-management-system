@@ -5,6 +5,8 @@ import { Header } from '@/components/layout/Header'
 import { FiDollarSign, FiTrendingUp, FiTrendingDown, FiPlus, FiEdit2, FiTrash2, FiX, FiFilter } from 'react-icons/fi'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'react-toastify'
+import { useCurrency } from '@/lib/currency/CurrencyContext'
+import { CurrencySwitcher } from '@/components/ui/CurrencySwitcher'
 
 interface Transaction {
   id: string
@@ -20,6 +22,7 @@ interface Transaction {
 
 export default function FinancePage() {
   const { profile } = useAuth()
+  const { formatCurrency } = useCurrency()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -161,7 +164,7 @@ export default function FinancePage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Income</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">${totalIncome.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalIncome)}</p>
               </div>
             </div>
           </div>
@@ -172,7 +175,7 @@ export default function FinancePage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Expenses</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">${totalExpenses.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalExpenses)}</p>
               </div>
             </div>
           </div>
@@ -183,9 +186,12 @@ export default function FinancePage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Balance</p>
-                <p className={`text-3xl font-bold mt-1 ${balance >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}`}>
-                  ${balance.toLocaleString()}
-                </p>
+                <div className="flex items-center gap-4 mt-1">
+                  <p className={`text-3xl font-bold ${balance >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}`}>
+                    {formatCurrency(balance)}
+                  </p>
+                  <CurrencySwitcher />
+                </div>
               </div>
             </div>
           </div>
@@ -277,7 +283,7 @@ export default function FinancePage() {
                       </td>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold text-right ${t.type === 'Income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                         }`}>
-                        {t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {t.type === 'Income' ? '+' : '-'}{formatCurrency(t.amount)}
                       </td>
                       {canManage && (
                         <td className="px-6 py-4 whitespace-nowrap text-right">

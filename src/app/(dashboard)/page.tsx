@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/lib/i18n'
+import { useCurrency } from '@/lib/currency/CurrencyContext'
+import { CurrencySwitcher } from '@/components/ui/CurrencySwitcher'
 import Link from 'next/link'
 import {
   FiFolder, FiCheckSquare, FiUsers, FiDollarSign, FiTrendingUp,
@@ -57,6 +59,7 @@ interface RecentTask {
 export default function DashboardPage() {
   const { profile } = useAuth()
   const { language, t } = useLanguage()
+  const { formatCurrency } = useCurrency()
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>([])
   const [recentTasks, setRecentTasks] = useState<RecentTask[]>([])
@@ -167,15 +170,6 @@ export default function DashboardPage() {
     }
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
-
   // Calculate task completion percentage
   const taskCompletionRate = stats?.tasks.total
     ? Math.round((stats.tasks.done / stats.tasks.total) * 100)
@@ -276,14 +270,11 @@ export default function DashboardPage() {
 
           {/* Finance Card */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg transition-all group">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl shadow-lg shadow-orange-200 dark:shadow-orange-900/30">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+              <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl shadow-lg shadow-orange-200 dark:shadow-orange-900/30 w-12 h-12 flex items-center justify-center shrink-0">
                 <FiDollarSign className="text-white" size={24} />
               </div>
-              <div className="flex items-center gap-1 text-green-600 dark:text-green-400 text-sm font-medium">
-                <FiTrendingUp size={16} />
-                <span>Balance</span>
-              </div>
+              <CurrencySwitcher />
             </div>
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
               {loading ? '...' : formatCurrency(stats?.finance.balance || 0)}

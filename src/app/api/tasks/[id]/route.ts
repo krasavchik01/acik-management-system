@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
+import { sendWebPushNotification } from '@/lib/web-push'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
@@ -17,6 +18,9 @@ async function createNotification(userId: string, type: string, title: string, m
         isRead: false,
         createdAt: new Date().toISOString(),
       })
+
+    // Also send Mobile Web Push
+    await sendWebPushNotification(userId, { title, body: message, url: link })
   } catch (error) {
     console.error('Failed to create notification:', error)
   }
