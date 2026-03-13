@@ -8,30 +8,38 @@ const getPrisma = () => {
   if (globalForPrisma.prisma) return globalForPrisma.prisma
 
   const connectionString = process.env.DATABASE_URL
+  
+  // During Vercel build, DATABASE_URL is often missing.
+  // We must not let pg.Pool throw an error here.
   if (!connectionString) {
-    // If we're here during build without a URL, return a proxy that will 
-    // only error if actually called. But ideally this isn't called during build.
-    console.warn('Prisma accessed without DATABASE_URL')
+    console.warn('[Prisma/Build] DATABASE_URL is not defined. Returning dummy client for static analysis.')
+    return {} as PrismaClient
   }
 
-  const pool = new pg.Pool({ connectionString })
-  const adapter = new PrismaPg(pool)
-  
-  const client = new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  })
+  try {
+    const pool = new pg.Pool({ connectionString })
+    const adapter = new PrismaPg(pool)
+    
+    const client = new PrismaClient({
+      adapter,
+      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    })
 
-  if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.prisma = client
+    if (process.env.NODE_ENV !== 'production') {
+      globalForPrisma.prisma = client
+    }
+    
+    return client
+  } catch (err) {
+    console.error('[Prisma/Init] Failed to initialize prisma client:', err)
+    return {} as PrismaClient
   }
-  
-  return client
 }
 
 // True lazy initialization via Proxy
 export const prisma = new Proxy({} as PrismaClient, {
   get: (target, prop) => {
+    if (prop === '$$typeof' || prop === 'constructor' || prop === 'then') return (target as any)[prop]
     const instance = getPrisma()
     return (instance as any)[prop]
   }
