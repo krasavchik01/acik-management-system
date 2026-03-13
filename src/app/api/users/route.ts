@@ -1,40 +1,91 @@
 import { NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { getAuthUser } from '@/lib/auth'
 
-// GET /api/users - Get all users (for dropdowns/assignments)
+export const dynamic = 'force-dynamic'
+
+// GET /api/users - Get all users with workload info (for dropdowns/assignments)
 export async function GET() {
   try {
-    const { user, error } = await getAuthUser()
-    if (error || !user) {
+    const { getAuthUser } = await import('@/lib/auth')
+    const { prisma } = await import('@/lib/prisma')
+
+    const { user: authUser, error } = await getAuthUser()
+    if (error || !authUser) {
       return NextResponse.json(
         { success: false, message: 'Not authorized' },
         { status: 401 }
       )
     }
 
-    const { data: users, error: fetchError } = await getSupabaseAdmin()
-      .from('User')
-      .select('id, name, email, role, avatar')
-      .eq('isActive', true)
-      .order('name', { ascending: true })
+    // Get today's start and end for attendance checking
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    if (fetchError) {
-      console.error('Users fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, message: 'Failed to fetch users' },
-        { status: 500 }
-      )
-    }
+    const users = await prisma.user.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        avatar: true,
+        department: true,
+        _count: {
+          select: {
+            assignedTasks: {
+              where: {
+                status: { notIn: ['Done', 'Review'] }
+              }
+            },
+            managedProjects: {
+              where: {
+                status: 'Active'
+              }
+            }
+          }
+        },
+        attendance: {
+          where: {
+            date: {
+              gte: today,
+              lt: tomorrow
+            }
+          },
+          select: {
+            workType: true,
+            status: true,
+            checkInTime: true
+          },
+          orderBy: { date: 'desc' },
+          take: 1
+        }
+      },
+      orderBy: { name: 'asc' }
+    })
+
+    // Format the data to be easier to consume on the frontend
+    const formattedUsers = users.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+      department: user.department,
+      activeTasks: user._count.assignedTasks,
+      activeProjects: user._count.managedProjects,
+      location: user.attendance.length > 0 ? user.attendance[0].workType : 'Unknown',
+      attendanceStatus: user.attendance.length > 0 ? user.attendance[0].status : 'Absent'
+    }))
 
     return NextResponse.json({
       success: true,
-      data: users || []
+      data: formattedUsers
     })
   } catch (error) {
     console.error('Users fetch error:', error)
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch users' },
+      { success: false, message: 'Failed to fetch users: ' + (error as Error).message },
       { status: 500 }
     )
   }

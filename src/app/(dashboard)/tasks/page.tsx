@@ -865,7 +865,7 @@ export default function TasksPage() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h2 className="text-xl font-bold text-gray-900">
-                {editingTask ? 'Edit Task' : 'Create New Task'}
+                {editingTask ? t('tasks', 'editTask') : t('tasks', 'newTask')}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
@@ -878,28 +878,28 @@ export default function TasksPage() {
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Task Title *
+                  {t('tasks', 'taskTitle')} *
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                  placeholder="Enter task title"
+                  placeholder={t('tasks', 'enterTaskTitle')}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
+                  {t('common', 'description')}
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                  placeholder="Describe the task..."
+                  placeholder={t('tasks', 'describeTask')}
                 />
               </div>
 
@@ -907,14 +907,14 @@ export default function TasksPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <FiFolder className="inline mr-2" size={14} />
-                    Project
+                    {t('tasks', 'project')}
                   </label>
                   <select
                     value={formData.projectId}
                     onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
                     className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
-                    <option value="">No project</option>
+                    <option value="">{t('tasks', 'noProject')}</option>
                     {projects.map(project => (
                       <option key={project.id} value={project.id}>{project.name}</option>
                     ))}
@@ -924,16 +924,18 @@ export default function TasksPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiUser className="inline mr-2 text-indigo-500" size={14} />
-                    Assignee
+                    {t('tasks', 'assignedTo')}
                   </label>
                   <select
                     value={formData.assignedToId}
                     onChange={(e) => setFormData({ ...formData, assignedToId: e.target.value })}
                     className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
-                    <option value="">Unassigned</option>
-                    {users.map(user => (
-                      <option key={user.id} value={user.id}>{user.name}</option>
+                    <option value="">{t('tasks', 'unassigned')}</option>
+                    {users.map((user: any) => (
+                      <option key={user.id} value={user.id}>
+                        {user.name} {user.activeTasks !== undefined ? `(${user.activeTasks} ${t('tasks', 'activeTasks')}, ${user.activeProjects} ${t('tasks', 'activeProjects')}, ${t('tasks', 'atLocation')} ${user.location})` : ''}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -941,14 +943,14 @@ export default function TasksPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiCheckCircle className="inline mr-2 text-blue-500" size={14} />
-                    Reviewer
+                    {t('tasks', 'reviewer')}
                   </label>
                   <select
                     value={formData.reviewerId}
                     onChange={(e) => setFormData({ ...formData, reviewerId: e.target.value })}
                     className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
-                    <option value="">No Reviewer</option>
+                    <option value="">{t('tasks', 'noReviewer')}</option>
                     {users.map(user => (
                       <option key={user.id} value={user.id}>{user.name}</option>
                     ))}
@@ -965,21 +967,21 @@ export default function TasksPage() {
                   className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                 />
                 <label htmlFor="isApprovalRequired" className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer">
-                  Mandatory Confirmation (Approval Required)
+                  {t('tasks', 'mandatoryConfirmation')}
                 </label>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   <FiFolder className="inline mr-2 text-purple-500" size={14} />
-                  Parent Task (for Subtasks)
+                  {t('tasks', 'parentTask')}
                 </label>
                 <select
                   value={formData.parentId}
                   onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
                   className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                 >
-                  <option value="">Top-level Task</option>
+                  <option value="">{t('tasks', 'topLevelTask')}</option>
                   {tasks.filter(t => t.id !== editingTask?.id && !t.parentId).map(task => (
                     <option key={task.id} value={task.id}>{task.title}</option>
                   ))}
@@ -988,7 +990,7 @@ export default function TasksPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">
-                  Co-executors
+                  {t('tasks', 'coExecutors')}
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {formData.coExecutors.map(userId => {
@@ -1015,7 +1017,7 @@ export default function TasksPage() {
                     }}
                     className="px-3 py-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full text-xs outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="">+ Add Co-executor</option>
+                    <option value="">+ {t('common', 'add')} {t('tasks', 'coExecutors')}</option>
                     {users.filter(u => u.id !== formData.assignedToId && !formData.coExecutors.includes(u.id)).map(user => (
                       <option key={user.id} value={user.id}>{user.name}</option>
                     ))}
@@ -1025,13 +1027,13 @@ export default function TasksPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 flex items-center justify-between">
-                  <span>Task Stages / Checklist</span>
+                  <span>{t('tasks', 'taskStages')}</span>
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, stages: [...formData.stages, { title: '', isCompleted: false }] })}
                     className="text-xs text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1"
                   >
-                    <FiPlus size={12} /> Add Stage
+                    <FiPlus size={12} /> {t('tasks', 'addStage')}
                   </button>
                 </label>
                 <div className="space-y-3">
@@ -1056,7 +1058,7 @@ export default function TasksPage() {
                           setFormData({ ...formData, stages: newStages })
                         }}
                         className="flex-1 px-4 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        placeholder="Stage title..."
+                        placeholder={t('tasks', 'stageTitle')}
                       />
                       <button
                         type="button"
@@ -1069,7 +1071,7 @@ export default function TasksPage() {
                   ))}
                   {formData.stages.length === 0 && (
                     <p className="text-xs text-center py-4 text-gray-400 bg-gray-50 dark:bg-slate-800/30 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
-                      No stages defined for this task.
+                      —
                     </p>
                   )}
                 </div>
@@ -1078,7 +1080,7 @@ export default function TasksPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
+                    {t('common', 'status')}
                   </label>
                   <select
                     value={formData.status}
@@ -1094,7 +1096,7 @@ export default function TasksPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <FiFlag className="inline mr-2" size={14} />
-                    Priority
+                    {t('common', 'priority')}
                   </label>
                   <select
                     value={formData.priority}
@@ -1111,7 +1113,7 @@ export default function TasksPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <FiCalendar className="inline mr-2" size={14} />
-                  Due Date
+                  {t('common', 'deadline')}
                 </label>
                 <input
                   type="date"
@@ -1127,14 +1129,14 @@ export default function TasksPage() {
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
                 >
-                  Cancel
+                  {t('common', 'cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
                   className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {saving ? 'Saving...' : editingTask ? 'Update Task' : 'Create Task'}
+                  {saving ? t('common', 'loading') : editingTask ? t('common', 'save') : t('common', 'create')}
                 </button>
               </div>
             </form>
