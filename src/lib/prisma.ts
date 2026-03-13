@@ -39,7 +39,21 @@ const getPrisma = () => {
 // True lazy initialization via Proxy
 export const prisma = new Proxy({} as PrismaClient, {
   get: (target, prop) => {
-    if (prop === '$$typeof' || prop === 'constructor' || prop === 'then') return (target as any)[prop]
+    // Handle framework-level property checks
+    if (prop === '$$typeof' || prop === 'constructor' || prop === 'then') {
+      return (target as any)[prop]
+    }
+    
+    // During build, if DATABASE_URL is missing, return a dummy proxy for chaining
+    if (!process.env.DATABASE_URL) {
+      // Return a recursive proxy that allows prisma.task.findMany() etc.
+      const dummy: any = () => dummy
+      return new Proxy(dummy, { 
+        get: () => dummy,
+        apply: () => dummy 
+      })
+    }
+    
     const instance = getPrisma()
     return (instance as any)[prop]
   }
