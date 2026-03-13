@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/lib/i18n'
@@ -22,6 +22,18 @@ interface User {
   avatar?: string
 }
 
+interface TaskStage {
+  id: string
+  title: string
+  isCompleted: boolean
+  order: number
+}
+
+interface CoExecutor {
+  userId: string
+  user: User
+}
+
 interface Task {
   id: string
   title: string
@@ -31,28 +43,43 @@ interface Task {
   dueDate?: string
   projectId?: string
   assignedToId?: string
+  reviewerId?: string
+  parentId?: string
+  isApprovalRequired: boolean
+  approvedAt?: string
   project?: Project
   assignedTo?: User
+  reviewer?: User
+  coExecutors?: CoExecutor[]
+  stages?: TaskStage[]
+  subtasks?: Task[]
+  parent?: { id: string, title: string }
   createdAt: string
+  _count?: {
+    subtasks: number
+    stages: number
+  }
 }
 
-const statusColumns = [
-  { key: 'TODO', label: 'To Do', color: 'bg-gray-50/50 dark:bg-slate-800/50', headerColor: 'bg-gray-500 dark:bg-slate-400', icon: FiList },
-  { key: 'InProgress', label: 'In Progress', color: 'bg-blue-50/50 dark:bg-blue-900/20', headerColor: 'bg-blue-500 dark:bg-blue-400', icon: FiClock },
-  { key: 'Review', label: 'Review', color: 'bg-purple-50/50 dark:bg-purple-900/20', headerColor: 'bg-purple-500 dark:bg-purple-400', icon: FiCheckCircle },
-  { key: 'Done', label: 'Done', color: 'bg-emerald-50/50 dark:bg-emerald-900/20', headerColor: 'bg-emerald-500 dark:bg-emerald-400', icon: FiCheckCircle },
-]
-
-const priorityOptions = [
-  { value: 'Low', label: 'Low', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', dot: 'bg-green-500' },
-  { value: 'Medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', dot: 'bg-yellow-500' },
-  { value: 'High', label: 'High', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', dot: 'bg-orange-500' },
-  { value: 'Critical', label: 'Critical', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', dot: 'bg-red-500' },
-]
+// Statuses and Priorities are now dynamic inside the component
 
 export default function TasksPage() {
   const { profile } = useAuth()
   const { t } = useLanguage()
+
+  const statusColumns = useMemo(() => [
+    { key: 'TODO', label: t('tasks', 'todo'), color: 'bg-gray-50/50 dark:bg-slate-800/50', headerColor: 'bg-gray-500 dark:bg-slate-400', icon: FiList },
+    { key: 'InProgress', label: t('tasks', 'inProgress'), color: 'bg-blue-50/50 dark:bg-blue-900/20', headerColor: 'bg-blue-500 dark:bg-blue-400', icon: FiClock },
+    { key: 'Review', label: t('tasks', 'review'), color: 'bg-purple-50/50 dark:bg-purple-900/20', headerColor: 'bg-purple-500 dark:bg-purple-400', icon: FiCheckCircle },
+    { key: 'Done', label: t('tasks', 'done'), color: 'bg-emerald-50/50 dark:bg-emerald-900/20', headerColor: 'bg-emerald-500 dark:bg-emerald-400', icon: FiCheckCircle },
+  ], [t])
+
+  const priorityOptions = useMemo(() => [
+    { value: 'Low', label: t('tasks', 'priorityLow'), color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', dot: 'bg-green-500' },
+    { value: 'Medium', label: t('tasks', 'priorityMedium'), color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', dot: 'bg-yellow-500' },
+    { value: 'High', label: t('tasks', 'priorityHigh'), color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', dot: 'bg-orange-500' },
+    { value: 'Critical', label: t('tasks', 'priorityUrgent'), color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', dot: 'bg-red-500' },
+  ], [t])
   const [tasks, setTasks] = useState<Task[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [users, setUsers] = useState<User[]>([])
@@ -82,6 +109,11 @@ export default function TasksPage() {
     dueDate: '',
     projectId: '',
     assignedToId: '',
+    reviewerId: '',
+    isApprovalRequired: false,
+    parentId: '',
+    coExecutors: [] as string[],
+    stages: [] as { title: string, isCompleted: boolean }[],
   })
 
   const canManage = profile?.role && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
@@ -161,6 +193,11 @@ export default function TasksPage() {
       dueDate: '',
       projectId: '',
       assignedToId: '',
+      reviewerId: '',
+      isApprovalRequired: false,
+      parentId: '',
+      coExecutors: [],
+      stages: [],
     })
     setShowModal(true)
   }
@@ -175,6 +212,11 @@ export default function TasksPage() {
       dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
       projectId: task.projectId || '',
       assignedToId: task.assignedToId || '',
+      reviewerId: task.reviewerId || '',
+      isApprovalRequired: task.isApprovalRequired || false,
+      parentId: task.parentId || '',
+      coExecutors: task.coExecutors?.map(ce => ce.userId) || [],
+      stages: task.stages?.map(s => ({ title: s.title, isCompleted: s.isCompleted })) || [],
     })
     setShowModal(true)
     setOpenDropdown(null)
@@ -200,6 +242,8 @@ export default function TasksPage() {
           dueDate: formData.dueDate || null,
           projectId: formData.projectId || null,
           assignedToId: formData.assignedToId || null,
+          reviewerId: formData.reviewerId || null,
+          parentId: formData.parentId || null,
           createdById: profile?.id,
         }),
       })
@@ -509,12 +553,18 @@ export default function TasksPage() {
                     const dateInfo = formatDate(task.dueDate)
                     const priorityStyle = getPriorityStyle(task.priority)
 
-                    return (
-                      <div
+                    return (                      <div
                         key={task.id}
-                        className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_2px_10px_rgb(0,0,0,0.02)] dark:shadow-[0_2px_10px_rgb(0,0,0,0.1)] hover:shadow-lg dark:hover:shadow-indigo-900/20 transition-all cursor-pointer border border-gray-100 dark:border-slate-700/50 hover:-translate-y-1 group"
+                        className={`bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_2px_10px_rgb(0,0,0,0.02)] dark:shadow-[0_2px_10px_rgb(0,0,0,0.1)] hover:shadow-xl dark:hover:shadow-indigo-900/30 transition-all cursor-pointer border ${task.status === 'Review' ? 'border-purple-400 dark:border-purple-500/50 ring-2 ring-purple-400/10' : 'border-gray-100 dark:border-slate-700/50'} hover:-translate-y-1 group relative overflow-hidden`}
                         onClick={() => canManage && openEditModal(task)}
                       >
+                        {/* Review Badge */}
+                        {task.status === 'Review' && (
+                          <div className="absolute top-0 right-0 px-2 py-0.5 bg-purple-500 text-[10px] font-bold text-white uppercase tracking-tighter rounded-bl-lg animate-pulse">
+                            Review Needed
+                          </div>
+                        )}
+
                         <div className="flex items-start justify-between mb-3">
                           <span className={`px-2.5 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold ${priorityStyle.color}`}>
                             {task.priority}
@@ -533,19 +583,19 @@ export default function TasksPage() {
                               </button>
 
                               {openDropdown === task.id && (
-                                <div className="absolute right-0 top-8 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20 min-w-[160px]">
+                                <div className="absolute right-0 top-8 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 z-20 min-w-[160px] animate-in zoom-in-95">
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation()
                                       openEditModal(task)
                                     }}
-                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
                                   >
                                     <FiEdit2 size={14} />
                                     Edit Task
                                   </button>
-                                  <div className="border-t border-gray-100 my-1" />
-                                  <div className="px-4 py-1 text-xs text-gray-400 uppercase">Move to</div>
+                                  <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
+                                  <div className="px-4 py-1 text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-widest">Move to</div>
                                   {statusColumns.filter(c => c.key !== task.status).map(col => (
                                     <button
                                       key={col.key}
@@ -553,13 +603,13 @@ export default function TasksPage() {
                                         e.stopPropagation()
                                         handleStatusChange(task, col.key as Task['status'])
                                       }}
-                                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                      className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
                                     >
                                       <div className={`w-2 h-2 ${col.headerColor} rounded-full`} />
                                       {col.label}
                                     </button>
                                   ))}
-                                  <div className="border-t border-gray-100 my-1" />
+                                  <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation()
@@ -567,7 +617,7 @@ export default function TasksPage() {
                                       setShowDeleteModal(true)
                                       setOpenDropdown(null)
                                     }}
-                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium"
                                   >
                                     <FiTrash2 size={14} />
                                     Delete
@@ -578,41 +628,84 @@ export default function TasksPage() {
                           )}
                         </div>
 
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">{task.title}</h4>
+                        <h4 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                          {task.title}
+                        </h4>
 
                         {task.description && (
-                          <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-2 mb-3">{task.description}</p>
+                          <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-2 mb-3 leading-relaxed">{task.description}</p>
+                        )}
+
+                        {/* Progress Infographic */}
+                        {(task._count?.stages || 0) > 0 && (
+                          <div className="mb-4">
+                             <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                              <span>Progress</span>
+                              <span>{Math.round(((task.stages?.filter(s => s.isCompleted).length || 0) / (task.stages?.length || 1)) * 100)}%</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden flex gap-0.5">
+                              {task.stages?.map((stage, idx) => (
+                                <div 
+                                  key={idx} 
+                                  className={`h-full flex-1 transition-all duration-500 ${stage.isCompleted ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-gray-200 dark:bg-slate-600'}`} 
+                                />
+                              ))}
+                            </div>
+                          </div>
                         )}
 
                         <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-700/50">
                           <div className="flex items-center gap-2">
                             {task.project && (
-                              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-700/30 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-slate-700/50">
-                                <FiFolder size={12} className="text-gray-400" />
-                                {task.project.name.substring(0, 12)}
+                              <span className="flex items-center gap-1.5 text-[10px] font-bold text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/30 uppercase tracking-tight">
+                                <FiFolder size={10} className="text-gray-400" />
+                                {task.project.name.substring(0, 15)}
                               </span>
                             )}
+                            {task._count?.subtasks !== undefined && task._count.subtasks > 0 && (
+                               <span className="flex items-center gap-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1.5 rounded-lg border border-blue-100 dark:border-blue-800/30">
+                               <FiList size={10} />
+                               {task._count.subtasks}
+                             </span>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
+                          
+                          <div className="flex items-center gap-1.5">
                             {dateInfo && (
-                              <span className={`text-xs font-medium px-2 py-1.5 rounded-lg ${dateInfo.color}`}>
+                              <span className={`text-[10px] font-bold px-2 py-1.5 rounded-lg uppercase tracking-tight ${dateInfo.color}`}>
                                 {dateInfo.text}
                               </span>
                             )}
-                            {task.assignedTo ? (
-                              <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm" title={task.assignedTo.name}>
-                                <span className="text-xs font-bold text-white">
-                                  {task.assignedTo.name.charAt(0)}
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="w-7 h-7 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800">
-                                <FiUser className="text-gray-400 dark:text-slate-500" size={12} />
-                              </div>
-                            )}
+                            
+                            <div className="flex -space-x-2">
+                                {/* Assignee */}
+                                {task.assignedTo ? (
+                                <div className="w-7 h-7 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-10" title={`Assignee: ${task.assignedTo.name}`}>
+                                    <span className="text-[10px] font-black text-white">{task.assignedTo.name.charAt(0)}</span>
+                                </div>
+                                ) : (
+                                <div className="w-7 h-7 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800" title="Unassigned">
+                                    <FiUser className="text-gray-400 dark:text-slate-500" size={12} />
+                                </div>
+                                )}
+
+                                {/* Co-executors */}
+                                {task.coExecutors?.slice(0, 2).map((ce, idx) => (
+                                    <div key={idx} className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-0" title={`Co-executor: ${ce.user.name}`}>
+                                        <span className="text-[10px] font-black text-white">{ce.user.name.charAt(0)}</span>
+                                    </div>
+                                ))}
+
+                                {task.coExecutors && task.coExecutors.length > 2 && (
+                                    <div className="w-7 h-7 bg-gray-200 dark:bg-slate-600 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-0">
+                                        <span className="text-[9px] font-bold text-gray-600 dark:text-slate-300">+{task.coExecutors.length - 2}</span>
+                                    </div>
+                                )}
+                            </div>
                           </div>
                         </div>
                       </div>
+
                     )
                   })}
 
@@ -657,48 +750,64 @@ export default function TasksPage() {
                     const statusCol = statusColumns.find(c => c.key === task.status)
 
                     return (
-                      <tr key={task.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors group">
+                      <tr key={task.id} className={`hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors group ${task.status === 'Review' ? 'bg-purple-50/20 dark:bg-purple-900/10' : ''}`}>
                         <td className="py-4 px-6">
                           <div>
-                            <p className="font-semibold text-gray-900 dark:text-white">{task.title}</p>
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <p className="font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors">{task.title}</p>
+                                {task.status === 'Review' && (
+                                    <span className="px-1.5 py-0.5 bg-purple-500 text-[8px] font-black text-white uppercase rounded-md tracking-tighter">Review</span>
+                                )}
+                            </div>
                             {task.description && (
-                              <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-1 mt-0.5">{task.description}</p>
+                              <p className="text-xs text-gray-400 dark:text-slate-500 line-clamp-1 italic">{task.description}</p>
                             )}
                           </div>
                         </td>
                         <td className="py-4 px-6">
                           {task.project ? (
-                            <span className="text-sm font-medium text-gray-600 dark:text-slate-300">{task.project.name}</span>
+                            <span className="text-xs font-bold text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700/50 px-2 py-1 rounded-lg uppercase tracking-wider">{task.project.name}</span>
                           ) : (
-                            <span className="text-sm text-gray-400 dark:text-slate-500">—</span>
+                            <span className="text-xs text-gray-400 dark:text-slate-600">—</span>
                           )}
                         </td>
                         <td className="py-4 px-6">
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusCol?.color || 'bg-gray-100'}`}>
-                            <div className={`w-2 h-2 ${statusCol?.headerColor || 'bg-gray-500'} rounded-full`} />
-                            {statusCol?.label || task.status}
-                          </span>
+                           <div className="space-y-1.5">
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${statusCol?.color || 'bg-gray-100'}`}>
+                                    <div className={`w-2 h-2 ${statusCol?.headerColor || 'bg-gray-500'} rounded-full`} />
+                                    {statusCol?.label || task.status}
+                                </span>
+                                {(task._count?.stages || 0) > 0 && (
+                                    <div className="w-24 h-1 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden flex">
+                                        {task.stages?.map((s, idx) => (
+                                            <div key={idx} className={`h-full flex-1 ${s.isCompleted ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-slate-600'}`} />
+                                        ))}
+                                    </div>
+                                )}
+                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${priorityStyle.color}`}>
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${priorityStyle.color}`}>
                             {task.priority}
                           </span>
                         </td>
                         <td className="py-4 px-6">
-                          {task.assignedTo ? (
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                                <span className="text-xs font-medium text-white">{task.assignedTo.name.charAt(0)}</span>
-                              </div>
-                              <span className="text-sm text-gray-600">{task.assignedTo.name}</span>
-                            </div>
-                          ) : (
-                            <span className="text-sm text-gray-400">Unassigned</span>
-                          )}
+                           <div className="flex -space-x-2">
+                                {task.assignedTo && (
+                                    <div className="w-7 h-7 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm z-10" title={`Assignee: ${task.assignedTo.name}`}>
+                                        <span className="text-[10px] font-bold text-white uppercase">{task.assignedTo.name.charAt(0)}</span>
+                                    </div>
+                                )}
+                                {task.coExecutors?.slice(0, 2).map((ce, idx) => (
+                                    <div key={idx} className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm" title={`Co-executor: ${ce.user.name}`}>
+                                        <span className="text-[10px] font-bold text-white uppercase">{ce.user.name.charAt(0)}</span>
+                                    </div>
+                                ))}
+                           </div>
                         </td>
                         <td className="py-4 px-6">
                           {dateInfo ? (
-                            <span className={`text-xs px-2 py-1 rounded-lg ${dateInfo.color}`}>{dateInfo.text}</span>
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-tight ${dateInfo.color}`}>{dateInfo.text}</span>
                           ) : (
                             <span className="text-sm text-gray-400">—</span>
                           )}
@@ -813,8 +922,8 @@ export default function TasksPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <FiUser className="inline mr-2" size={14} />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                    <FiUser className="inline mr-2 text-indigo-500" size={14} />
                     Assignee
                   </label>
                   <select
@@ -827,6 +936,142 @@ export default function TasksPage() {
                       <option key={user.id} value={user.id}>{user.name}</option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                    <FiCheckCircle className="inline mr-2 text-blue-500" size={14} />
+                    Reviewer
+                  </label>
+                  <select
+                    value={formData.reviewerId}
+                    onChange={(e) => setFormData({ ...formData, reviewerId: e.target.value })}
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                  >
+                    <option value="">No Reviewer</option>
+                    {users.map(user => (
+                      <option key={user.id} value={user.id}>{user.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 py-2">
+                <input
+                  type="checkbox"
+                  id="isApprovalRequired"
+                  checked={formData.isApprovalRequired}
+                  onChange={(e) => setFormData({ ...formData, isApprovalRequired: e.target.checked })}
+                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                />
+                <label htmlFor="isApprovalRequired" className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer">
+                  Mandatory Confirmation (Approval Required)
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                  <FiFolder className="inline mr-2 text-purple-500" size={14} />
+                  Parent Task (for Subtasks)
+                </label>
+                <select
+                  value={formData.parentId}
+                  onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                >
+                  <option value="">Top-level Task</option>
+                  {tasks.filter(t => t.id !== editingTask?.id && !t.parentId).map(task => (
+                    <option key={task.id} value={task.id}>{task.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">
+                  Co-executors
+                </label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {formData.coExecutors.map(userId => {
+                    const u = users.find(user => user.id === userId)
+                    return (
+                      <span key={userId} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-bold border border-indigo-100 dark:border-indigo-800">
+                        {u?.name || 'User'}
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, coExecutors: formData.coExecutors.filter(id => id !== userId) })}
+                          className="hover:text-red-500 ml-1"
+                        >
+                          <FiX size={14} />
+                        </button>
+                      </span>
+                    )
+                  })}
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value && !formData.coExecutors.includes(e.target.value)) {
+                        setFormData({ ...formData, coExecutors: [...formData.coExecutors, e.target.value] })
+                      }
+                      e.target.value = ''
+                    }}
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">+ Add Co-executor</option>
+                    {users.filter(u => u.id !== formData.assignedToId && !formData.coExecutors.includes(u.id)).map(user => (
+                      <option key={user.id} value={user.id}>{user.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 flex items-center justify-between">
+                  <span>Task Stages / Checklist</span>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, stages: [...formData.stages, { title: '', isCompleted: false }] })}
+                    className="text-xs text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1"
+                  >
+                    <FiPlus size={12} /> Add Stage
+                  </button>
+                </label>
+                <div className="space-y-3">
+                  {formData.stages.map((stage, index) => (
+                    <div key={index} className="flex items-center gap-3 animate-in slide-in-from-left-2">
+                       <input
+                        type="checkbox"
+                        checked={stage.isCompleted}
+                        onChange={(e) => {
+                          const newStages = [...formData.stages]
+                          newStages[index].isCompleted = e.target.checked
+                          setFormData({ ...formData, stages: newStages })
+                        }}
+                        className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                      />
+                      <input
+                        type="text"
+                        value={stage.title}
+                        onChange={(e) => {
+                          const newStages = [...formData.stages]
+                          newStages[index].title = e.target.value
+                          setFormData({ ...formData, stages: newStages })
+                        }}
+                        className="flex-1 px-4 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="Stage title..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, stages: formData.stages.filter((_, i) => i !== index) })}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  {formData.stages.length === 0 && (
+                    <p className="text-xs text-center py-4 text-gray-400 bg-gray-50 dark:bg-slate-800/30 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
+                      No stages defined for this task.
+                    </p>
+                  )}
                 </div>
               </div>
 

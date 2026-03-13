@@ -308,6 +308,9 @@ model User {
   approvedReports    Report[]            @relation("ReportApprover")
   reportReviews      ReportReviewer[]
   notifications      Notification[]
+  reviewedTasks      Task[]              @relation("TaskReviewer")
+  coExecutedTasks    TaskCoExecutor[]
+  pushSubscriptions  PushSubscription[]
 
   @@index([email])
   @@index([supabaseId])
@@ -422,9 +425,47 @@ model Task {
   dependentOn     TaskDependency[]    @relation("DependencyTask")
   attendanceTasks AttendanceTask[]
 
+  reviewerId         String?
+  reviewer           User?               @relation("TaskReviewer", fields: [reviewerId], references: [id])
+  isApprovalRequired Boolean             @default(true)
+  approvedAt         DateTime?
+  
+  parentId           String?
+  parent             Task?               @relation("SubTasks", fields: [parentId], references: [id])
+  subtasks           Task[]              @relation("SubTasks")
+  
+  stages             TaskStage[]
+  coExecutors        TaskCoExecutor[]
+
   @@index([projectId, status])
   @@index([assignedToId, status])
+  @@index([reviewerId, status])
+  @@index([parentId])
   @@index([dueDate])
+}
+
+model TaskStage {
+  id          String   @id @default(uuid())
+  taskId      String
+  title       String
+  isCompleted Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model TaskCoExecutor {
+  id        String   @id @default(uuid())
+  taskId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
 }
 
 model TaskChecklistItem {

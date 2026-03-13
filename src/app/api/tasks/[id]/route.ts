@@ -1,26 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
-import { sendWebPushNotification } from '@/lib/web-push'
+
+export const dynamic = 'force-dynamic'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
   try {
-    await getSupabaseAdmin()
-      .from('Notification')
-      .insert({
-        id: crypto.randomUUID(),
+    await prisma.notification.create({
+      data: {
         userId,
-        type,
+        type: type as any,
         title,
         message,
         link: link || null,
-        isRead: false,
-        createdAt: new Date().toISOString(),
-      })
-
-    // Also send Mobile Web Push
-    await sendWebPushNotification(userId, { title, body: message, url: link })
+      }
+    })
   } catch (error) {
     console.error('Failed to create notification:', error)
   }
@@ -42,54 +37,34 @@ export async function GET(
 
     const { id } = await params
 
-    const { data: task, error: fetchError } = await getSupabaseAdmin()
-      .from('Task')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const task = await prisma.task.findUnique({
+      where: { id },
+      include: {
+        project: { select: { id: true, name: true } },
+        assignedTo: { select: { id: true, name: true, avatar: true, email: true } },
+        createdBy: { select: { id: true, name: true } },
+        reviewer: { select: { id: true, name: true, avatar: true } },
+        coExecutors: { include: { user: { select: { id: true, name: true, avatar: true } } } },
+        stages: { orderBy: { order: 'asc' } },
+        subtasks: {
+          include: {
+            assignedTo: { select: { name: true, avatar: true } }
+          }
+        },
+        parent: { select: { id: true, title: true } }
+      }
+    })
 
-    if (fetchError || !task) {
+    if (!task) {
       return NextResponse.json(
         { success: false, message: 'Task not found' },
         { status: 404 }
       )
     }
 
-    // Get related data
-    let project = null
-    let assignedTo = null
-    let createdBy = null
-
-    if (task.projectId) {
-      const { data } = await getSupabaseAdmin()
-        .from('Project')
-        .select('id, name')
-        .eq('id', task.projectId)
-        .single()
-      project = data
-    }
-
-    if (task.assignedToId) {
-      const { data } = await getSupabaseAdmin()
-        .from('User')
-        .select('id, name, avatar, email')
-        .eq('id', task.assignedToId)
-        .single()
-      assignedTo = data
-    }
-
-    if (task.createdById) {
-      const { data } = await getSupabaseAdmin()
-        .from('User')
-        .select('id, name')
-        .eq('id', task.createdById)
-        .single()
-      createdBy = data
-    }
-
     return NextResponse.json({
       success: true,
-      data: { ...task, project, assignedTo, createdBy }
+      data: task
     })
   } catch (error) {
     console.error('Task fetch error:', error)
@@ -106,8 +81,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { user, error } = await getAuthUser()
-    if (error || !user) {
+    const { user, error: authError } = await getAuthUser()
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, message: 'Not authorized' },
         { status: 401 }
@@ -117,12 +92,11 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
-    // Get current task to compare changes
-    const { data: currentTask } = await getSupabaseAdmin()
-      .from('Task')
-      .select('*')
-      .eq('id', id)
-      .single()
+    // Get current task to check permissions and logic
+    const currentTask = await prisma.task.findUnique({
+      where: { id },
+      include: { coExecutors: true }
+    })
 
     if (!currentTask) {
       return NextResponse.json(
@@ -131,76 +105,110 @@ export async function PUT(
       )
     }
 
-    const updateData: Record<string, unknown> = { updatedAt: new Date().toISOString() }
+    // Permission Check
+    const isAdmin = ['Admin', 'President', 'CEO', 'ProjectManager'].includes(user.role)
+    const isCreator = currentTask.createdById === user.id
+    const isAssignee = currentTask.assignedToId === user.id
+    const isCoExecutor = currentTask.coExecutors.some(ce => ce.userId === user.id)
+    const isReviewer = currentTask.reviewerId === user.id
 
-    if (body.title !== undefined) updateData.title = body.title
-    if (body.description !== undefined) updateData.description = body.description
-    if (body.status !== undefined) {
-      updateData.status = body.status
-      if (body.status === 'Done') {
-        updateData.completedAt = new Date().toISOString()
+    // Assignees can ONLY change status and actualHours or update stages
+    if (!isAdmin && !isCreator && !isReviewer && (isAssignee || isCoExecutor)) {
+      const allowedKeys = ['status', 'actualHours', 'stages']
+      const bodyKeys = Object.keys(body)
+      const forbiddenKeys = bodyKeys.filter(k => !allowedKeys.includes(k))
+      
+      if (forbiddenKeys.length > 0) {
+        return NextResponse.json(
+          { success: false, message: 'You only have permission to update status and actual hours' },
+          { status: 403 }
+        )
       }
     }
+
+    const updateData: any = { updatedAt: new Date() }
+
+    // Logic: Approval Flow
+    if (body.status === 'Done' && currentTask.status !== 'Done') {
+      if (currentTask.isApprovalRequired && !isReviewer && !isAdmin) {
+        // Force to Review if approval is required and user is not reviewer/admin
+        body.status = 'Review'
+        
+        if (currentTask.reviewerId) {
+          await createNotification(
+            currentTask.reviewerId,
+            'TaskUpdated',
+            'Task needs your approval',
+            `${user.name} finished task "${currentTask.title}" and it needs your review`,
+            `/tasks?id=${id}`
+          )
+        }
+      } else {
+        updateData.completedAt = new Date()
+        if (isReviewer || isAdmin) {
+          updateData.approvedAt = new Date()
+        }
+      }
+    }
+
+    // Field updates
+    if (body.title !== undefined) updateData.title = body.title
+    if (body.description !== undefined) updateData.description = body.description
+    if (body.status !== undefined) updateData.status = body.status
     if (body.priority !== undefined) updateData.priority = body.priority
-    if (body.dueDate !== undefined) updateData.dueDate = body.dueDate
+    if (body.dueDate !== undefined) updateData.dueDate = body.dueDate ? new Date(body.dueDate) : null
     if (body.estimatedHours !== undefined) updateData.estimatedHours = body.estimatedHours
     if (body.actualHours !== undefined) updateData.actualHours = body.actualHours
     if (body.assignedToId !== undefined) updateData.assignedToId = body.assignedToId
+    if (body.reviewerId !== undefined) updateData.reviewerId = body.reviewerId
+    if (body.isApprovalRequired !== undefined) updateData.isApprovalRequired = body.isApprovalRequired
     if (body.tags !== undefined) updateData.tags = body.tags
 
-    const { data: task, error: updateError } = await getSupabaseAdmin()
-      .from('Task')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (updateError) {
-      return NextResponse.json(
-        { success: false, message: 'Failed to update task' },
-        { status: 500 }
-      )
+    // Nested updates: coExecutors
+    if (body.coExecutors !== undefined && (isAdmin || isCreator)) {
+      updateData.coExecutors = {
+        deleteMany: {},
+        create: body.coExecutors.map((userId: string) => ({ userId }))
+      }
     }
 
-    // Send notifications for important changes
-    // 1. Task assigned to new user
+    // Nested updates: stages
+    if (body.stages !== undefined) {
+      updateData.stages = {
+        deleteMany: {},
+        create: body.stages.map((stage: any, index: number) => ({
+          title: stage.title,
+          isCompleted: stage.isCompleted || false,
+          order: index
+        }))
+      }
+    }
+
+    const task = await prisma.task.update({
+      where: { id },
+      data: updateData,
+      include: {
+        assignedTo: { select: { name: true } },
+        reviewer: { select: { name: true } }
+      }
+    })
+
+    // Notify for assignment changes
     if (body.assignedToId && body.assignedToId !== currentTask.assignedToId && body.assignedToId !== user.id) {
-      await createNotification(
-        body.assignedToId,
-        'TaskAssigned',
-        'Task Assigned to You',
-        `${user.name} assigned you task: "${currentTask.title}"`,
-        '/tasks'
-      )
-    }
-
-    // 2. Task completed - notify creator
-    if (body.status === 'Done' && currentTask.status !== 'Done' && currentTask.createdById !== user.id) {
-      await createNotification(
-        currentTask.createdById,
-        'TaskCompleted',
-        'Task Completed',
-        `${user.name} completed task: "${currentTask.title}"`,
-        '/tasks'
-      )
-    }
-
-    // 3. Task status changed - notify assignee
-    if (body.status && body.status !== currentTask.status && currentTask.assignedToId && currentTask.assignedToId !== user.id) {
-      await createNotification(
-        currentTask.assignedToId,
-        'TaskUpdated',
-        'Task Status Updated',
-        `${user.name} changed status of "${currentTask.title}" to ${body.status}`,
-        '/tasks'
-      )
+        await createNotification(
+            body.assignedToId,
+            'TaskAssigned',
+            'Task Assigned to You',
+            `${user.name} assigned you task: "${currentTask.title}"`,
+            '/tasks'
+        )
     }
 
     return NextResponse.json({ success: true, data: task })
   } catch (error) {
     console.error('Task update error:', error)
     return NextResponse.json(
-      { success: false, message: 'Failed to update task' },
+      { success: false, message: 'Failed to update task: ' + (error as Error).message },
       { status: 500 }
     )
   }
@@ -212,8 +220,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { user, error } = await getAuthUser()
-    if (error || !user) {
+    const { user, error: authError } = await getAuthUser()
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, message: 'Not authorized' },
         { status: 401 }
@@ -222,12 +230,10 @@ export async function DELETE(
 
     const { id } = await params
 
-    // Check if task exists and user has permission
-    const { data: task } = await getSupabaseAdmin()
-      .from('Task')
-      .select('createdById')
-      .eq('id', id)
-      .single()
+    const task = await prisma.task.findUnique({
+      where: { id },
+      select: { createdById: true }
+    })
 
     if (!task) {
       return NextResponse.json(
@@ -244,17 +250,7 @@ export async function DELETE(
       )
     }
 
-    const { error: deleteError } = await getSupabaseAdmin()
-      .from('Task')
-      .delete()
-      .eq('id', id)
-
-    if (deleteError) {
-      return NextResponse.json(
-        { success: false, message: 'Failed to delete task' },
-        { status: 500 }
-      )
-    }
+    await prisma.task.delete({ where: { id } })
 
     return NextResponse.json({
       success: true,
@@ -268,3 +264,4 @@ export async function DELETE(
     )
   }
 }
+
