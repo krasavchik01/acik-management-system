@@ -10,7 +10,7 @@ async function createNotification(userId: string, type: string, title: string, m
     await prisma.notification.create({
       data: {
         userId,
-        type: type as any,
+        type: type as "TaskAssigned" | "TaskUpdated" | "TaskCompleted" | "TaskOverdue" | "ProjectUpdate" | "MemberJoined" | "EventReminder" | "AttendanceReminder" | "SystemAlert" | "Message",
         title,
         message,
         link: link || null,
@@ -109,7 +109,7 @@ export async function PUT(
     const isAdmin = ['Admin', 'President', 'CEO', 'ProjectManager'].includes(user.role)
     const isCreator = currentTask.createdById === user.id
     const isAssignee = currentTask.assignedToId === user.id
-    const isCoExecutor = currentTask.coExecutors.some((ce: any) => ce.userId === user.id)
+    const isCoExecutor = currentTask.coExecutors.some((ce: { userId: string }) => ce.userId === user.id)
     const isReviewer = currentTask.reviewerId === user.id
 
     // Assignees can ONLY change status and actualHours or update stages
@@ -126,7 +126,7 @@ export async function PUT(
       }
     }
 
-    const updateData: any = { updatedAt: new Date() }
+    const updateData: Record<string, unknown> = { updatedAt: new Date() }
 
     // Logic: Approval Flow
     if (body.status === 'Done' && currentTask.status !== 'Done') {
@@ -176,7 +176,7 @@ export async function PUT(
     if (body.stages !== undefined) {
       updateData.stages = {
         deleteMany: {},
-        create: body.stages.map((stage: any, index: number) => ({
+        create: body.stages.map((stage: { title: string, isCompleted?: boolean }, index: number) => ({
           title: stage.title,
           isCompleted: stage.isCompleted || false,
           order: index

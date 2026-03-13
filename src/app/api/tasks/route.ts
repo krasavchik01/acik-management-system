@@ -10,7 +10,7 @@ async function createNotification(userId: string, type: string, title: string, m
     await prisma.notification.create({
       data: {
         userId,
-        type: type as any,
+        type: type as "TaskAssigned" | "TaskUpdated" | "TaskCompleted" | "TaskOverdue" | "ProjectUpdate" | "MemberJoined" | "EventReminder" | "AttendanceReminder" | "SystemAlert" | "Message",
         title,
         message,
         link: link || null,
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const myTasks = searchParams.get('my') === 'true'
     const includeSubtasks = searchParams.get('includeSubtasks') === 'true'
 
-    const where: any = {}
+    const where: Record<string, unknown> = {}
 
     if (myTasks) {
       where.OR = [
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
           create: body.coExecutors.map((userId: string) => ({ userId }))
         } : undefined,
         stages: body.stages ? {
-          create: body.stages.map((stage: any, index: number) => ({
+          create: body.stages.map((stage: { title: string, isCompleted?: boolean }, index: number) => ({
             title: stage.title,
             isCompleted: false,
             order: index
