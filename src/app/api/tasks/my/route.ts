@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
@@ -12,68 +14,36 @@ export async function GET() {
       )
     }
 
-    // Get tasks assigned to or created by user
-    const { data: tasks, error: fetchError } = await getSupabaseAdmin()
-      .from('Task')
-      .select('*')
-      .or(`assignedToId.eq.${user.id},createdById.eq.${user.id}`)
-      .order('createdAt', { ascending: false })
-
-    if (fetchError) {
-      console.error('My tasks fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, message: 'Failed to fetch tasks' },
-        { status: 500 }
-      )
-    }
-
-    // Get related data
-    const tasksWithDetails = await Promise.all(
-      (tasks || []).map(async (task) => {
-        let project = null
-        let assignedTo = null
-        let createdBy = null
-
-        if (task.projectId) {
-          const { data } = await getSupabaseAdmin()
-            .from('Project')
-            .select('id, name')
-            .eq('id', task.projectId)
-            .single()
-          project = data
-        }
-
-        if (task.assignedToId) {
-          const { data } = await getSupabaseAdmin()
-            .from('User')
-            .select('id, name, avatar')
-            .eq('id', task.assignedToId)
-            .single()
-          assignedTo = data
-        }
-
-        if (task.createdById) {
-          const { data } = await getSupabaseAdmin()
-            .from('User')
-            .select('id, name')
-            .eq('id', task.createdById)
-            .single()
-          createdBy = data
-        }
-
-        return { ...task, project, assignedTo, createdBy }
-      })
-    )
+    // Get tasks assigned to, created by, reviewer for, or co-executor for user
+    const tasks = await prisma.task.findMany({
+      where: {
+        OR: [
+          { assignedToId: user.id },
+          { createdById: user.id },
+          { reviewerId: user.id },
+          { coExecutors: { some: { userId: user.id } } }
+        ]
+      },
+      include: {
+        project: { select: { id: true, name: true } },
+        assignedTo: { select: { id: true, name: true, avatar: true } },
+        createdBy: { select: { id: true, name: true } },
+        reviewer: { select: { id: true, name: true, avatar: true } },
+        coExecutors: { include: { user: { select: { id: true, name: true, avatar: true } } } },
+        _count: { select: { subtasks: true, stages: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
 
     return NextResponse.json({
       success: true,
-      count: tasksWithDetails.length,
-      data: tasksWithDetails
+      count: tasks.length,
+      data: tasks
     })
   } catch (error) {
     console.error('My tasks fetch error:', error)
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch tasks' },
+      { success: false, message: 'Failed to fetch tasks: ' + (error as Error).message },
       { status: 500 }
     )
   }
