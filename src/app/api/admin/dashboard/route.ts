@@ -55,6 +55,14 @@ export async function GET() {
     const totalEvents = events.length
     const totalIncome = finances.filter(f => f.type === 'Income').reduce((sum, f) => sum + (f.amount || 0), 0)
 
+    // Get today's attendance
+    const todayDate = new Date().toISOString().split('T')[0]
+    const { data: todayAttendance } = await getSupabaseAdmin()
+      .from('Attendance')
+      .select('id, userId, status, workType, checkInTime, checkInAddress')
+      .gte('date', todayDate + 'T00:00:00')
+      .lte('date', todayDate + 'T23:59:59')
+
     // Get recent users
     const { data: recentUsers } = await getSupabaseAdmin()
       .from('User')
@@ -69,6 +77,17 @@ export async function GET() {
       .order('createdAt', { ascending: false })
       .limit(5)
 
+    // Get counts for system health
+    const [
+      financeTotal,
+      sponsorsTotal,
+      membersTotal,
+    ] = await Promise.all([
+      getSupabaseAdmin().from('Finance').select('id', { count: 'exact', head: true }),
+      getSupabaseAdmin().from('Sponsor').select('id', { count: 'exact', head: true }),
+      getSupabaseAdmin().from('Member').select('id', { count: 'exact', head: true }),
+    ])
+
     return NextResponse.json({
       success: true,
       data: {
@@ -79,11 +98,17 @@ export async function GET() {
           members: { total: totalMembers, active: activeMembers },
           events: { total: totalEvents },
           finance: { totalIncome },
+          system: {
+            financeRecords: financeTotal.count || 0,
+            sponsors: sponsorsTotal.count || 0,
+            members: membersTotal.count || 0,
+          }
         },
         recent: {
           users: recentUsers || [],
           projects: recentProjects || [],
-        }
+        },
+        presence: todayAttendance || [],
       }
     })
   } catch (error) {

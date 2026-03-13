@@ -813,37 +813,73 @@ export default function AttendancePage() {
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-gray-900 dark:text-white font-bold bg-gray-50 dark:bg-slate-700/50 px-2 py-1 rounded-lg border border-gray-100 dark:border-slate-600">
+                            <span className="text-indigo-600 dark:text-indigo-400 font-black tracking-tight bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1 rounded-lg border border-indigo-100 dark:border-indigo-800/30">
                               {formatHours(record.hoursWorked)}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(record.status)}`}>
-                              {record.status}
+                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm ${getStatusColor(record.status)}`}>
+                              {record.status === 'Present' ? (language === 'ru' ? 'В ОФИСЕ' : 'PRESENT') :
+                                record.status === 'Late' ? (language === 'ru' ? 'ОПОЗДАНИЕ' : 'LATE') :
+                                  record.status === 'Working' ? (language === 'ru' ? 'РАБОТАЕТ' : 'WORKING') :
+                                    record.status === 'Absent' ? (language === 'ru' ? 'ОТСУТСТВУЕТ' : 'ABSENT') : record.status}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            {record.workType === 'Office' ? (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-xl text-[11px] font-bold uppercase tracking-wider border border-green-200/50 dark:border-green-800/50 shadow-sm">
-                                <FiMapPin size={12} />
-                                {language === 'ru' ? 'В офисе' : 'Office'}
-                              </span>
-                            ) : record.workType === 'Remote' ? (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-xl text-[11px] font-bold uppercase tracking-wider border border-blue-200/50 dark:border-blue-800/50 shadow-sm">
-                                <FiClock size={12} />
-                                {language === 'ru' ? 'Удалённо' : 'Remote'}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400 dark:text-slate-500 text-xs font-medium">
-                                {record.workType || '—'}
-                              </span>
-                            )}
+                            <div className="flex flex-col gap-1">
+                              {record.workType === 'Office' ? (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-emerald-200/50 dark:border-emerald-800/50 shadow-sm w-max">
+                                  <FiMapPin size={12} />
+                                  {language === 'ru' ? 'ОФИС' : 'OFFICE'}
+                                </span>
+                              ) : record.workType === 'Remote' ? (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-200/50 dark:border-indigo-800/50 shadow-sm w-max">
+                                  <FiClock size={12} />
+                                  {language === 'ru' ? 'УДАЛЁННО' : 'REMOTE'}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400 dark:text-slate-500 text-xs font-medium uppercase tracking-tighter">
+                                  {record.workType || '—'}
+                                </span>
+                              )}
+                              <p className="text-[10px] font-bold text-slate-400 truncate max-w-[150px] mt-1 italic">
+                                {record.location || '—'}
+                              </p>
+                            </div>
                           </td>
                         </tr>
                       ))
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+
+            {/* Presence Intelligence Summary */}
+            <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -mr-48 -mt-48 group-hover:bg-indigo-600/20 transition-all duration-1000" />
+              
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div>
+                  <h3 className="text-3xl font-black text-white tracking-tight mb-2">Presence Intelligence</h3>
+                  <p className="text-slate-400 font-medium">Real-time team distribution and operational status.</p>
+                </div>
+                
+                <div className="flex items-center gap-8 px-8 py-6 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-3xl">
+                  <div className="text-center">
+                    <p className="text-4xl font-black text-emerald-400 mb-1">
+                      {attendance.filter(a => a.workType === 'Office' || a.status === 'Present').length}
+                    </p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">In Office</p>
+                  </div>
+                  <div className="w-px h-12 bg-slate-700" />
+                  <div className="text-center">
+                    <p className="text-4xl font-black text-indigo-400 mb-1">
+                      {attendance.filter(a => a.workType === 'Remote' || a.status === 'Working').length}
+                    </p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Remote</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
