@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/lib/i18n'
 import { toast } from 'react-toastify'
 import {
   FiPlus, FiSearch, FiX, FiCalendar, FiUser, FiFlag, FiFolder,
@@ -51,6 +52,7 @@ const priorityOptions = [
 
 export default function TasksPage() {
   const { profile } = useAuth()
+  const { t } = useLanguage()
   const [tasks, setTasks] = useState<Task[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [users, setUsers] = useState<User[]>([])
@@ -376,7 +378,7 @@ export default function TasksPage() {
                 : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
           >
-            Мои задачи
+            {t('tasks', 'myTasksTab')}
           </button>
           <button
             onClick={() => setActiveTab('assignedByMe')}
@@ -385,7 +387,7 @@ export default function TasksPage() {
                 : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
           >
-            Порученные мной
+            {t('tasks', 'assignedByMeTab')}
           </button>
           <button
             onClick={() => setActiveTab('all')}
@@ -394,7 +396,7 @@ export default function TasksPage() {
                 : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
           >
-            Все задачи
+            {t('tasks', 'allTasksTab')}
           </button>
         </div>
 

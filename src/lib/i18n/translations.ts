@@ -141,6 +141,9 @@ export const translations = {
     priorityUrgent: { en: 'Urgent', ru: 'Срочный' },
     kanbanView: { en: 'Kanban', ru: 'Канбан' },
     listView: { en: 'List', ru: 'Список' },
+    myTasksTab: { en: 'My Tasks', ru: 'Мои задачи' },
+    assignedByMeTab: { en: 'Assigned by Me', ru: 'Порученные мной' },
+    allTasksTab: { en: 'All Tasks', ru: 'Все задачи' },
   },
 
   // Members
