@@ -1,23 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { getAuthUser } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
   try {
+    const { prisma } = await import('@/lib/prisma')
     await prisma.notification.create({
       data: {
         userId,
-        type: type as "TaskAssigned" | "TaskUpdated" | "TaskCompleted" | "TaskOverdue" | "ProjectUpdate" | "MemberJoined" | "EventReminder" | "AttendanceReminder" | "SystemAlert" | "Message",
+        type: type as any,
         title,
         message,
         link: link || null,
       }
     })
-    // Push notification logic could be added here if needed, 
-    // but we'll focus on the DB side for now as getSupabaseAdmin was used before
   } catch (error) {
     console.error('Failed to create notification:', error)
   }
@@ -26,6 +23,9 @@ async function createNotification(userId: string, type: string, title: string, m
 // GET /api/tasks
 export async function GET(request: NextRequest) {
   try {
+    const { getAuthUser } = await import('@/lib/auth')
+    const { prisma } = await import('@/lib/prisma')
+
     const { user, error } = await getAuthUser()
     if (error || !user) {
       return NextResponse.json(
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const myTasks = searchParams.get('my') === 'true'
     const includeSubtasks = searchParams.get('includeSubtasks') === 'true'
 
-    const where: Record<string, unknown> = {}
+    const where: any = {}
 
     if (myTasks) {
       where.OR = [
@@ -107,6 +107,9 @@ export async function GET(request: NextRequest) {
 // POST /api/tasks
 export async function POST(request: NextRequest) {
   try {
+    const { getAuthUser } = await import('@/lib/auth')
+    const { prisma } = await import('@/lib/prisma')
+
     const { user, error } = await getAuthUser()
     if (error || !user) {
       return NextResponse.json(
@@ -144,7 +147,7 @@ export async function POST(request: NextRequest) {
           create: body.coExecutors.map((userId: string) => ({ userId }))
         } : undefined,
         stages: body.stages ? {
-          create: body.stages.map((stage: { title: string, isCompleted?: boolean }, index: number) => ({
+          create: body.stages.map((stage: any, index: number) => ({
             title: stage.title,
             isCompleted: false,
             order: index

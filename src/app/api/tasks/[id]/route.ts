@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { getAuthUser } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
   try {
+    const { prisma } = await import('@/lib/prisma')
     await prisma.notification.create({
       data: {
         userId,
-        type: type as "TaskAssigned" | "TaskUpdated" | "TaskCompleted" | "TaskOverdue" | "ProjectUpdate" | "MemberJoined" | "EventReminder" | "AttendanceReminder" | "SystemAlert" | "Message",
+        type: type as any,
         title,
         message,
         link: link || null,
@@ -27,6 +26,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { getAuthUser } = await import('@/lib/auth')
+    const { prisma } = await import('@/lib/prisma')
+
     const { user, error } = await getAuthUser()
     if (error || !user) {
       return NextResponse.json(
@@ -81,6 +83,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { getAuthUser } = await import('@/lib/auth')
+    const { prisma } = await import('@/lib/prisma')
+
     const { user, error: authError } = await getAuthUser()
     if (authError || !user) {
       return NextResponse.json(
@@ -109,7 +114,7 @@ export async function PUT(
     const isAdmin = ['Admin', 'President', 'CEO', 'ProjectManager'].includes(user.role)
     const isCreator = currentTask.createdById === user.id
     const isAssignee = currentTask.assignedToId === user.id
-    const isCoExecutor = currentTask.coExecutors.some((ce: { userId: string }) => ce.userId === user.id)
+    const isCoExecutor = currentTask.coExecutors.some((ce: any) => ce.userId === user.id)
     const isReviewer = currentTask.reviewerId === user.id
 
     // Assignees can ONLY change status and actualHours or update stages
@@ -126,7 +131,7 @@ export async function PUT(
       }
     }
 
-    const updateData: Record<string, unknown> = { updatedAt: new Date() }
+    const updateData: any = { updatedAt: new Date() }
 
     // Logic: Approval Flow
     if (body.status === 'Done' && currentTask.status !== 'Done') {
@@ -176,7 +181,7 @@ export async function PUT(
     if (body.stages !== undefined) {
       updateData.stages = {
         deleteMany: {},
-        create: body.stages.map((stage: { title: string, isCompleted?: boolean }, index: number) => ({
+        create: body.stages.map((stage: any, index: number) => ({
           title: stage.title,
           isCompleted: stage.isCompleted || false,
           order: index
@@ -220,6 +225,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { getAuthUser } = await import('@/lib/auth')
+    const { prisma } = await import('@/lib/prisma')
+
     const { user, error: authError } = await getAuthUser()
     if (authError || !user) {
       return NextResponse.json(
