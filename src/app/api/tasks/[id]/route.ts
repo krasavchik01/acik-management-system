@@ -109,14 +109,14 @@ export async function PUT(
     const isAdmin = ['Admin', 'President', 'CEO', 'ProjectManager'].includes(user.role)
     const isCreator = currentTask.createdById === user.id
     const isAssignee = currentTask.assignedToId === user.id
-    const isCoExecutor = currentTask.coExecutors.some(ce => ce.userId === user.id)
+    const isCoExecutor = currentTask.coExecutors.some((ce: any) => ce.userId === user.id)
     const isReviewer = currentTask.reviewerId === user.id
 
     // Assignees can ONLY change status and actualHours or update stages
     if (!isAdmin && !isCreator && !isReviewer && (isAssignee || isCoExecutor)) {
       const allowedKeys = ['status', 'actualHours', 'stages']
       const bodyKeys = Object.keys(body)
-      const forbiddenKeys = bodyKeys.filter(k => !allowedKeys.includes(k))
+      const forbiddenKeys = bodyKeys.filter((k: string) => !allowedKeys.includes(k))
       
       if (forbiddenKeys.length > 0) {
         return NextResponse.json(
