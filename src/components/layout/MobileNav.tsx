@@ -4,17 +4,20 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/lib/i18n'
+import { useTheme } from '@/lib/theme'
 import {
   FiHome, FiCheckSquare, FiBell, FiFolder, FiGrid,
   FiUsers, FiCalendar, FiDollarSign, FiHeart, FiClock,
-  FiBarChart2, FiShield, FiSettings, FiX
+  FiBarChart2, FiShield, FiSettings, FiX, FiGlobe, FiMoon, FiSun, FiLogOut
 } from 'react-icons/fi'
 import { useState, useEffect, useCallback, useRef } from 'react'
 
 export function MobileNav() {
   const pathname = usePathname()
   const { profile } = useAuth()
-  const { t } = useLanguage()
+  const { language, setLanguage, t } = useLanguage()
+  const { theme, toggleTheme } = useTheme()
+  const { logout } = useAuth()
   const [unreadCount, setUnreadCount] = useState(0)
   const [showMore, setShowMore] = useState(false)
   const prevCountRef = useRef(0)
@@ -73,7 +76,7 @@ export function MobileNav() {
                 <FiX size={20} />
               </button>
             </div>
-            <div className="grid grid-cols-4 gap-1 px-3 pb-4">
+            <div className="grid grid-cols-4 gap-1 px-3 pb-3">
               {moreItems.map(item => {
                 const isActive = pathname === item.href
                 return (
@@ -94,6 +97,35 @@ export function MobileNav() {
                   </Link>
                 )
               })}
+            </div>
+
+            {/* Quick settings */}
+            <div className="flex items-center gap-2 px-4 pb-4 pt-2 border-t border-gray-100 dark:border-slate-800">
+              {/* Language toggle */}
+              <button
+                onClick={() => setLanguage(language === 'ru' ? 'en' : 'ru')}
+                className="flex items-center gap-2 flex-1 px-3 py-2.5 bg-gray-100 dark:bg-slate-800 rounded-xl text-sm text-gray-700 dark:text-slate-300 active:bg-gray-200 dark:active:bg-slate-700"
+              >
+                <FiGlobe size={16} />
+                <span>{language === 'ru' ? 'EN' : 'RU'}</span>
+              </button>
+
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-2 flex-1 px-3 py-2.5 bg-gray-100 dark:bg-slate-800 rounded-xl text-sm text-gray-700 dark:text-slate-300 active:bg-gray-200 dark:active:bg-slate-700"
+              >
+                {theme === 'dark' ? <FiSun size={16} /> : <FiMoon size={16} />}
+                <span>{theme === 'dark' ? t('common', 'lightMode') : t('common', 'darkMode')}</span>
+              </button>
+
+              {/* Logout */}
+              <button
+                onClick={() => { setShowMore(false); logout() }}
+                className="flex items-center justify-center px-3 py-2.5 bg-red-50 dark:bg-red-900/20 rounded-xl text-red-600 dark:text-red-400 active:bg-red-100 dark:active:bg-red-900/40"
+              >
+                <FiLogOut size={16} />
+              </button>
             </div>
           </div>
         </>
