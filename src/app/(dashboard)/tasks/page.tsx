@@ -910,53 +910,51 @@ export default function TasksPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <FiFolder className="inline mr-2" size={14} />
-                    {t('tasks', 'project')}
-                  </label>
-                  <select
-                    value={formData.projectId}
-                    onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
-                  >
-                    <option value="">{t('tasks', 'noProject')}</option>
-                    {projects.map(project => (
-                      <option key={project.id} value={project.id}>{project.name}</option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <FiFolder className="inline mr-2" size={14} />
+                  {t('tasks', 'project')}
+                </label>
+                <select
+                  value={formData.projectId}
+                  onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                >
+                  <option value="">{t('tasks', 'noProject')}</option>
+                  {projects.map(project => (
+                    <option key={project.id} value={project.id}>{project.name}</option>
+                  ))}
+                </select>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    <FiUser className="inline mr-2 text-indigo-500" size={14} />
-                    {t('tasks', 'assignedTo')}
-                  </label>
-                  <UserPicker
-                    users={users}
-                    value={formData.assignedToId}
-                    onChange={(id) => setFormData({ ...formData, assignedToId: id })}
-                    placeholder={t('tasks', 'unassigned')}
-                    language={language}
-                    showWorkload
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                  <FiUser className="inline mr-2 text-indigo-500" size={14} />
+                  {t('tasks', 'assignedTo')}
+                </label>
+                <UserPicker
+                  users={users}
+                  value={formData.assignedToId}
+                  onChange={(id) => setFormData({ ...formData, assignedToId: id })}
+                  placeholder={t('tasks', 'unassigned')}
+                  language={language}
+                  showWorkload
+                />
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    <FiCheckCircle className="inline mr-2 text-blue-500" size={14} />
-                    {t('tasks', 'reviewer')}
-                  </label>
-                  <UserPicker
-                    users={users}
-                    value={formData.reviewerId}
-                    onChange={(id) => setFormData({ ...formData, reviewerId: id })}
-                    placeholder={t('tasks', 'noReviewer')}
-                    language={language}
-                    showWorkload={false}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                  <FiCheckCircle className="inline mr-2 text-blue-500" size={14} />
+                  {t('tasks', 'reviewer')}
+                </label>
+                <UserPicker
+                  users={users}
+                  value={formData.reviewerId}
+                  onChange={(id) => setFormData({ ...formData, reviewerId: id })}
+                  placeholder={t('tasks', 'noReviewer')}
+                  language={language}
+                  showWorkload={false}
+                />
               </div>
 
               <div className="flex items-center gap-2 py-2">
