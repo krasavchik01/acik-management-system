@@ -81,6 +81,8 @@ export const translations = {
     settings: { en: 'Settings', ru: 'Настройки' },
     admin: { en: 'Admin', ru: 'Админ' },
     logout: { en: 'Logout', ru: 'Выйти' },
+    more: { en: 'More', ru: 'Ещё' },
+    menu: { en: 'Menu', ru: 'Меню' },
     deliveryPlan: { en: 'Delivery Plan', ru: 'План сдачи' },
   },
 

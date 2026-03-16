@@ -105,15 +105,7 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-indigo-600 text-white rounded-lg"
-      >
-        {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-      </button>
-
-      {/* Overlay */}
+      {/* Overlay (triggered by MobileNav "More" menu) */}
       {isOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black/50 z-40"
