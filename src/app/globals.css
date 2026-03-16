@@ -168,3 +168,23 @@ body {
   background-color: #1e293b !important;
   color: #f1f5f9 !important;
 }
+
+/* PWA & Mobile safe areas */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Hide scrollbar on mobile nav */
+@media (max-width: 1023px) {
+  body {
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Standalone PWA - extra top padding for status bar */
+@media all and (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}

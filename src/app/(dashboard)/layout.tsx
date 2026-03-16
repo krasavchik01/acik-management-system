@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/hooks/useAuth'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { MobileNav } from '@/components/layout/MobileNav'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { CurrencyProvider } from '@/lib/currency/CurrencyContext'
@@ -39,9 +40,10 @@ export default function DashboardLayout({
     <CurrencyProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         <Sidebar />
-        <main className="lg:ml-64 min-h-screen">
+        <main className="lg:ml-64 min-h-screen pb-20 lg:pb-0">
           {children}
         </main>
+        <MobileNav />
       </div>
     </CurrencyProvider>
   )
