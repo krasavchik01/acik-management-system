@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/lib/i18n'
@@ -70,25 +70,35 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
+  const isAdmin = profile?.role === 'Admin' || profile?.role === 'President' || profile?.role === 'CEO'
+  const permissions = profile?.permissions || []
+
+  const can = (module: string) => isAdmin || permissions.includes(module)
+
   useEffect(() => {
-    fetchDashboardData()
-  }, [])
+    if (profile) fetchDashboardData()
+  }, [profile])
 
   const fetchDashboardData = async () => {
     try {
-      const [projectsRes, membersRes, tasksRes] = await Promise.all([
-        fetch('/api/projects'),
-        fetch('/api/members'),
-        fetch('/api/tasks'),
-      ])
+      const fetches: Promise<Response>[] = []
+      const keys: string[] = []
 
-      const projectsData = await projectsRes.json()
-      const membersData = await membersRes.json()
-      const tasksData = await tasksRes.json()
+      // Only fetch data the user has access to
+      if (can('projects')) { fetches.push(fetch('/api/projects')); keys.push('projects') }
+      if (can('members')) { fetches.push(fetch('/api/members')); keys.push('members') }
+      if (can('tasks')) { fetches.push(fetch('/api/tasks')); keys.push('tasks') }
 
-      const projects = projectsData.data || []
-      const members = membersData.data || []
-      const tasks = tasksData.data || []
+      const responses = await Promise.all(fetches)
+      const results: Record<string, any[]> = {}
+      for (let i = 0; i < keys.length; i++) {
+        const data = await responses[i].json()
+        results[keys[i]] = data.data || []
+      }
+
+      const projects = results.projects || []
+      const members = results.members || []
+      const tasks = results.tasks || []
 
       setStats({
         projects: {
@@ -175,6 +185,112 @@ export default function DashboardPage() {
   const taskCompletionRate = stats?.tasks.total ? Math.round((stats.tasks.done / stats.tasks.total) * 100) : 0
   const projectCompletionRate = stats?.projects.total ? Math.round((stats.projects.completed / stats.projects.total) * 100) : 0
 
+  // Build stats cards based on permissions
+  const statsCards = []
+
+  if (can('projects')) {
+    statsCards.push(
+      <StatsCard
+        key="projects"
+        icon={FiFolder}
+        value={loading ? '...' : (stats?.projects.total || 0).toString()}
+        subtitle={t('dashboard', 'activeProjects')}
+        trend={{ value: `${stats?.projects.active || 0} ${language === 'ru' ? 'активных' : 'active'}`, icon: FiTrendingUp, colorClass: 'text-green-600 dark:text-green-400' }}
+        gradientClass="from-blue-500 to-blue-600"
+        shadowClass="shadow-blue-200 dark:shadow-blue-900/30"
+        footer={
+          <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
+            <span>{stats?.projects.completed || 0} {language === 'ru' ? 'завершено' : 'completed'}</span>
+            <span>{stats?.projects.onHold || 0} {language === 'ru' ? 'на паузе' : 'on hold'}</span>
+          </div>
+        }
+      />
+    )
+  }
+
+  if (can('tasks')) {
+    statsCards.push(
+      <StatsCard
+        key="tasks"
+        icon={FiCheckSquare}
+        value={loading ? '...' : (stats?.tasks.total || 0).toString()}
+        subtitle={t('dashboard', 'totalTasks')}
+        trend={{ value: `${stats?.tasks.inProgress || 0} ${language === 'ru' ? 'в работе' : 'in progress'}`, icon: FiActivity, colorClass: 'text-blue-600 dark:text-blue-400' }}
+        gradientClass="from-green-500 to-emerald-600"
+        shadowClass="shadow-green-200 dark:shadow-green-900/30"
+        footer={
+          <div className="flex justify-between text-xs">
+            <span className="text-green-600 dark:text-green-400">{stats?.tasks.done || 0} {language === 'ru' ? 'готово' : 'done'}</span>
+            <span className="text-red-600 dark:text-red-400">{stats?.tasks.overdue || 0} {language === 'ru' ? 'просрочено' : 'overdue'}</span>
+          </div>
+        }
+      />
+    )
+  }
+
+  if (can('members')) {
+    statsCards.push(
+      <StatsCard
+        key="members"
+        icon={FiUsers}
+        value={loading ? '...' : (stats?.members.total || 0).toString()}
+        subtitle={t('dashboard', 'teamMembers')}
+        trend={{ value: `${stats?.members.diamond || 0} diamond`, icon: FiStar, colorClass: 'text-purple-600 dark:text-purple-400' }}
+        gradientClass="from-purple-500 to-violet-600"
+        shadowClass="shadow-purple-200 dark:shadow-purple-900/30"
+        footer={
+          <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
+            <span>{stats?.members.active || 0} active</span>
+            <span>{stats?.members.platinum || 0} platinum</span>
+          </div>
+        }
+      />
+    )
+  }
+
+  if (can('finance')) {
+    statsCards.push(
+      <StatsCard
+        key="finance"
+        icon={FiDollarSign}
+        value={loading ? '...' : formatCurrency(stats?.finance.balance || 0)}
+        subtitle={t('dashboard', 'monthlyBudget')}
+        gradientClass="from-orange-500 to-amber-600"
+        shadowClass="shadow-orange-200 dark:shadow-orange-900/30"
+        trend={undefined}
+        footer={
+          <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
+            <span>Total: {formatCurrency(stats?.finance.totalBudget || 0)}</span>
+            <span>Spent: {formatCurrency(stats?.finance.totalSpent || 0)}</span>
+          </div>
+        }
+      >
+        <div className="absolute top-6 right-6">
+          <CurrencySwitcher />
+        </div>
+      </StatsCard>
+    )
+  }
+
+  // Dynamic grid cols based on card count
+  const gridCols = statsCards.length <= 2
+    ? 'grid-cols-1 sm:grid-cols-2'
+    : statsCards.length === 3
+      ? 'grid-cols-1 sm:grid-cols-3'
+      : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+
+  // Quick actions filtered by permissions
+  const allActions = [
+    { href: '/projects', label: t('dashboard', 'newProject'), icon: FiPlus, module: 'projects', colorClass: 'bg-blue-500', bgColorClass: 'bg-gradient-to-br from-blue-50 to-indigo-50', hoverBgClass: 'hover:from-blue-100 hover:to-indigo-100', darkBgClass: 'dark:from-blue-900/30 dark:to-indigo-900/30', darkHoverBgClass: 'dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50' },
+    { href: '/tasks', label: t('dashboard', 'newTask'), icon: FiCheckSquare, module: 'tasks', colorClass: 'bg-green-500', bgColorClass: 'bg-gradient-to-br from-green-50 to-emerald-50', hoverBgClass: 'hover:from-green-100 hover:to-emerald-100', darkBgClass: 'dark:from-green-900/30 dark:to-emerald-900/30', darkHoverBgClass: 'dark:hover:from-green-900/50 dark:hover:to-emerald-900/50' },
+    { href: '/members', label: t('nav', 'members'), icon: FiUsers, module: 'members', colorClass: 'bg-purple-500', bgColorClass: 'bg-gradient-to-br from-purple-50 to-violet-50', hoverBgClass: 'hover:from-purple-100 hover:to-violet-100', darkBgClass: 'dark:from-purple-900/30 dark:to-violet-900/30', darkHoverBgClass: 'dark:hover:from-purple-900/50 dark:hover:to-violet-900/50' },
+    { href: '/events', label: t('nav', 'events'), icon: FiCalendar, module: 'events', colorClass: 'bg-pink-500', bgColorClass: 'bg-gradient-to-br from-pink-50 to-rose-50', hoverBgClass: 'hover:from-pink-100 hover:to-rose-100', darkBgClass: 'dark:from-pink-900/30 dark:to-rose-900/30', darkHoverBgClass: 'dark:hover:from-pink-900/50 dark:hover:to-rose-900/50' },
+    { href: '/finance', label: t('nav', 'finance'), icon: FiDollarSign, module: 'finance', colorClass: 'bg-orange-500', bgColorClass: 'bg-gradient-to-br from-orange-50 to-amber-50', hoverBgClass: 'hover:from-orange-100 hover:to-amber-100', darkBgClass: 'dark:from-orange-900/30 dark:to-amber-900/30', darkHoverBgClass: 'dark:hover:from-orange-900/50 dark:hover:to-amber-900/50' },
+    { href: '/sponsors', label: t('nav', 'sponsors'), icon: FiAward, module: 'sponsors', colorClass: 'bg-cyan-500', bgColorClass: 'bg-gradient-to-br from-cyan-50 to-sky-50', hoverBgClass: 'hover:from-cyan-100 hover:to-sky-100', darkBgClass: 'dark:from-cyan-900/30 dark:to-sky-900/30', darkHoverBgClass: 'dark:hover:from-cyan-900/50 dark:hover:to-sky-900/50' },
+  ]
+
+  const filteredActions = allActions.filter(a => can(a.module))
+
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
@@ -192,165 +308,119 @@ export default function DashboardPage() {
       />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard
-            icon={FiFolder}
-            value={loading ? '...' : (stats?.projects.total || 0).toString()}
-            subtitle={t('dashboard', 'activeProjects')}
-            trend={{ value: `${stats?.projects.active || 0} ${language === 'ru' ? 'активных' : 'active'}`, icon: FiTrendingUp, colorClass: 'text-green-600 dark:text-green-400' }}
-            gradientClass="from-blue-500 to-blue-600"
-            shadowClass="shadow-blue-200 dark:shadow-blue-900/30"
-            footer={
-              <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
-                <span>{stats?.projects.completed || 0} {language === 'ru' ? 'завершено' : 'completed'}</span>
-                <span>{stats?.projects.onHold || 0} {language === 'ru' ? 'на паузе' : 'on hold'}</span>
-              </div>
-            }
-          />
-          <StatsCard
-            icon={FiCheckSquare}
-            value={loading ? '...' : (stats?.tasks.total || 0).toString()}
-            subtitle={t('dashboard', 'totalTasks')}
-            trend={{ value: `${stats?.tasks.inProgress || 0} ${language === 'ru' ? 'в работе' : 'in progress'}`, icon: FiActivity, colorClass: 'text-blue-600 dark:text-blue-400' }}
-            gradientClass="from-green-500 to-emerald-600"
-            shadowClass="shadow-green-200 dark:shadow-green-900/30"
-            footer={
-              <div className="flex justify-between text-xs">
-                <span className="text-green-600 dark:text-green-400">{stats?.tasks.done || 0} {language === 'ru' ? 'готово' : 'done'}</span>
-                <span className="text-red-600 dark:text-red-400">{stats?.tasks.overdue || 0} {language === 'ru' ? 'просрочено' : 'overdue'}</span>
-              </div>
-            }
-          />
-          <StatsCard
-            icon={FiUsers}
-            value={loading ? '...' : (stats?.members.total || 0).toString()}
-            subtitle={t('dashboard', 'teamMembers')}
-            trend={{ value: `${stats?.members.diamond || 0} diamond`, icon: FiStar, colorClass: 'text-purple-600 dark:text-purple-400' }}
-            gradientClass="from-purple-500 to-violet-600"
-            shadowClass="shadow-purple-200 dark:shadow-purple-900/30"
-            footer={
-              <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
-                <span>{stats?.members.active || 0} active</span>
-                <span>{stats?.members.platinum || 0} platinum</span>
-              </div>
-            }
-          />
-          <StatsCard
-            icon={FiDollarSign}
-            value={loading ? '...' : formatCurrency(stats?.finance.balance || 0)}
-            subtitle={t('dashboard', 'monthlyBudget')}
-            gradientClass="from-orange-500 to-amber-600"
-            shadowClass="shadow-orange-200 dark:shadow-orange-900/30"
-            trend={undefined}
-            footer={
-              <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
-                <span>Total: {formatCurrency(stats?.finance.totalBudget || 0)}</span>
-                <span>Spent: {formatCurrency(stats?.finance.totalSpent || 0)}</span>
-              </div>
-            }
-          >
-            <div className="absolute top-6 right-6">
-              <CurrencySwitcher />
-            </div>
-          </StatsCard>
-        </div>
+        {/* Stats cards — only modules user has access to */}
+        {statsCards.length > 0 && (
+          <div className={`grid ${gridCols} gap-6`}>
+            {statsCards}
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ProgressCircle
-            label={language === 'ru' ? 'Выполнение задач' : 'Task Completion'}
-            subtitle={language === 'ru' ? 'Общий прогресс' : 'Overall progress this period'}
-            percentage={taskCompletionRate}
-            gradientId="gradient1"
-            colors={{ start: '#10b981', end: '#34d399' }}
-            icon={<FiTarget className="text-green-600 dark:text-green-400" size={20} />}
-            stats={[
-              { label: t('tasks', 'todo'), value: stats?.tasks.todo || 0 },
-              { label: t('tasks', 'inProgress'), value: stats?.tasks.inProgress || 0, colorClass: 'text-blue-600 dark:text-blue-400' },
-              { label: t('tasks', 'done'), value: stats?.tasks.done || 0, colorClass: 'text-green-600 dark:text-green-400' },
-              { label: t('tasks', 'overdueTasks'), value: stats?.tasks.overdue || 0, colorClass: 'text-red-600 dark:text-red-400' },
-            ]}
-          />
-          <ProgressCircle
-            label={t('dashboard', 'projectProgress')}
-            subtitle={t('dashboard', 'projectsDistribution')}
-            percentage={projectCompletionRate}
-            gradientId="gradient2"
-            colors={{ start: '#6366f1', end: '#8b5cf6' }}
-            icon={<FiPieChart className="text-blue-600 dark:text-blue-400" size={20} />}
-            stats={[
-              { label: t('projects', 'statusActive'), value: stats?.projects.active || 0 },
-              { label: t('projects', 'statusCompleted'), value: stats?.projects.completed || 0 },
-              { label: t('projects', 'statusOnHold'), value: stats?.projects.onHold || 0 },
-            ]}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RecentList
-            title={t('dashboard', 'recentProjects')}
-            viewAllHref="/projects"
-            viewAllLabel={t('dashboard', 'viewAll')}
-            items={recentProjects}
-            emptyState={{ icon: FiFolder, message: t('dashboard', 'noProjects') }}
-            renderItem={(project) => (
-              <Link href="/projects" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
-                    <FiFolder className="text-white" size={18} />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{project.name}</p>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(project.status)}`}>{project.status}</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="w-24 h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: `${project.progress}%` }} />
-                  </div>
-                  <span className="text-xs text-gray-500 dark:text-slate-400">{project.progress}%</span>
-                </div>
-              </Link>
+        {/* Progress circles — only if user has access */}
+        {(can('tasks') || can('projects')) && (
+          <div className={`grid grid-cols-1 ${can('tasks') && can('projects') ? 'lg:grid-cols-2' : ''} gap-6`}>
+            {can('tasks') && (
+              <ProgressCircle
+                label={language === 'ru' ? 'Выполнение задач' : 'Task Completion'}
+                subtitle={language === 'ru' ? 'Общий прогресс' : 'Overall progress this period'}
+                percentage={taskCompletionRate}
+                gradientId="gradient1"
+                colors={{ start: '#10b981', end: '#34d399' }}
+                icon={<FiTarget className="text-green-600 dark:text-green-400" size={20} />}
+                stats={[
+                  { label: t('tasks', 'todo'), value: stats?.tasks.todo || 0 },
+                  { label: t('tasks', 'inProgress'), value: stats?.tasks.inProgress || 0, colorClass: 'text-blue-600 dark:text-blue-400' },
+                  { label: t('tasks', 'done'), value: stats?.tasks.done || 0, colorClass: 'text-green-600 dark:text-green-400' },
+                  { label: t('tasks', 'overdueTasks'), value: stats?.tasks.overdue || 0, colorClass: 'text-red-600 dark:text-red-400' },
+                ]}
+              />
             )}
-          />
-          <RecentList
-            title={t('dashboard', 'myTasks')}
-            viewAllHref="/tasks"
-            viewAllLabel={t('dashboard', 'viewAll')}
-            items={recentTasks}
-            emptyState={{ icon: FiCheckSquare, message: t('dashboard', 'noTasks') }}
-            renderItem={(task) => (
-              <Link href="/tasks" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-blue-100 dark:bg-blue-900/50'}`}>
-                    <FiCheckSquare className={task.status === 'Done' ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'} size={18} />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white line-clamp-1">{task.title}</p>
-                    <span className="text-xs text-gray-500 dark:text-slate-400">{task.project?.name || t('dashboard', 'noProject')}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(task.priority)}`}>{t('tasks', `priority${task.priority}`)}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(task.status)}`}>
-                    {task.status === 'TODO' ? t('tasks', 'todo') : task.status === 'InProgress' ? t('tasks', 'inProgress') : t('tasks', task.status.toLowerCase())}
-                  </span>
-                </div>
-              </Link>
+            {can('projects') && (
+              <ProgressCircle
+                label={t('dashboard', 'projectProgress')}
+                subtitle={t('dashboard', 'projectsDistribution')}
+                percentage={projectCompletionRate}
+                gradientId="gradient2"
+                colors={{ start: '#6366f1', end: '#8b5cf6' }}
+                icon={<FiPieChart className="text-blue-600 dark:text-blue-400" size={20} />}
+                stats={[
+                  { label: t('projects', 'statusActive'), value: stats?.projects.active || 0 },
+                  { label: t('projects', 'statusCompleted'), value: stats?.projects.completed || 0 },
+                  { label: t('projects', 'statusOnHold'), value: stats?.projects.onHold || 0 },
+                ]}
+              />
             )}
-          />
-        </div>
+          </div>
+        )}
 
-        <QuickActions
-          title={t('dashboard', 'quickActions')}
-          actions={[
-            { href: '/projects', label: t('dashboard', 'newProject'), icon: FiPlus, colorClass: 'bg-blue-500', bgColorClass: 'bg-gradient-to-br from-blue-50 to-indigo-50', hoverBgClass: 'hover:from-blue-100 hover:to-indigo-100', darkBgClass: 'dark:from-blue-900/30 dark:to-indigo-900/30', darkHoverBgClass: 'dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50' },
-            { href: '/tasks', label: t('dashboard', 'newTask'), icon: FiCheckSquare, colorClass: 'bg-green-500', bgColorClass: 'bg-gradient-to-br from-green-50 to-emerald-50', hoverBgClass: 'hover:from-green-100 hover:to-emerald-100', darkBgClass: 'dark:from-green-900/30 dark:to-emerald-900/30', darkHoverBgClass: 'dark:hover:from-green-900/50 dark:hover:to-emerald-900/50' },
-            { href: '/members', label: t('nav', 'members'), icon: FiUsers, colorClass: 'bg-purple-500', bgColorClass: 'bg-gradient-to-br from-purple-50 to-violet-50', hoverBgClass: 'hover:from-purple-100 hover:to-violet-100', darkBgClass: 'dark:from-purple-900/30 dark:to-violet-900/30', darkHoverBgClass: 'dark:hover:from-purple-900/50 dark:hover:to-violet-900/50' },
-            { href: '/events', label: t('nav', 'events'), icon: FiCalendar, colorClass: 'bg-pink-500', bgColorClass: 'bg-gradient-to-br from-pink-50 to-rose-50', hoverBgClass: 'hover:from-pink-100 hover:to-rose-100', darkBgClass: 'dark:from-pink-900/30 dark:to-rose-900/30', darkHoverBgClass: 'dark:hover:from-pink-900/50 dark:hover:to-rose-900/50' },
-            { href: '/finance', label: t('nav', 'finance'), icon: FiDollarSign, colorClass: 'bg-orange-500', bgColorClass: 'bg-gradient-to-br from-orange-50 to-amber-50', hoverBgClass: 'hover:from-orange-100 hover:to-amber-100', darkBgClass: 'dark:from-orange-900/30 dark:to-amber-900/30', darkHoverBgClass: 'dark:hover:from-orange-900/50 dark:hover:to-amber-900/50' },
-            { href: '/sponsors', label: t('nav', 'sponsors'), icon: FiAward, colorClass: 'bg-cyan-500', bgColorClass: 'bg-gradient-to-br from-cyan-50 to-sky-50', hoverBgClass: 'hover:from-cyan-100 hover:to-sky-100', darkBgClass: 'dark:from-cyan-900/30 dark:to-sky-900/30', darkHoverBgClass: 'dark:hover:from-cyan-900/50 dark:hover:to-sky-900/50' },
-          ]}
-        />
+        {/* Recent lists — only if user has access */}
+        {(can('projects') || can('tasks')) && (
+          <div className={`grid grid-cols-1 ${can('projects') && can('tasks') ? 'lg:grid-cols-2' : ''} gap-6`}>
+            {can('projects') && (
+              <RecentList
+                title={t('dashboard', 'recentProjects')}
+                viewAllHref="/projects"
+                viewAllLabel={t('dashboard', 'viewAll')}
+                items={recentProjects}
+                emptyState={{ icon: FiFolder, message: t('dashboard', 'noProjects') }}
+                renderItem={(project) => (
+                  <Link href="/projects" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+                        <FiFolder className="text-white" size={18} />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{project.name}</p>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(project.status)}`}>{project.status}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="w-24 h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: `${project.progress}%` }} />
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-slate-400">{project.progress}%</span>
+                    </div>
+                  </Link>
+                )}
+              />
+            )}
+            {can('tasks') && (
+              <RecentList
+                title={t('dashboard', 'myTasks')}
+                viewAllHref="/tasks"
+                viewAllLabel={t('dashboard', 'viewAll')}
+                items={recentTasks}
+                emptyState={{ icon: FiCheckSquare, message: t('dashboard', 'noTasks') }}
+                renderItem={(task) => (
+                  <Link href="/tasks" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-blue-100 dark:bg-blue-900/50'}`}>
+                        <FiCheckSquare className={task.status === 'Done' ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'} size={18} />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white line-clamp-1">{task.title}</p>
+                        <span className="text-xs text-gray-500 dark:text-slate-400">{task.project?.name || t('dashboard', 'noProject')}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(task.priority)}`}>{t('tasks', `priority${task.priority}`)}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(task.status)}`}>
+                        {task.status === 'TODO' ? t('tasks', 'todo') : task.status === 'InProgress' ? t('tasks', 'inProgress') : t('tasks', task.status.toLowerCase())}
+                      </span>
+                    </div>
+                  </Link>
+                )}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Quick actions — filtered by permissions */}
+        {filteredActions.length > 0 && (
+          <QuickActions
+            title={t('dashboard', 'quickActions')}
+            actions={filteredActions}
+          />
+        )}
       </div>
     </div>
   )
