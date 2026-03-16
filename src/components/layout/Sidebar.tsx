@@ -25,7 +25,7 @@ import {
   FiSun,
   FiBell,
 } from 'react-icons/fi'
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 const menuItems = [
   { key: 'dashboard', href: '/', icon: FiHome, module: null },
@@ -52,8 +52,56 @@ export function Sidebar() {
   const { theme, toggleTheme } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
   const [showLangMenu, setShowLangMenu] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const prevCountRef = useRef(0)
 
   const isAdmin = profile?.role === 'Admin' || profile?.role === 'President' || profile?.role === 'CEO'
+
+  const playNotificationSound = useCallback(() => {
+    try {
+      const ctx = new AudioContext()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.setValueAtTime(880, ctx.currentTime)
+      osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1)
+      gain.gain.setValueAtTime(0.3, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.3)
+    } catch {}
+  }, [])
+
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/notifications?unreadOnly=true&limit=1')
+      const data = await res.json()
+      if (data.success) {
+        const newCount = data.unreadCount || 0
+        // Play sound if count increased
+        if (newCount > prevCountRef.current && prevCountRef.current >= 0) {
+          playNotificationSound()
+        }
+        prevCountRef.current = newCount
+        setUnreadCount(newCount)
+      }
+    } catch {}
+  }, [playNotificationSound])
+
+  useEffect(() => {
+    if (!profile) return
+    fetchUnreadCount()
+    const interval = setInterval(fetchUnreadCount, 30000)
+    return () => clearInterval(interval)
+  }, [profile, fetchUnreadCount])
+
+  // Reset badge on visiting notifications page
+  useEffect(() => {
+    if (pathname === '/notifications') {
+      prevCountRef.current = unreadCount
+    }
+  }, [pathname, unreadCount])
 
   return (
     <>
@@ -106,21 +154,34 @@ export function Sidebar() {
               return (profile?.permissions || []).includes(item.module)
             }).map((item) => {
               const isActive = pathname === item.href
+              const isNotification = item.key === 'notifications'
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all
+                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all relative
                     ${isActive
                       ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-medium'
                       : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
                     }
                   `}
                 >
-                  <item.icon size={20} />
+                  <div className="relative">
+                    <item.icon size={20} />
+                    {isNotification && unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full leading-none">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </div>
                   <span>{t('nav', item.key)}</span>
+                  {isNotification && unreadCount > 0 && (
+                    <span className="ml-auto bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 text-xs font-medium px-2 py-0.5 rounded-full">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Link>
               )
             })}
