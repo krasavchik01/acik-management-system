@@ -10,6 +10,7 @@ import {
   FiMoreVertical, FiEdit2, FiTrash2, FiCheckCircle, FiClock,
   FiAlertCircle, FiList, FiGrid, FiChevronDown
 } from 'react-icons/fi'
+import UserPicker from './UserPicker'
 
 interface Project {
   id: string
@@ -20,9 +21,12 @@ interface User {
   id: string
   name: string
   avatar?: string
+  role?: string
+  department?: string
   activeTasks?: number
   activeProjects?: number
   location?: string
+  attendanceStatus?: string
 }
 
 interface TaskStage {
@@ -929,21 +933,14 @@ export default function TasksPage() {
                     <FiUser className="inline mr-2 text-indigo-500" size={14} />
                     {t('tasks', 'assignedTo')}
                   </label>
-                  <select
+                  <UserPicker
+                    users={users}
                     value={formData.assignedToId}
-                    onChange={(e) => setFormData({ ...formData, assignedToId: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
-                  >
-                    <option value="">{t('tasks', 'unassigned')}</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.name} 
-                        {user.activeTasks !== undefined ? 
-                          ` (${user.activeTasks} ${t('tasks', 'activeTasks')}, ${user.activeProjects} ${t('tasks', 'activeProjects')}, ${t('tasks', 'atLocation')} ${user.location === 'Office' ? (language === 'ru' ? 'офисе' : 'Office') : (language === 'ru' ? 'удалёнке' : 'Remote')})` 
-                          : ''}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(id) => setFormData({ ...formData, assignedToId: id })}
+                    placeholder={t('tasks', 'unassigned')}
+                    language={language}
+                    showWorkload
+                  />
                 </div>
 
                 <div>
@@ -951,16 +948,14 @@ export default function TasksPage() {
                     <FiCheckCircle className="inline mr-2 text-blue-500" size={14} />
                     {t('tasks', 'reviewer')}
                   </label>
-                  <select
+                  <UserPicker
+                    users={users}
                     value={formData.reviewerId}
-                    onChange={(e) => setFormData({ ...formData, reviewerId: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
-                  >
-                    <option value="">{t('tasks', 'noReviewer')}</option>
-                    {users.map(user => (
-                      <option key={user.id} value={user.id}>{user.name}</option>
-                    ))}
-                  </select>
+                    onChange={(id) => setFormData({ ...formData, reviewerId: id })}
+                    placeholder={t('tasks', 'noReviewer')}
+                    language={language}
+                    showWorkload={false}
+                  />
                 </div>
               </div>
 
