@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header'
 import { FiDollarSign, FiMail, FiPhone, FiGlobe, FiEdit2, FiTrash2, FiX, FiStar } from 'react-icons/fi'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'react-toastify'
+import { useLanguage } from '@/lib/i18n'
 
 interface Sponsor {
   id: string
@@ -26,6 +27,7 @@ interface Sponsor {
 
 export default function SponsorsPage() {
   const { profile } = useAuth()
+  const { t, language } = useLanguage()
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -84,7 +86,7 @@ export default function SponsorsPage() {
 
       const data = await res.json()
       if (data.success) {
-        toast.success(editingSponsor ? 'Sponsor updated!' : 'Sponsor created!')
+        toast.success(editingSponsor ? t('sponsors', 'sponsorUpdated') : t('sponsors', 'sponsorCreated'))
         setShowModal(false)
         resetForm()
         fetchSponsors()
@@ -92,23 +94,23 @@ export default function SponsorsPage() {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error('Failed to save sponsor')
+      toast.error(t('sponsors', 'failedToSave'))
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this sponsor?')) return
+    if (!confirm(t('sponsors', 'deleteConfirm'))) return
     try {
       const res = await fetch(`/api/sponsors/${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
-        toast.success('Sponsor deleted!')
+        toast.success(t('sponsors', 'sponsorDeleted'))
         fetchSponsors()
       } else {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error('Failed to delete sponsor')
+      toast.error(t('sponsors', 'failedToDelete'))
     }
   }
 
@@ -169,10 +171,10 @@ export default function SponsorsPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
-        title="Sponsors"
-        subtitle="Manage organization sponsors"
+        title={t('sponsors', 'title')}
+        subtitle={t('sponsors', 'subtitle')}
         action={canManage ? {
-          label: 'New Sponsor',
+          label: t('sponsors', 'newSponsor'),
           onClick: () => { resetForm(); setShowModal(true) }
         } : undefined}
       />
@@ -186,7 +188,7 @@ export default function SponsorsPage() {
                 <FiStar className="text-purple-600 dark:text-purple-400" size={24} />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Sponsors</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('sponsors', 'totalSponsors')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{sponsors.length}</p>
               </div>
             </div>
@@ -197,7 +199,7 @@ export default function SponsorsPage() {
                 <FiDollarSign className="text-blue-600 dark:text-blue-400" size={24} />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Committed</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('sponsors', 'totalCommitted')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">${totalCommitted.toLocaleString()}</p>
               </div>
             </div>
@@ -208,7 +210,7 @@ export default function SponsorsPage() {
                 <FiDollarSign className="text-green-600 dark:text-green-400" size={24} />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Received</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('sponsors', 'totalReceived')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">${totalReceived.toLocaleString()}</p>
               </div>
             </div>
@@ -219,15 +221,15 @@ export default function SponsorsPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-12 h-12 border-4 border-indigo-200 dark:border-indigo-900 border-t-indigo-600 dark:border-t-indigo-500 rounded-full animate-spin"></div>
-            <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium">Loading sponsors...</p>
+            <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium">{t('sponsors', 'loadingSponsors')}</p>
           </div>
         ) : sponsors.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50 shadow-sm">
             <div className="w-20 h-20 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiStar className="text-gray-400 dark:text-slate-500" size={32} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Sponsors Found</h3>
-            <p className="text-gray-500 dark:text-slate-400">There are no sponsors recorded yet.</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('sponsors', 'noSponsorsFound')}</h3>
+            <p className="text-gray-500 dark:text-slate-400">{t('sponsors', 'noSponsors')}</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -287,11 +289,11 @@ export default function SponsorsPage() {
 
                 <div className="mt-6 pt-5 border-t border-gray-100 dark:border-slate-700/50">
                   <div className="flex justify-between items-center text-sm mb-2">
-                    <span className="text-gray-500 dark:text-slate-400 font-medium">Committed</span>
+                    <span className="text-gray-500 dark:text-slate-400 font-medium">{t('sponsors', 'committed')}</span>
                     <span className="font-bold text-gray-900 dark:text-white">${sponsor.totalCommitted?.toLocaleString() || 0}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500 dark:text-slate-400 font-medium">Received</span>
+                    <span className="text-gray-500 dark:text-slate-400 font-medium">{t('sponsors', 'received')}</span>
                     <span className="font-bold text-green-600 dark:text-green-400">${sponsor.totalReceived?.toLocaleString() || 0}</span>
                   </div>
                   {sponsor.totalCommitted > 0 && (
@@ -314,7 +316,7 @@ export default function SponsorsPage() {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700/50">
             <div className="p-6 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{editingSponsor ? 'Edit Sponsor' : 'New Sponsor'}</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{editingSponsor ? t('sponsors', 'editSponsor') : t('sponsors', 'newSponsor')}</h2>
               <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 rounded-xl transition-all">
                 <FiX size={20} />
               </button>
@@ -432,13 +434,13 @@ export default function SponsorsPage() {
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
                 >
-                  Cancel
+                  {t('common', 'cancel')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-95"
                 >
-                  {editingSponsor ? 'Update Sponsor' : 'Create Sponsor'}
+                  {editingSponsor ? t('sponsors', 'updateSponsor') : t('sponsors', 'createSponsor')}
                 </button>
               </div>
             </form>

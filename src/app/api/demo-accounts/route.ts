@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/demo-accounts - получение демо аккаунтов для страницы входа
 export async function GET() {
   try {

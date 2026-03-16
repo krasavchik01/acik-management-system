@@ -12,6 +12,10 @@ import {
   FiCalendar, FiClock, FiActivity, FiPieChart, FiBarChart2,
   FiArrowRight, FiPlus, FiStar, FiAward, FiTarget, FiZap
 } from 'react-icons/fi'
+import { StatsCard } from './components/StatsCard'
+import { ProgressCircle } from './components/ProgressCircle'
+import { RecentList } from './components/RecentList'
+import { QuickActions } from './components/QuickActions'
 
 interface Stats {
   projects: {
@@ -86,7 +90,6 @@ export default function DashboardPage() {
       const members = membersData.data || []
       const tasks = tasksData.data || []
 
-      // Calculate stats
       setStats({
         projects: {
           total: projects.length,
@@ -117,8 +120,7 @@ export default function DashboardPage() {
         },
       })
 
-      // Get recent items
-      setRecentProjects(projects.slice(0, 5).map((p: { id: string; name: string; status: string }) => ({
+      setRecentProjects(projects.slice(0, 5).map((p: any) => ({
         ...p,
         progress: Math.floor(Math.random() * 100),
       })))
@@ -170,15 +172,8 @@ export default function DashboardPage() {
     }
   }
 
-  // Calculate task completion percentage
-  const taskCompletionRate = stats?.tasks.total
-    ? Math.round((stats.tasks.done / stats.tasks.total) * 100)
-    : 0
-
-  // Calculate project progress
-  const projectCompletionRate = stats?.projects.total
-    ? Math.round((stats.projects.completed / stats.projects.total) * 100)
-    : 0
+  const taskCompletionRate = stats?.tasks.total ? Math.round((stats.tasks.done / stats.tasks.total) * 100) : 0
+  const projectCompletionRate = stats?.projects.total ? Math.round((stats.projects.completed / stats.projects.total) * 100) : 0
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
@@ -197,424 +192,165 @@ export default function DashboardPage() {
       />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
-        {/* Main Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Projects Card */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg transition-all group">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-200 dark:shadow-blue-900/30">
-                <FiFolder className="text-white" size={24} />
-              </div>
-              <div className="flex items-center gap-1 text-green-600 dark:text-green-400 text-sm font-medium">
-                <FiTrendingUp size={16} />
-                <span>{stats?.projects.active || 0} {language === 'ru' ? 'активных' : 'active'}</span>
-              </div>
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {loading ? '...' : stats?.projects.total || 0}
-            </h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('dashboard', 'activeProjects')}</p>
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+          <StatsCard
+            icon={FiFolder}
+            value={loading ? '...' : (stats?.projects.total || 0).toString()}
+            subtitle={t('dashboard', 'activeProjects')}
+            trend={{ value: `${stats?.projects.active || 0} ${language === 'ru' ? 'активных' : 'active'}`, icon: FiTrendingUp, colorClass: 'text-green-600 dark:text-green-400' }}
+            gradientClass="from-blue-500 to-blue-600"
+            shadowClass="shadow-blue-200 dark:shadow-blue-900/30"
+            footer={
               <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
                 <span>{stats?.projects.completed || 0} {language === 'ru' ? 'завершено' : 'completed'}</span>
                 <span>{stats?.projects.onHold || 0} {language === 'ru' ? 'на паузе' : 'on hold'}</span>
               </div>
-            </div>
-          </div>
-
-          {/* Tasks Card */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg transition-all group">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg shadow-green-200 dark:shadow-green-900/30">
-                <FiCheckSquare className="text-white" size={24} />
-              </div>
-              <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium">
-                <FiActivity size={16} />
-                <span>{stats?.tasks.inProgress || 0} {language === 'ru' ? 'в работе' : 'in progress'}</span>
-              </div>
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {loading ? '...' : stats?.tasks.total || 0}
-            </h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('dashboard', 'totalTasks')}</p>
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+            }
+          />
+          <StatsCard
+            icon={FiCheckSquare}
+            value={loading ? '...' : (stats?.tasks.total || 0).toString()}
+            subtitle={t('dashboard', 'totalTasks')}
+            trend={{ value: `${stats?.tasks.inProgress || 0} ${language === 'ru' ? 'в работе' : 'in progress'}`, icon: FiActivity, colorClass: 'text-blue-600 dark:text-blue-400' }}
+            gradientClass="from-green-500 to-emerald-600"
+            shadowClass="shadow-green-200 dark:shadow-green-900/30"
+            footer={
               <div className="flex justify-between text-xs">
                 <span className="text-green-600 dark:text-green-400">{stats?.tasks.done || 0} {language === 'ru' ? 'готово' : 'done'}</span>
                 <span className="text-red-600 dark:text-red-400">{stats?.tasks.overdue || 0} {language === 'ru' ? 'просрочено' : 'overdue'}</span>
               </div>
-            </div>
-          </div>
-
-          {/* Members Card */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg transition-all group">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg shadow-purple-200 dark:shadow-purple-900/30">
-                <FiUsers className="text-white" size={24} />
-              </div>
-              <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400 text-sm font-medium">
-                <FiStar size={16} />
-                <span>{stats?.members.diamond || 0} diamond</span>
-              </div>
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {loading ? '...' : stats?.members.total || 0}
-            </h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('dashboard', 'teamMembers')}</p>
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+            }
+          />
+          <StatsCard
+            icon={FiUsers}
+            value={loading ? '...' : (stats?.members.total || 0).toString()}
+            subtitle={t('dashboard', 'teamMembers')}
+            trend={{ value: `${stats?.members.diamond || 0} diamond`, icon: FiStar, colorClass: 'text-purple-600 dark:text-purple-400' }}
+            gradientClass="from-purple-500 to-violet-600"
+            shadowClass="shadow-purple-200 dark:shadow-purple-900/30"
+            footer={
               <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
                 <span>{stats?.members.active || 0} active</span>
                 <span>{stats?.members.platinum || 0} platinum</span>
               </div>
-            </div>
-          </div>
-
-          {/* Finance Card */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg transition-all group">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-              <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl shadow-lg shadow-orange-200 dark:shadow-orange-900/30 w-12 h-12 flex items-center justify-center shrink-0">
-                <FiDollarSign className="text-white" size={24} />
-              </div>
-              <CurrencySwitcher />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {loading ? '...' : formatCurrency(stats?.finance.balance || 0)}
-            </h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('dashboard', 'monthlyBudget')}</p>
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+            }
+          />
+          <StatsCard
+            icon={FiDollarSign}
+            value={loading ? '...' : formatCurrency(stats?.finance.balance || 0)}
+            subtitle={t('dashboard', 'monthlyBudget')}
+            gradientClass="from-orange-500 to-amber-600"
+            shadowClass="shadow-orange-200 dark:shadow-orange-900/30"
+            trend={undefined}
+            footer={
               <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
                 <span>Total: {formatCurrency(stats?.finance.totalBudget || 0)}</span>
                 <span>Spent: {formatCurrency(stats?.finance.totalSpent || 0)}</span>
               </div>
+            }
+          >
+            <div className="absolute top-6 right-6">
+              <CurrencySwitcher />
             </div>
-          </div>
+          </StatsCard>
         </div>
 
-        {/* Progress Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Task Completion */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">{language === 'ru' ? 'Выполнение задач' : 'Task Completion'}</h2>
-                <p className="text-sm text-gray-500 dark:text-slate-400">{language === 'ru' ? 'Общий прогресс' : 'Overall progress this period'}</p>
-              </div>
-              <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-xl">
-                <FiTarget className="text-green-600 dark:text-green-400" size={20} />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <div className="relative w-32 h-32">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="currentColor"
-                    className="text-gray-200 dark:text-slate-700"
-                    strokeWidth="12"
-                    fill="none"
-                  />
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="url(#gradient1)"
-                    strokeWidth="12"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeDasharray={`${taskCompletionRate * 3.51} 351`}
-                  />
-                  <defs>
-                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#10b981" />
-                      <stop offset="100%" stopColor="#34d399" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">{taskCompletionRate}%</span>
-                </div>
-              </div>
-
-              <div className="flex-1 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-slate-400">To Do</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{stats?.tasks.todo || 0}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-slate-400">In Progress</span>
-                  <span className="font-medium text-blue-600 dark:text-blue-400">{stats?.tasks.inProgress || 0}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-slate-400">Done</span>
-                  <span className="font-medium text-green-600 dark:text-green-400">{stats?.tasks.done || 0}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-slate-400">Overdue</span>
-                  <span className="font-medium text-red-600 dark:text-red-400">{stats?.tasks.overdue || 0}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Project Progress */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('dashboard', 'projectProgress')}</h2>
-                <p className="text-sm text-gray-500 dark:text-slate-400">{language === 'ru' ? 'Распределение по статусу' : 'Project status distribution'}</p>
-              </div>
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
-                <FiPieChart className="text-blue-600 dark:text-blue-400" size={20} />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <div className="relative w-32 h-32">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="currentColor"
-                    className="text-gray-200 dark:text-slate-700"
-                    strokeWidth="12"
-                    fill="none"
-                  />
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="url(#gradient2)"
-                    strokeWidth="12"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeDasharray={`${projectCompletionRate * 3.51} 351`}
-                  />
-                  <defs>
-                    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#6366f1" />
-                      <stop offset="100%" stopColor="#8b5cf6" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">{projectCompletionRate}%</span>
-                </div>
-              </div>
-
-              <div className="flex-1 space-y-3">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-gray-600 dark:text-slate-400">Active</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{stats?.projects.active || 0}</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-green-500 rounded-full"
-                      style={{ width: `${stats?.projects.total ? (stats.projects.active / stats.projects.total) * 100 : 0}%` }}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-gray-600 dark:text-slate-400">Completed</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{stats?.projects.completed || 0}</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 rounded-full"
-                      style={{ width: `${stats?.projects.total ? (stats.projects.completed / stats.projects.total) * 100 : 0}%` }}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-gray-600 dark:text-slate-400">On Hold</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{stats?.projects.onHold || 0}</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-yellow-500 rounded-full"
-                      style={{ width: `${stats?.projects.total ? (stats.projects.onHold / stats.projects.total) * 100 : 0}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ProgressCircle
+            label={language === 'ru' ? 'Выполнение задач' : 'Task Completion'}
+            subtitle={language === 'ru' ? 'Общий прогресс' : 'Overall progress this period'}
+            percentage={taskCompletionRate}
+            gradientId="gradient1"
+            colors={{ start: '#10b981', end: '#34d399' }}
+            icon={<FiTarget className="text-green-600 dark:text-green-400" size={20} />}
+            stats={[
+              { label: t('tasks', 'todo'), value: stats?.tasks.todo || 0 },
+              { label: t('tasks', 'inProgress'), value: stats?.tasks.inProgress || 0, colorClass: 'text-blue-600 dark:text-blue-400' },
+              { label: t('tasks', 'done'), value: stats?.tasks.done || 0, colorClass: 'text-green-600 dark:text-green-400' },
+              { label: t('tasks', 'overdueTasks'), value: stats?.tasks.overdue || 0, colorClass: 'text-red-600 dark:text-red-400' },
+            ]}
+          />
+          <ProgressCircle
+            label={t('dashboard', 'projectProgress')}
+            subtitle={t('dashboard', 'projectsDistribution')}
+            percentage={projectCompletionRate}
+            gradientId="gradient2"
+            colors={{ start: '#6366f1', end: '#8b5cf6' }}
+            icon={<FiPieChart className="text-blue-600 dark:text-blue-400" size={20} />}
+            stats={[
+              { label: t('projects', 'statusActive'), value: stats?.projects.active || 0 },
+              { label: t('projects', 'statusCompleted'), value: stats?.projects.completed || 0 },
+              { label: t('projects', 'statusOnHold'), value: stats?.projects.onHold || 0 },
+            ]}
+          />
         </div>
 
-        {/* Recent Activity Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Projects */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('dashboard', 'recentProjects')}</h2>
-              <Link
-                href="/projects"
-                className="flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
-              >
-                {t('dashboard', 'viewAll')}
-                <FiArrowRight size={16} />
-              </Link>
-            </div>
-            <div className="divide-y divide-gray-50 dark:divide-slate-700">
-              {recentProjects.length === 0 ? (
-                <div className="p-6 text-center text-gray-500 dark:text-slate-400">
-                  <FiFolder size={32} className="mx-auto mb-2 text-gray-300 dark:text-slate-600" />
-                  <p>{language === 'ru' ? 'Проектов пока нет' : 'No projects yet'}</p>
+          <RecentList
+            title={t('dashboard', 'recentProjects')}
+            viewAllHref="/projects"
+            viewAllLabel={t('dashboard', 'viewAll')}
+            items={recentProjects}
+            emptyState={{ icon: FiFolder, message: t('dashboard', 'noProjects') }}
+            renderItem={(project) => (
+              <Link href="/projects" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+                    <FiFolder className="text-white" size={18} />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">{project.name}</p>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(project.status)}`}>{project.status}</span>
+                  </div>
                 </div>
-              ) : (
-                recentProjects.map((project) => (
-                  <Link
-                    key={project.id}
-                    href={`/projects`}
-                    className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
-                        <FiFolder className="text-white" size={18} />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{project.name}</p>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(project.status)}`}>
-                          {project.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="w-24 h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
-                          style={{ width: `${project.progress}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-500 dark:text-slate-400">{project.progress}%</span>
-                    </div>
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Recent Tasks */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('dashboard', 'myTasks')}</h2>
-              <Link
-                href="/tasks"
-                className="flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
-              >
-                {t('dashboard', 'viewAll')}
-                <FiArrowRight size={16} />
-              </Link>
-            </div>
-            <div className="divide-y divide-gray-50 dark:divide-slate-700">
-              {recentTasks.length === 0 ? (
-                <div className="p-6 text-center text-gray-500 dark:text-slate-400">
-                  <FiCheckSquare size={32} className="mx-auto mb-2 text-gray-300 dark:text-slate-600" />
-                  <p>{language === 'ru' ? 'Задач пока нет' : 'No tasks yet'}</p>
+                <div className="text-right">
+                  <div className="w-24 h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: `${project.progress}%` }} />
+                  </div>
+                  <span className="text-xs text-gray-500 dark:text-slate-400">{project.progress}%</span>
                 </div>
-              ) : (
-                recentTasks.map((task) => (
-                  <Link
-                    key={task.id}
-                    href={`/tasks`}
-                    className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-blue-100 dark:bg-blue-900/50'
-                        }`}>
-                        <FiCheckSquare className={task.status === 'Done' ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'} size={18} />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white line-clamp-1">{task.title}</p>
-                        <span className="text-xs text-gray-500 dark:text-slate-400">{task.project?.name || 'No project'}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(task.priority)}`}>
-                        {task.priority}
-                      </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(task.status)}`}>
-                        {task.status === 'TODO' ? 'To Do' : task.status === 'InProgress' ? 'In Progress' : task.status}
-                      </span>
-                    </div>
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
+              </Link>
+            )}
+          />
+          <RecentList
+            title={t('dashboard', 'myTasks')}
+            viewAllHref="/tasks"
+            viewAllLabel={t('dashboard', 'viewAll')}
+            items={recentTasks}
+            emptyState={{ icon: FiCheckSquare, message: t('dashboard', 'noTasks') }}
+            renderItem={(task) => (
+              <Link href="/tasks" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-blue-100 dark:bg-blue-900/50'}`}>
+                    <FiCheckSquare className={task.status === 'Done' ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'} size={18} />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white line-clamp-1">{task.title}</p>
+                    <span className="text-xs text-gray-500 dark:text-slate-400">{task.project?.name || t('dashboard', 'noProject')}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(task.priority)}`}>{t('tasks', `priority${task.priority}`)}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(task.status)}`}>
+                    {task.status === 'TODO' ? t('tasks', 'todo') : task.status === 'InProgress' ? t('tasks', 'inProgress') : t('tasks', task.status.toLowerCase())}
+                  </span>
+                </div>
+              </Link>
+            )}
+          />
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl text-indigo-600 dark:text-indigo-400">
-              <FiZap size={20} />
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('dashboard', 'quickActions')}</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
-            <Link
-              href="/projects"
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50 transition-all group"
-            >
-              <div className="p-3 bg-blue-500 rounded-xl mb-2 group-hover:scale-110 transition-transform">
-                <FiPlus className="text-white" size={20} />
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('dashboard', 'newProject')}</span>
-            </Link>
-            <Link
-              href="/tasks"
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 transition-all group"
-            >
-              <div className="p-3 bg-green-500 rounded-xl mb-2 group-hover:scale-110 transition-transform">
-                <FiCheckSquare className="text-white" size={20} />
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('dashboard', 'newTask')}</span>
-            </Link>
-            <Link
-              href="/members"
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/30 dark:to-violet-900/30 rounded-xl hover:from-purple-100 hover:to-violet-100 dark:hover:from-purple-900/50 dark:hover:to-violet-900/50 transition-all group"
-            >
-              <div className="p-3 bg-purple-500 rounded-xl mb-2 group-hover:scale-110 transition-transform">
-                <FiUsers className="text-white" size={20} />
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('nav', 'members')}</span>
-            </Link>
-            <Link
-              href="/events"
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/30 dark:to-rose-900/30 rounded-xl hover:from-pink-100 hover:to-rose-100 dark:hover:from-pink-900/50 dark:hover:to-rose-900/50 transition-all group"
-            >
-              <div className="p-3 bg-pink-500 rounded-xl mb-2 group-hover:scale-110 transition-transform">
-                <FiCalendar className="text-white" size={20} />
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('nav', 'events')}</span>
-            </Link>
-            <Link
-              href="/finance"
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 rounded-xl hover:from-orange-100 hover:to-amber-100 dark:hover:from-orange-900/50 dark:hover:to-amber-900/50 transition-all group"
-            >
-              <div className="p-3 bg-orange-500 rounded-xl mb-2 group-hover:scale-110 transition-transform">
-                <FiDollarSign className="text-white" size={20} />
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('nav', 'finance')}</span>
-            </Link>
-            <Link
-              href="/sponsors"
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-900/30 dark:to-sky-900/30 rounded-xl hover:from-cyan-100 hover:to-sky-100 dark:hover:from-cyan-900/50 dark:hover:to-sky-900/50 transition-all group"
-            >
-              <div className="p-3 bg-cyan-500 rounded-xl mb-2 group-hover:scale-110 transition-transform">
-                <FiAward className="text-white" size={20} />
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-cyan-700 dark:group-hover:text-cyan-300 transition-colors">{t('nav', 'sponsors')}</span>
-            </Link>
-          </div>
-        </div>
-
+        <QuickActions
+          title={t('dashboard', 'quickActions')}
+          actions={[
+            { href: '/projects', label: t('dashboard', 'newProject'), icon: FiPlus, colorClass: 'bg-blue-500', bgColorClass: 'bg-gradient-to-br from-blue-50 to-indigo-50', hoverBgClass: 'hover:from-blue-100 hover:to-indigo-100', darkBgClass: 'dark:from-blue-900/30 dark:to-indigo-900/30', darkHoverBgClass: 'dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50' },
+            { href: '/tasks', label: t('dashboard', 'newTask'), icon: FiCheckSquare, colorClass: 'bg-green-500', bgColorClass: 'bg-gradient-to-br from-green-50 to-emerald-50', hoverBgClass: 'hover:from-green-100 hover:to-emerald-100', darkBgClass: 'dark:from-green-900/30 dark:to-emerald-900/30', darkHoverBgClass: 'dark:hover:from-green-900/50 dark:hover:to-emerald-900/50' },
+            { href: '/members', label: t('nav', 'members'), icon: FiUsers, colorClass: 'bg-purple-500', bgColorClass: 'bg-gradient-to-br from-purple-50 to-violet-50', hoverBgClass: 'hover:from-purple-100 hover:to-violet-100', darkBgClass: 'dark:from-purple-900/30 dark:to-violet-900/30', darkHoverBgClass: 'dark:hover:from-purple-900/50 dark:hover:to-violet-900/50' },
+            { href: '/events', label: t('nav', 'events'), icon: FiCalendar, colorClass: 'bg-pink-500', bgColorClass: 'bg-gradient-to-br from-pink-50 to-rose-50', hoverBgClass: 'hover:from-pink-100 hover:to-rose-100', darkBgClass: 'dark:from-pink-900/30 dark:to-rose-900/30', darkHoverBgClass: 'dark:hover:from-pink-900/50 dark:hover:to-rose-900/50' },
+            { href: '/finance', label: t('nav', 'finance'), icon: FiDollarSign, colorClass: 'bg-orange-500', bgColorClass: 'bg-gradient-to-br from-orange-50 to-amber-50', hoverBgClass: 'hover:from-orange-100 hover:to-amber-100', darkBgClass: 'dark:from-orange-900/30 dark:to-amber-900/30', darkHoverBgClass: 'dark:hover:from-orange-900/50 dark:hover:to-amber-900/50' },
+            { href: '/sponsors', label: t('nav', 'sponsors'), icon: FiAward, colorClass: 'bg-cyan-500', bgColorClass: 'bg-gradient-to-br from-cyan-50 to-sky-50', hoverBgClass: 'hover:from-cyan-100 hover:to-sky-100', darkBgClass: 'dark:from-cyan-900/30 dark:to-sky-900/30', darkHoverBgClass: 'dark:hover:from-cyan-900/50 dark:hover:to-sky-900/50' },
+          ]}
+        />
       </div>
     </div>
   )

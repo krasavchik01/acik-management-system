@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/lib/i18n'
 import { toast } from 'react-toastify'
 import {
   FiPlus, FiSearch, FiX, FiMail, FiPhone, FiGrid, FiList,
@@ -43,6 +44,7 @@ const statusOptions = [
 
 export default function MembersPage() {
   const { profile } = useAuth()
+  const { language, t } = useLanguage()
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
   const [view, setView] = useState<'grid' | 'list'>('grid')
@@ -222,7 +224,7 @@ export default function MembersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
-      <Header title="Members" subtitle="Manage organization members" />
+      <Header title={t('members', 'title')} subtitle={t('members', 'subtitle')} />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Stats Cards */}
@@ -234,7 +236,7 @@ export default function MembersPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.total}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Members</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('members', 'totalMembers')}</p>
               </div>
             </div>
           </div>
@@ -245,7 +247,7 @@ export default function MembersPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.active}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Active</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('members', 'statusActive')}</p>
               </div>
             </div>
           </div>
@@ -256,7 +258,7 @@ export default function MembersPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.inactive}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Inactive</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('members', 'statusInactive')}</p>
               </div>
             </div>
           </div>
@@ -267,7 +269,7 @@ export default function MembersPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.diamond}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Diamond</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('members', 'categoryDiamond')}</p>
               </div>
             </div>
           </div>
@@ -278,7 +280,7 @@ export default function MembersPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.platinum}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Platinum</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('members', 'categoryPlatinum')}</p>
               </div>
             </div>
           </div>
@@ -293,7 +295,7 @@ export default function MembersPage() {
                 <FiSearch className="text-gray-400 dark:text-slate-400" size={18} />
                 <input
                   type="text"
-                  placeholder="Search members..."
+                  placeholder={t('members', 'searchPlaceholder')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="bg-transparent border-none outline-none ml-2 w-full text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
@@ -306,9 +308,9 @@ export default function MembersPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all cursor-pointer text-gray-900 dark:text-white"
               >
-                <option value="">All Status</option>
+                <option value="">{t('members', 'allStatus')}</option>
                 {statusOptions.map(s => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
+                  <option key={s.value} value={s.value}>{t('members', `status${s.value}`)}</option>
                 ))}
               </select>
 
@@ -318,9 +320,9 @@ export default function MembersPage() {
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all cursor-pointer text-gray-900 dark:text-white"
               >
-                <option value="">All Categories</option>
+                <option value="">{t('members', 'allCategories')}</option>
                 {categoryOptions.map(c => (
-                  <option key={c.value} value={c.value}>{c.icon} {c.label}</option>
+                  <option key={c.value} value={c.value}>{c.icon} {t('members', `category${c.value}`)}</option>
                 ))}
               </select>
             </div>
@@ -348,7 +350,7 @@ export default function MembersPage() {
                   className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 font-medium"
                 >
                   <FiPlus size={18} />
-                  <span className="hidden sm:inline">Add Member</span>
+                  <span className="hidden sm:inline">{t('members', 'addMember')}</span>
                 </button>
               )}
             </div>
@@ -360,19 +362,19 @@ export default function MembersPage() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto" />
-              <p className="mt-4 text-gray-500">Loading members...</p>
+              <p className="mt-4 text-gray-500">{t('common', 'loading')}</p>
             </div>
           </div>
         ) : members.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-20 text-center">
             <FiUsers size={48} className="mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500 mb-4">No members found</p>
+            <p className="text-gray-500 mb-4">{t('members', 'noMembersFound')}</p>
             {canManage && (
               <button
                 onClick={openCreateModal}
                 className="text-indigo-600 hover:underline"
               >
-                Add your first member
+                {t('members', 'addFirst')}
               </button>
             )}
           </div>
@@ -440,11 +442,11 @@ export default function MembersPage() {
 
                   <div className="flex items-center gap-2 mb-5">
                     <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${categoryStyle.color}`}>
-                      {categoryStyle.icon} {member.category}
+                      {categoryStyle.icon} {t('members', `category${member.category}`)}
                     </span>
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${statusStyle.color}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
-                      {member.status}
+                      {t('members', `status${member.status}`)}
                     </span>
                   </div>
 
@@ -472,7 +474,7 @@ export default function MembersPage() {
                       <div className="p-1.5 bg-gray-50 dark:bg-slate-700/30 rounded-lg">
                         <FiCalendar size={14} />
                       </div>
-                      <span>Joined {new Date(member.joinDate).toLocaleDateString()}</span>
+                      <span>{language === 'ru' ? 'Вступил(а)' : 'Joined'} {new Date(member.joinDate).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
@@ -487,13 +489,13 @@ export default function MembersPage() {
               <table className="w-full">
                 <thead className="bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700/50">
                   <tr>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Member</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Contact</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Company</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Category</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Joined</th>
-                    {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>}
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav', 'members')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'email')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('members', 'company')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('members', 'category')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'status')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('members', 'joinDate')}</th>
+                    {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'actions')}</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
@@ -578,7 +580,7 @@ export default function MembersPage() {
           <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700/50">
             <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700/50">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {editingMember ? 'Edit Member' : 'Add New Member'}
+                {editingMember ? t('members', 'editMember') : t('members', 'addMember')}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
@@ -588,55 +590,54 @@ export default function MembersPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    First Name *
+                    {t('members', 'firstName')} *
                   </label>
                   <input
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                    placeholder="John"
+                    placeholder={language === 'ru' ? 'Иван' : 'John'}
                     required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Last Name *
+                    {t('members', 'lastName')} *
                   </label>
                   <input
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                    placeholder="Doe"
+                    placeholder={language === 'ru' ? 'Иванов' : 'Doe'}
                     required
                   />
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiMail className="inline mr-2" size={14} />
-                    Email *
+                    {t('common', 'email')} *
                   </label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                    placeholder="john@example.com"
+                    placeholder="mail@example.com"
                     required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiPhone className="inline mr-2" size={14} />
-                    Phone
+                    {t('common', 'phone')}
                   </label>
                   <input
                     type="tel"
@@ -647,31 +648,30 @@ export default function MembersPage() {
                   />
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiBriefcase className="inline mr-2" size={14} />
-                    Company Name
+                    {t('members', 'company')}
                   </label>
                   <input
                     type="text"
                     value={formData.companyName}
                     onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                    placeholder="Company Inc."
+                    placeholder={language === 'ru' ? 'Название компании' : 'Company Inc.'}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Position
+                    {t('members', 'position')}
                   </label>
                   <input
                     type="text"
                     value={formData.companyPosition}
                     onChange={(e) => setFormData({ ...formData, companyPosition: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                    placeholder="CEO, Director, etc."
+                    placeholder={language === 'ru' ? 'Директор, Менеджер и т.д.' : 'CEO, Director, etc.'}
                   />
                 </div>
               </div>
@@ -679,7 +679,7 @@ export default function MembersPage() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Category
+                    {t('members', 'category')}
                   </label>
                   <select
                     value={formData.category}
@@ -693,7 +693,7 @@ export default function MembersPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Status
+                    {t('common', 'status')}
                   </label>
                   <select
                     value={formData.status}
@@ -708,7 +708,7 @@ export default function MembersPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiCalendar className="inline mr-2" size={14} />
-                    Join Date
+                    {t('members', 'joinDate')}
                   </label>
                   <input
                     type="date"
@@ -722,27 +722,27 @@ export default function MembersPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   <FiMapPin className="inline mr-2" size={14} />
-                  Address
+                  {t('members', 'address')}
                 </label>
                 <input
                   type="text"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                  placeholder="Full address"
+                  placeholder={t('members', 'fullAddressPlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                  Notes
+                  {t('members', 'notes')}
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                  placeholder="Additional notes about this member..."
+                  placeholder={language === 'ru' ? 'Дополнительные заметки об участнике...' : 'Additional notes about this member...'}
                 />
               </div>
 
@@ -752,14 +752,14 @@ export default function MembersPage() {
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
                 >
-                  Cancel
+                  {t('common', 'cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
                   className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-95"
                 >
-                  {saving ? 'Saving...' : editingMember ? 'Update Member' : 'Add Member'}
+                  {saving ? t('common', 'saving') : editingMember ? t('members', 'updateMember') : t('members', 'addMember')}
                 </button>
               </div>
             </form>
@@ -775,10 +775,10 @@ export default function MembersPage() {
               <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                 <FiTrash2 className="text-red-600 dark:text-red-400" size={28} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Remove Member</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('members', 'removeMember')}</h3>
               <p className="text-gray-500 dark:text-slate-400 mb-8">
-                Are you sure you want to remove <span className="font-semibold text-gray-900 dark:text-white">&quot;{deletingMember?.firstName} {deletingMember?.lastName}&quot;</span>?
-                This action cannot be undone.
+                {t('members', 'removeConfirm')} <span className="font-semibold text-gray-900 dark:text-white">&quot;{deletingMember?.firstName} {deletingMember?.lastName}&quot;</span>?
+                {language === 'ru' ? ' Это действие нельзя отменить.' : ' This action cannot be undone.'}
               </p>
               <div className="flex gap-3">
                 <button
@@ -788,14 +788,14 @@ export default function MembersPage() {
                   }}
                   className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
                 >
-                  Cancel
+                  {t('common', 'cancel')}
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={saving}
                   className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all disabled:opacity-50 active:scale-95"
                 >
-                  {saving ? 'Removing...' : 'Remove'}
+                  {saving ? t('common', 'removing') : t('common', 'remove')}
                 </button>
               </div>
             </div>

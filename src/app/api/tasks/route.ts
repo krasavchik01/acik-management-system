@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthUser } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
   try {
-    const { prisma } = await import('@/lib/prisma')
     await prisma.notification.create({
       data: {
         userId,
@@ -23,9 +24,6 @@ async function createNotification(userId: string, type: string, title: string, m
 // GET /api/tasks
 export async function GET(request: NextRequest) {
   try {
-    const { getAuthUser } = await import('@/lib/auth')
-    const { prisma } = await import('@/lib/prisma')
-
     const { user, error } = await getAuthUser()
     if (error || !user) {
       return NextResponse.json(
@@ -55,14 +53,14 @@ export async function GET(request: NextRequest) {
         { reviewerId: user.id }
       ]
     }
-    
+
     if (status) where.status = status
     if (priority) where.priority = priority
     if (projectId) where.projectId = projectId
     if (assignedToId) where.assignedToId = assignedToId
     if (createdById) where.createdById = createdById
     if (reviewerId) where.reviewerId = reviewerId
-    
+
     if (parentId) {
       where.parentId = parentId
     } else if (!includeSubtasks) {
@@ -107,9 +105,6 @@ export async function GET(request: NextRequest) {
 // POST /api/tasks
 export async function POST(request: NextRequest) {
   try {
-    const { getAuthUser } = await import('@/lib/auth')
-    const { prisma } = await import('@/lib/prisma')
-
     const { user, error } = await getAuthUser()
     if (error || !user) {
       return NextResponse.json(
@@ -194,4 +189,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

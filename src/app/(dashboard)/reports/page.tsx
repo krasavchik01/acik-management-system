@@ -15,7 +15,7 @@ interface Stats {
 
 export default function ReportsPage() {
   const { profile } = useAuth()
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -61,26 +61,26 @@ export default function ReportsPage() {
 
   const reports = [
     {
-      title: 'Projects Overview',
-      description: 'Summary of all projects, their status, and progress',
+      title: t('reports', 'projectsOverview'),
+      description: t('reports', 'projectsDesc'),
       icon: FiBarChart2,
       color: 'bg-blue-500',
     },
     {
-      title: 'Financial Report',
-      description: 'Income, expenses, and budget utilization',
+      title: t('reports', 'financialReport'),
+      description: t('reports', 'financialDesc'),
       icon: FiTrendingUp,
       color: 'bg-green-500',
     },
     {
-      title: 'Member Statistics',
-      description: 'Membership growth and category distribution',
+      title: t('reports', 'memberStats'),
+      description: t('reports', 'memberDesc'),
       icon: FiPieChart,
       color: 'bg-purple-500',
     },
     {
-      title: 'Task Completion',
-      description: 'Task metrics and team productivity',
+      title: t('reports', 'taskCompletion'),
+      description: t('reports', 'taskDesc'),
       icon: FiFileText,
       color: 'bg-orange-500',
     },
@@ -89,8 +89,8 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
-        title={language === 'ru' ? 'Отчеты' : 'Reports'}
-        subtitle={language === 'ru' ? 'Просмотр отчетов и аналитики' : 'View organization reports and analytics'}
+        title={t('reports', 'title')}
+        subtitle={t('reports', 'subtitle')}
       />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
@@ -102,7 +102,7 @@ export default function ReportsPage() {
                 <FiBarChart2 className="text-blue-600 dark:text-blue-400" size={24} />
               </div>
               <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50 px-3 py-1 rounded-full">
-                {language === 'ru' ? 'Проекты' : 'Projects'}
+                {t('projects', 'title')}
               </p>
             </div>
             <div>
@@ -110,7 +110,7 @@ export default function ReportsPage() {
                 {loading ? '...' : stats?.projects.total || 0}
               </p>
               <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                <span className="text-blue-600 dark:text-blue-400 font-bold">{stats?.projects.active || 0}</span> {language === 'ru' ? 'активных' : 'active'}, <span className="text-gray-900 dark:text-slate-300 font-bold">{stats?.projects.completed || 0}</span> {language === 'ru' ? 'завершено' : 'completed'}
+                <span className="text-blue-600 dark:text-blue-400 font-bold">{stats?.projects.active || 0}</span> {t('reports', 'active')}, <span className="text-gray-900 dark:text-slate-300 font-bold">{stats?.projects.completed || 0}</span> {t('reports', 'completed')}
               </p>
             </div>
           </div>
@@ -121,7 +121,7 @@ export default function ReportsPage() {
                 <FiPieChart className="text-purple-600 dark:text-purple-400" size={24} />
               </div>
               <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50 px-3 py-1 rounded-full">
-                {language === 'ru' ? 'Участники' : 'Members'}
+                {t('members', 'title')}
               </p>
             </div>
             <div>
@@ -129,7 +129,7 @@ export default function ReportsPage() {
                 {loading ? '...' : stats?.members.total || 0}
               </p>
               <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                <span className="text-purple-600 dark:text-purple-400 font-bold">{stats?.members.active || 0}</span> {language === 'ru' ? 'активных участников' : 'active members'}
+                <span className="text-purple-600 dark:text-purple-400 font-bold">{stats?.members.active || 0}</span> {t('reports', 'activeMembers')}
               </p>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function ReportsPage() {
                 <FiTrendingUp className="text-green-600 dark:text-green-400" size={24} />
               </div>
               <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50 px-3 py-1 rounded-full">
-                {language === 'ru' ? 'Доход' : 'Income'}
+                {t('finance', 'income')}
               </p>
             </div>
             <div>
@@ -148,7 +148,7 @@ export default function ReportsPage() {
                 ${(stats?.finance.income || 0).toLocaleString()}
               </p>
               <p className="text-xs text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-green-900/30 w-max px-2 py-0.5 rounded-md mt-1">
-                {language === 'ru' ? 'Выделенный бюджет' : 'Budget allocated'}
+                {t('reports', 'budgetAllocated')}
               </p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function ReportsPage() {
                 <FiFileText className="text-red-600 dark:text-red-400" size={24} />
               </div>
               <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50 px-3 py-1 rounded-full">
-                {language === 'ru' ? 'Расходы' : 'Expenses'}
+                {t('finance', 'expense')}
               </p>
             </div>
             <div>
@@ -167,7 +167,7 @@ export default function ReportsPage() {
                 ${(stats?.finance.expenses || 0).toLocaleString()}
               </p>
               <p className="text-xs text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/30 w-max px-2 py-0.5 rounded-md mt-1">
-                {language === 'ru' ? 'Потраченный бюджет' : 'Budget spent'}
+                {t('reports', 'budgetSpent')}
               </p>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function ReportsPage() {
         {/* Reports Grid */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
-            {language === 'ru' ? 'Доступные отчеты' : 'Available Reports'}
+            {t('reports', 'availableReports')}
           </h2>
         </div>
 
@@ -195,7 +195,7 @@ export default function ReportsPage() {
                     <p className="text-sm font-medium text-gray-500 dark:text-slate-400 leading-relaxed">{report.description}</p>
                     <button className="mt-5 flex items-center justify-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-4 py-2 rounded-xl transition-colors w-max">
                       <FiDownload size={16} />
-                      {language === 'ru' ? 'Скачать отчет' : 'Download Report'}
+                      {t('reports', 'downloadReport')}
                     </button>
                   </div>
                 </div>
@@ -207,7 +207,7 @@ export default function ReportsPage() {
         {/* Chart Placeholder */}
         <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-slate-700/50">
           <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-6">
-            {language === 'ru' ? 'Ежемесячный обзор' : 'Monthly Overview'}
+            {t('reports', 'monthlyOverview')}
           </h2>
           <div className="h-[300px] flex items-center justify-center bg-gray-50/50 dark:bg-slate-900/30 rounded-2xl border border-dashed border-gray-200 dark:border-slate-700 relative overflow-hidden group">
             <div className="absolute inset-0 bg-indigo-50/50 dark:bg-indigo-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -216,10 +216,10 @@ export default function ReportsPage() {
                 <FiBarChart2 size={32} className="text-indigo-600 dark:text-indigo-400" />
               </div>
               <p className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                {language === 'ru' ? 'Построение графика скоро будет доступно' : 'Chart visualization coming soon'}
+                {t('reports', 'chartComingSoon')}
               </p>
               <p className="text-sm text-gray-500 dark:text-slate-400">
-                {language === 'ru' ? 'Мы работаем над интеграцией графиков' : 'We are working on integrating charts'}
+                {t('reports', 'workingOnCharts')}
               </p>
             </div>
           </div>

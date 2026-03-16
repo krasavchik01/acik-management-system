@@ -1,120 +1,118 @@
-import { NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, hasRole, ADMIN_ROLES } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const { user, error } = await getAuthUser()
-    if (error || !user) {
+    const { user: authUser, error } = await getAuthUser()
+    if (error || !authUser) {
       return NextResponse.json(
         { success: false, message: 'Not authorized' },
         { status: 401 }
       )
     }
 
-    if (!hasRole(user.role, ADMIN_ROLES)) {
+    if (!hasRole(authUser.role, ADMIN_ROLES)) {
       return NextResponse.json(
         { success: false, message: 'Admin access required' },
         { status: 403 }
       )
     }
 
-    // Get all stats in parallel
+    // Get today's start and end for attendance
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    // Get all stats in parallel using Prisma
     const [
-      usersRes,
-      projectsRes,
-      tasksRes,
-      membersRes,
-      eventsRes,
-      financeRes,
-    ] = await Promise.all([
-      getSupabaseAdmin().from('User').select('id, isActive'),
-      getSupabaseAdmin().from('Project').select('id, status'),
-      getSupabaseAdmin().from('Task').select('id, status'),
-      getSupabaseAdmin().from('Member').select('id, status'),
-      getSupabaseAdmin().from('Event').select('id'),
-      getSupabaseAdmin().from('Finance').select('amount, type'),
-    ])
-
-    const users = usersRes.data || []
-    const projects = projectsRes.data || []
-    const tasks = tasksRes.data || []
-    const members = membersRes.data || []
-    const events = eventsRes.data || []
-    const finances = financeRes.data || []
-
-    // Calculate stats
-    const totalUsers = users.length
-    const activeUsers = users.filter(u => u.isActive).length
-    const totalProjects = projects.length
-    const activeProjects = projects.filter(p => p.status === 'Active').length
-    const totalTasks = tasks.length
-    const completedTasks = tasks.filter(t => t.status === 'Done').length
-    const totalMembers = members.length
-    const activeMembers = members.filter(m => m.status === 'Active').length
-    const totalEvents = events.length
-    const totalIncome = finances.filter(f => f.type === 'Income').reduce((sum, f) => sum + (f.amount || 0), 0)
-
-    // Get today's attendance
-    const todayDate = new Date().toISOString().split('T')[0]
-    const { data: todayAttendance } = await getSupabaseAdmin()
-      .from('Attendance')
-      .select('id, userId, status, workType, checkInTime, checkInAddress')
-      .gte('date', todayDate + 'T00:00:00')
-      .lte('date', todayDate + 'T23:59:59')
-
-    // Get recent users
-    const { data: recentUsers } = await getSupabaseAdmin()
-      .from('User')
-      .select('id, name, email, role, createdAt')
-      .order('createdAt', { ascending: false })
-      .limit(5)
-
-    // Get recent projects
-    const { data: recentProjects } = await getSupabaseAdmin()
-      .from('Project')
-      .select('id, name, status, createdAt')
-      .order('createdAt', { ascending: false })
-      .limit(5)
-
-    // Get counts for system health
-    const [
+      userStats,
+      projectStats,
+      taskStats,
+      memberStats,
+      eventStats,
+      financeStats,
+      todayAttendance,
+      recentUsers,
+      recentProjects,
       financeTotal,
       sponsorsTotal,
-      membersTotal,
+      membersTotal
     ] = await Promise.all([
-      getSupabaseAdmin().from('Finance').select('id', { count: 'exact', head: true }),
-      getSupabaseAdmin().from('Sponsor').select('id', { count: 'exact', head: true }),
-      getSupabaseAdmin().from('Member').select('id', { count: 'exact', head: true }),
+      prisma.user.aggregate({ _count: { id: true, isActive: true } }),
+      prisma.project.aggregate({ _count: { id: true } }),
+      prisma.task.aggregate({ _count: { id: true } }),
+      prisma.member.aggregate({ _count: { id: true } }),
+      prisma.event.count(),
+      prisma.finance.findMany({ select: { amount: true, type: true } }),
+      prisma.attendance.findMany({
+        where: {
+          date: { gte: today, lt: tomorrow }
+        },
+        select: {
+          id: true,
+          userId: true,
+          status: true,
+          workType: true,
+          checkInTime: true,
+          checkInAddress: true
+        }
+      }),
+      prisma.user.findMany({
+        select: { id: true, name: true, email: true, role: true, createdAt: true },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      }),
+      prisma.project.findMany({
+        select: { id: true, name: true, status: true, createdAt: true },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      }),
+      prisma.finance.count(),
+      prisma.sponsor.count(),
+      prisma.member.count()
     ])
+
+    // Get specific status counts
+    const activeProjectsCount = await prisma.project.count({ where: { status: 'Active' } })
+    const completedTasksCount = await prisma.task.count({ where: { status: 'Done' } })
+    const activeMembersCount = await prisma.member.count({ where: { status: 'Active' } })
+    const activeUsersCount = await prisma.user.count({ where: { isActive: true } })
+
+    const totalIncome = financeStats
+      .filter(f => f.type === 'Income')
+      .reduce((sum, f) => sum + (f.amount || 0), 0)
 
     return NextResponse.json({
       success: true,
       data: {
         stats: {
-          users: { total: totalUsers, active: activeUsers },
-          projects: { total: totalProjects, active: activeProjects },
-          tasks: { total: totalTasks, completed: completedTasks },
-          members: { total: totalMembers, active: activeMembers },
-          events: { total: totalEvents },
+          users: { total: userStats._count.id, active: activeUsersCount },
+          projects: { total: projectStats._count.id, active: activeProjectsCount },
+          tasks: { total: taskStats._count.id, completed: completedTasksCount },
+          members: { total: memberStats._count.id, active: activeMembersCount },
+          events: { total: eventStats },
           finance: { totalIncome },
           system: {
-            financeRecords: financeTotal.count || 0,
-            sponsors: sponsorsTotal.count || 0,
-            members: membersTotal.count || 0,
+            financeRecords: financeTotal,
+            sponsors: sponsorsTotal,
+            members: membersTotal,
           }
         },
         recent: {
-          users: recentUsers || [],
-          projects: recentProjects || [],
+          users: recentUsers,
+          projects: recentProjects,
         },
-        presence: todayAttendance || [],
+        presence: todayAttendance,
       }
     })
   } catch (error) {
     console.error('Admin dashboard error:', error)
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch dashboard data' },
+      { success: false, message: 'Failed to fetch dashboard data: ' + (error as Error).message },
       { status: 500 }
     )
   }

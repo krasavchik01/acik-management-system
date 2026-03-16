@@ -7,6 +7,7 @@ import {
   FiCalendar, FiDollarSign, FiUsers, FiCheckCircle, FiClock, FiMoreVertical
 } from 'react-icons/fi'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/lib/i18n'
 import { toast } from 'react-toastify'
 
 interface Project {
@@ -29,6 +30,7 @@ interface Project {
 
 export default function ProjectsPage() {
   const { profile } = useAuth()
+  const { language, t } = useLanguage()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [view, setView] = useState<'grid' | 'list'>('grid')
@@ -192,8 +194,8 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
-        title="Projects"
-        subtitle="Manage and track all your projects"
+        title={t('projects', 'title')}
+        subtitle={t('projects', 'subtitle')}
       />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
@@ -206,7 +208,7 @@ export default function ProjectsPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.total}</p>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Projects</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('projects', 'totalProjects')}</p>
               </div>
             </div>
           </div>
@@ -217,7 +219,7 @@ export default function ProjectsPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.active}</p>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Active</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('projects', 'statusActive')}</p>
               </div>
             </div>
           </div>
@@ -228,7 +230,7 @@ export default function ProjectsPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.completed}</p>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Completed</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('projects', 'statusCompleted')}</p>
               </div>
             </div>
           </div>
@@ -239,7 +241,7 @@ export default function ProjectsPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">${stats.totalBudget.toLocaleString()}</p>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Budget</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('projects', 'totalBudget')}</p>
               </div>
             </div>
           </div>
@@ -254,7 +256,7 @@ export default function ProjectsPage() {
                 <FiSearch className="text-gray-400 dark:text-slate-400" size={18} />
                 <input
                   type="text"
-                  placeholder="Search projects..."
+                  placeholder={t('projects', 'searchPlaceholder')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && fetchProjects()}
@@ -268,11 +270,11 @@ export default function ProjectsPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all text-gray-900 dark:text-white"
               >
-                <option value="">All Status</option>
-                <option value="Planning">Planning</option>
-                <option value="Active">Active</option>
-                <option value="OnHold">On Hold</option>
-                <option value="Completed">Completed</option>
+                <option value="">{t('projects', 'allStatus')}</option>
+                <option value="Planning">{t('projects', 'statusPlanning')}</option>
+                <option value="Active">{t('projects', 'statusActive')}</option>
+                <option value="OnHold">{t('projects', 'statusOnHold')}</option>
+                <option value="Completed">{t('projects', 'statusCompleted')}</option>
               </select>
             </div>
 
@@ -300,7 +302,7 @@ export default function ProjectsPage() {
                   className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 font-medium"
                 >
                   <FiPlus size={18} />
-                  <span className="hidden sm:inline">New Project</span>
+                  <span className="hidden sm:inline">{t('projects', 'newProject')}</span>
                 </button>
               )}
             </div>
@@ -311,22 +313,22 @@ export default function ProjectsPage() {
         {loading ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto" />
-            <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium">Loading projects...</p>
+            <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium">{t('common', 'loading')}</p>
           </div>
         ) : projects.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700">
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiGrid className="text-gray-400" size={32} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No projects found</h3>
-            <p className="text-gray-500 dark:text-slate-400 mb-6">Get started by creating your first project</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('projects', 'noProjectsFound')}</h3>
+            <p className="text-gray-500 dark:text-slate-400 mb-6">{t('projects', 'getStarted')}</p>
             {canManage && (
               <button
                 onClick={() => { resetForm(); setShowModal(true) }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all"
               >
                 <FiPlus size={18} />
-                Create Project
+                {t('projects', 'newProject')}
               </button>
             )}
           </div>
@@ -367,12 +369,12 @@ export default function ProjectsPage() {
 
                 {/* Content */}
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1">{project.name}</h3>
-                <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-2 mb-4 min-h-[40px]">{project.description || 'No description'}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-2 mb-4 min-h-[40px]">{project.description || t('common', 'noData')}</p>
 
                 {/* Progress */}
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-500 dark:text-slate-400">Progress</span>
+                    <span className="text-gray-500 dark:text-slate-400">{t('common', 'progress')}</span>
                     <span className="font-semibold text-gray-900 dark:text-white">{project.progress || 0}%</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -425,12 +427,12 @@ export default function ProjectsPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700/50">
                   <tr>
-                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Project</th>
-                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Progress</th>
-                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Budget</th>
-                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Manager</th>
-                    {canManage && <th className="px-6 py-4 text-right font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>}
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('projects', 'title')}</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'status')}</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'progress')}</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('projects', 'budget')}</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('projects', 'manager')}</th>
+                    {canManage && <th className="px-6 py-4 text-right font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'actions')}</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
@@ -513,8 +515,8 @@ export default function ProjectsPage() {
           <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="sticky top-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md px-8 py-6 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between z-10">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{editingProject ? 'Edit Project' : 'Create New Project'}</h2>
-                <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Fill in the details below</p>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{editingProject ? t('projects', 'editProject') : t('projects', 'newProject')}</h2>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('projects', 'fillDetails')}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
@@ -526,25 +528,25 @@ export default function ProjectsPage() {
 
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Project Name *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('projects', 'projectName')} *</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                  placeholder="Enter project name"
+                  placeholder={t('projects', 'enterProjectName')}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('common', 'description')}</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   rows={3}
-                  placeholder="Describe your project"
+                  placeholder={t('projects', 'describeProject')}
                 />
               </div>
 
@@ -583,20 +585,20 @@ export default function ProjectsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Priority</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('common', 'priority')}</label>
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                     className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="Critical">Critical</option>
+                    <option value="Low">{t('tasks', 'priorityLow')}</option>
+                    <option value="Medium">{t('tasks', 'priorityMedium')}</option>
+                    <option value="High">{t('tasks', 'priorityHigh')}</option>
+                    <option value="Critical">{t('tasks', 'priorityCritical')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Budget ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('projects', 'budget')} ($)</label>
                   <input
                     type="number"
                     value={formData.budgetAllocated}
@@ -655,8 +657,8 @@ export default function ProjectsPage() {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FiTrash2 className="text-red-600" size={28} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">Delete Project?</h3>
-            <p className="text-gray-500 dark:text-slate-400 text-center mb-8">This action cannot be undone. All tasks associated with this project will also be deleted.</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">{t('projects', 'deleteConfirmTitle')}</h3>
+            <p className="text-gray-500 dark:text-slate-400 text-center mb-8">{t('projects', 'deleteConfirmText')}</p>
             <div className="flex gap-4">
               <button
                 onClick={() => setShowDeleteConfirm(null)}

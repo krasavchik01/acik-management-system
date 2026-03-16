@@ -1,20 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, ADMIN_ROLES } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
+
+export const dynamic = 'force-dynamic'
 
 // GET /api/admin/users
 export async function GET(request: NextRequest) {
   try {
-    const { user, error } = await getAuthUser()
-    if (error || !user) {
+    const { user: authUser, error } = await getAuthUser()
+    if (error || !authUser) {
       return NextResponse.json(
         { success: false, message: 'Not authorized' },
         { status: 401 }
       )
     }
 
-    if (!hasRole(user.role, ADMIN_ROLES)) {
+    if (!hasRole(authUser.role, ADMIN_ROLES)) {
       return NextResponse.json(
         { success: false, message: 'Admin access required' },
         { status: 403 }
@@ -27,41 +30,93 @@ export async function GET(request: NextRequest) {
     const department = searchParams.get('department')
     const demoOnly = searchParams.get('demoOnly')
 
-    let query = getSupabaseAdmin()
-      .from('User')
-      .select('id, supabaseId, email, name, role, department, avatar, phone, isActive, isDemo, permissions, lastLogin, createdAt')
-      .order('createdAt', { ascending: false })
+    // Get today's start and end for attendance
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
 
-    if (role) query = query.eq('role', role)
-    if (department) query = query.eq('department', department)
-    if (demoOnly === 'true') query = query.eq('isDemo', true)
-    if (search) query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`)
-
-    const { data: users, error: fetchError } = await query
-
-    if (fetchError) {
-      console.error('Admin users fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, message: 'Failed to fetch users' },
-        { status: 500 }
-      )
+    const where: any = {}
+    if (role && role !== 'all') where.role = role
+    if (department && department !== 'all') where.department = department
+    if (demoOnly === 'true') where.isDemo = true
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ]
     }
+
+    const users = await prisma.user.findMany({
+      where,
+      select: {
+        id: true,
+        supabaseId: true,
+        email: true,
+        name: true,
+        role: true,
+        department: true,
+        avatar: true,
+        isActive: true,
+        isDemo: true,
+        permissions: true,
+        lastLogin: true,
+        createdAt: true,
+        _count: {
+          select: {
+            assignedTasks: {
+              where: {
+                status: { notIn: ['Done', 'Review'] }
+              }
+            },
+            managedProjects: {
+              where: {
+                status: 'Active'
+              }
+            }
+          }
+        },
+        attendance: {
+          where: {
+            date: {
+              gte: today,
+              lt: tomorrow
+            }
+          },
+          select: {
+            workType: true,
+            status: true,
+          },
+          orderBy: { date: 'desc' },
+          take: 1
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    const formattedUsers = users.map(user => ({
+      ...user,
+      activeTasks: user._count.assignedTasks,
+      activeProjects: user._count.managedProjects,
+      location: user.attendance.length > 0 ? user.attendance[0].workType : 'Unknown',
+      attendanceStatus: user.attendance.length > 0 ? user.attendance[0].status : 'Absent'
+    }))
 
     return NextResponse.json({
       success: true,
-      count: (users || []).length,
-      data: users || []
+      count: formattedUsers.length,
+      data: formattedUsers
     })
   } catch (error) {
     console.error('Admin users fetch error:', error)
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch users' },
+      { success: false, message: 'Failed to fetch users: ' + (error as Error).message },
       { status: 500 }
     )
   }
 }
 
-// POST /api/admin/users - Create new user (including demo)
+// POST /api/admin/users - Create new user
 export async function POST(request: NextRequest) {
   try {
     const { user, error } = await getAuthUser()
@@ -80,9 +135,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, password, name, role, isDemo, permissions } = body
-
-    console.log('Creating user with data:', { email, name, role, isDemo, permissions })
+    const { email, password, name, role, department, isDemo, permissions } = body
 
     if (!email || !password || !name) {
       return NextResponse.json(
@@ -118,38 +171,35 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create user in our database
-    const { data: newUser, error: dbError } = await getSupabaseAdmin()
-      .from('User')
-      .insert({
-        supabaseId: authData.user.id,
-        email,
-        name,
-        role: role || 'Member',
-        isDemo: isDemo || false,
-        isActive: true,
-        permissions: permissions || [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+    // Create user in our database using Prisma for consistency with GET
+    try {
+      const newUser = await prisma.user.create({
+        data: {
+          supabaseId: authData.user.id,
+          email,
+          name,
+          role: (role || 'Member') as any,
+          department: (department || 'Operations') as any,
+          isDemo: isDemo || false,
+          isActive: true,
+          permissions: permissions || []
+        }
       })
-      .select()
-      .single()
 
-    if (dbError) {
+      return NextResponse.json({
+        success: true,
+        message: 'User created successfully',
+        data: newUser
+      })
+    } catch (dbError) {
       // Rollback: delete auth user if db creation fails
       await supabaseAuthAdmin.auth.admin.deleteUser(authData.user.id)
       console.error('DB user creation error:', dbError)
       return NextResponse.json(
-        { success: false, message: `Failed to create user in database: ${dbError.message}` },
+        { success: false, message: `Failed to create user in database: ${(dbError as Error).message}` },
         { status: 500 }
       )
     }
-
-    return NextResponse.json({
-      success: true,
-      message: 'User created successfully',
-      data: newUser
-    })
   } catch (error) {
     console.error('Admin user create error:', error)
     return NextResponse.json(

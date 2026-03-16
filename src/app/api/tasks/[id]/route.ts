@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthUser } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
 // Helper function to create notification
 async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
   try {
-    const { prisma } = await import('@/lib/prisma')
     await prisma.notification.create({
       data: {
         userId,
@@ -26,9 +27,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { getAuthUser } = await import('@/lib/auth')
-    const { prisma } = await import('@/lib/prisma')
-
     const { user, error } = await getAuthUser()
     if (error || !user) {
       return NextResponse.json(
@@ -83,9 +81,6 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { getAuthUser } = await import('@/lib/auth')
-    const { prisma } = await import('@/lib/prisma')
-
     const { user, error: authError } = await getAuthUser()
     if (authError || !user) {
       return NextResponse.json(
@@ -122,7 +117,7 @@ export async function PUT(
       const allowedKeys = ['status', 'actualHours', 'stages']
       const bodyKeys = Object.keys(body)
       const forbiddenKeys = bodyKeys.filter((k: string) => !allowedKeys.includes(k))
-      
+
       if (forbiddenKeys.length > 0) {
         return NextResponse.json(
           { success: false, message: 'You only have permission to update status and actual hours' },
@@ -138,7 +133,7 @@ export async function PUT(
       if (currentTask.isApprovalRequired && !isReviewer && !isAdmin) {
         // Force to Review if approval is required and user is not reviewer/admin
         body.status = 'Review'
-        
+
         if (currentTask.reviewerId) {
           await createNotification(
             currentTask.reviewerId,
@@ -225,9 +220,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { getAuthUser } = await import('@/lib/auth')
-    const { prisma } = await import('@/lib/prisma')
-
     const { user, error: authError } = await getAuthUser()
     if (authError || !user) {
       return NextResponse.json(
@@ -272,4 +264,3 @@ export async function DELETE(
     )
   }
 }
-

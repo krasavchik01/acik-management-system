@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, ADMIN_ROLES } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 interface OfficeSetting {
   name: string
   latitude: number

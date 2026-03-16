@@ -20,6 +20,9 @@ interface User {
   id: string
   name: string
   avatar?: string
+  activeTasks?: number
+  activeProjects?: number
+  location?: string
 }
 
 interface TaskStage {
@@ -65,7 +68,7 @@ interface Task {
 
 export default function TasksPage() {
   const { profile } = useAuth()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   const statusColumns = useMemo(() => [
     { key: 'TODO', label: t('tasks', 'todo'), color: 'bg-gray-50/50 dark:bg-slate-800/50', headerColor: 'bg-gray-500 dark:bg-slate-400', icon: FiList },
@@ -323,11 +326,11 @@ export default function TasksPage() {
     const diffTime = d.getTime() - today.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-    if (diffDays < 0) return { text: 'Overdue', color: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30' }
-    if (diffDays === 0) return { text: 'Today', color: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30' }
-    if (diffDays === 1) return { text: 'Tomorrow', color: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30' }
+    if (diffDays < 0) return { text: t('tasks', 'overdueTasks'), color: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30' }
+    if (diffDays === 0) return { text: t('tasks', 'dueToday'), color: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30' }
+    if (diffDays === 1) return { text: t('tasks', 'dueTomorrow'), color: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30' }
     return {
-      text: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      text: d.toLocaleDateString(t('common', 'language') === 'ru' ? 'ru-RU' : 'en-US', { month: 'short', day: 'numeric' }),
       color: 'text-gray-600 dark:text-slate-300 bg-gray-50 dark:bg-slate-700/50'
     }
   }
@@ -351,7 +354,7 @@ export default function TasksPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
-      <Header title="Tasks" subtitle="Manage and track all your tasks" />
+      <Header title={t('tasks', 'title')} subtitle={t('tasks', 'subtitle')} />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Stats Cards */}
@@ -363,7 +366,7 @@ export default function TasksPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.total}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Tasks</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'totalTasks')}</p>
               </div>
             </div>
           </div>
@@ -374,7 +377,7 @@ export default function TasksPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.todo}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">To Do</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'todo')}</p>
               </div>
             </div>
           </div>
@@ -385,7 +388,7 @@ export default function TasksPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.inProgress}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">In Progress</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'inProgress')}</p>
               </div>
             </div>
           </div>
@@ -396,7 +399,7 @@ export default function TasksPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.done}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Completed</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'completedTasks')}</p>
               </div>
             </div>
           </div>
@@ -407,7 +410,7 @@ export default function TasksPage() {
               </div>
               <div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{stats.overdue}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Overdue</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'overdueTasks')}</p>
               </div>
             </div>
           </div>
@@ -453,7 +456,7 @@ export default function TasksPage() {
                 <FiSearch className="text-gray-400 dark:text-slate-400" size={18} />
                 <input
                   type="text"
-                  placeholder="Search tasks..."
+                  placeholder={t('tasks', 'searchPlaceholder')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="bg-transparent border-none outline-none ml-2 w-full text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
@@ -466,7 +469,7 @@ export default function TasksPage() {
                 onChange={(e) => setProjectFilter(e.target.value)}
                 className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all cursor-pointer text-gray-900 dark:text-white"
               >
-                <option value="">All Projects</option>
+                <option value="">{t('tasks', 'allProjects')}</option>
                 {projects.map(project => (
                   <option key={project.id} value={project.id}>{project.name}</option>
                 ))}
@@ -478,7 +481,7 @@ export default function TasksPage() {
                 onChange={(e) => setPriorityFilter(e.target.value)}
                 className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all cursor-pointer text-gray-900 dark:text-white"
               >
-                <option value="">All Priorities</option>
+                <option value="">{t('tasks', 'allPriorities')}</option>
                 {priorityOptions.map(p => (
                   <option key={p.value} value={p.value}>{p.label}</option>
                 ))}
@@ -508,7 +511,7 @@ export default function TasksPage() {
                   className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 font-medium"
                 >
                   <FiPlus size={18} />
-                  <span className="hidden sm:inline">New Task</span>
+                  <span className="hidden sm:inline">{t('tasks', 'newTask')}</span>
                 </button>
               )}
             </div>
@@ -520,7 +523,7 @@ export default function TasksPage() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto" />
-              <p className="mt-4 text-gray-500">Loading tasks...</p>
+              <p className="mt-4 text-gray-500">{t('tasks', 'loadingTasks')}</p>
             </div>
           </div>
         ) : viewMode === 'kanban' ? (
@@ -561,7 +564,7 @@ export default function TasksPage() {
                         {/* Review Badge */}
                         {task.status === 'Review' && (
                           <div className="absolute top-0 right-0 px-2 py-0.5 bg-purple-500 text-[10px] font-bold text-white uppercase tracking-tighter rounded-bl-lg animate-pulse">
-                            Review Needed
+                            {t('tasks', 'reviewNeeded')}
                           </div>
                         )}
 
@@ -592,10 +595,10 @@ export default function TasksPage() {
                                     className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
                                   >
                                     <FiEdit2 size={14} />
-                                    Edit Task
+                                    {t('tasks', 'editTask')}
                                   </button>
                                   <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
-                                  <div className="px-4 py-1 text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-widest">Move to</div>
+                                  <div className="px-4 py-1 text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-widest">{t('tasks', 'moveTo')}</div>
                                   {statusColumns.filter(c => c.key !== task.status).map(col => (
                                     <button
                                       key={col.key}
@@ -620,7 +623,7 @@ export default function TasksPage() {
                                     className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium"
                                   >
                                     <FiTrash2 size={14} />
-                                    Delete
+                                    {t('common', 'delete')}
                                   </button>
                                 </div>
                               )}
@@ -640,7 +643,7 @@ export default function TasksPage() {
                         {(task._count?.stages || 0) > 0 && (
                           <div className="mb-4">
                              <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
-                              <span>Progress</span>
+                              <span>{t('common', 'progress')}</span>
                               <span>{Math.round(((task.stages?.filter(s => s.isCompleted).length || 0) / (task.stages?.length || 1)) * 100)}%</span>
                             </div>
                             <div className="h-1.5 w-full bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden flex gap-0.5">
@@ -680,18 +683,18 @@ export default function TasksPage() {
                             <div className="flex -space-x-2">
                                 {/* Assignee */}
                                 {task.assignedTo ? (
-                                <div className="w-7 h-7 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-10" title={`Assignee: ${task.assignedTo.name}`}>
+                                <div className="w-7 h-7 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-10" title={`${t('tasks', 'assignedTo')}: ${task.assignedTo.name}`}>
                                     <span className="text-[10px] font-black text-white">{task.assignedTo.name.charAt(0)}</span>
                                 </div>
                                 ) : (
-                                <div className="w-7 h-7 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800" title="Unassigned">
+                                <div className="w-7 h-7 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800" title={t('tasks', 'unassigned')}>
                                     <FiUser className="text-gray-400 dark:text-slate-500" size={12} />
                                 </div>
                                 )}
 
                                 {/* Co-executors */}
                                 {task.coExecutors?.slice(0, 2).map((ce, idx) => (
-                                    <div key={idx} className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-0" title={`Co-executor: ${ce.user.name}`}>
+                                    <div key={idx} className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-0" title={`${t('tasks', 'coExecutors')}: ${ce.user.name}`}>
                                         <span className="text-[10px] font-black text-white">{ce.user.name.charAt(0)}</span>
                                     </div>
                                 ))}
@@ -712,13 +715,13 @@ export default function TasksPage() {
                   {(!groupedTasks[column.key] || groupedTasks[column.key].length === 0) && (
                     <div className="text-center py-12 text-gray-400">
                       <FiList size={32} className="mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No tasks</p>
+                      <p className="text-sm">{t('tasks', 'noTasks')}</p>
                       {canManage && (
                         <button
                           onClick={() => openCreateModal(column.key as Task['status'])}
                           className="mt-2 text-xs text-indigo-600 hover:underline"
                         >
-                          Add a task
+                          + {t('common', 'add')} {t('tasks', 'title').toLowerCase()}
                         </button>
                       )}
                     </div>
@@ -734,13 +737,13 @@ export default function TasksPage() {
               <table className="w-full">
                 <thead className="bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700/50">
                   <tr>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Task</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Project</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Priority</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Assignee</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Due Date</th>
-                    {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>}
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'taskTitle')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'project')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'status')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'priority')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'assignedTo')}</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'deadline')}</th>
+                    {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'actions')}</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
@@ -756,7 +759,7 @@ export default function TasksPage() {
                             <div className="flex items-center gap-2 mb-0.5">
                                 <p className="font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors">{task.title}</p>
                                 {task.status === 'Review' && (
-                                    <span className="px-1.5 py-0.5 bg-purple-500 text-[8px] font-black text-white uppercase rounded-md tracking-tighter">Review</span>
+                                    <span className="px-1.5 py-0.5 bg-purple-500 text-[8px] font-black text-white uppercase rounded-md tracking-tighter">{t('tasks', 'review')}</span>
                                 )}
                             </div>
                             {task.description && (
@@ -840,13 +843,13 @@ export default function TasksPage() {
                     <tr>
                       <td colSpan={canManage ? 7 : 6} className="py-20 text-center">
                         <FiList size={48} className="mx-auto text-gray-300 mb-4" />
-                        <p className="text-gray-500">No tasks found</p>
+                        <p className="text-gray-500">{t('tasks', 'noTasks')}</p>
                         {canManage && (
                           <button
                             onClick={() => openCreateModal()}
                             className="mt-4 text-indigo-600 hover:underline"
                           >
-                            Create your first task
+                            {t('tasks', 'createFirst')}
                           </button>
                         )}
                       </td>
@@ -932,9 +935,12 @@ export default function TasksPage() {
                     className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   >
                     <option value="">{t('tasks', 'unassigned')}</option>
-                    {users.map((user: any) => (
+                    {users.map((user) => (
                       <option key={user.id} value={user.id}>
-                        {user.name} {user.activeTasks !== undefined ? `(${user.activeTasks} ${t('tasks', 'activeTasks')}, ${user.activeProjects} ${t('tasks', 'activeProjects')}, ${t('tasks', 'atLocation')} ${user.location})` : ''}
+                        {user.name} 
+                        {user.activeTasks !== undefined ? 
+                          ` (${user.activeTasks} ${t('tasks', 'activeTasks')}, ${user.activeProjects} ${t('tasks', 'activeProjects')}, ${t('tasks', 'atLocation')} ${user.location === 'Office' ? (language === 'ru' ? 'офисе' : 'Office') : (language === 'ru' ? 'удалёнке' : 'Remote')})` 
+                          : ''}
                       </option>
                     ))}
                   </select>
@@ -1152,10 +1158,10 @@ export default function TasksPage() {
               <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                 <FiTrash2 className="text-red-600 dark:text-red-400" size={28} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Delete Task</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('tasks', 'deleteConfirmTitle')}</h3>
               <p className="text-gray-500 dark:text-slate-400 mb-8">
-                Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">&quot;{deletingTask?.title}&quot;</span>?
-                This action cannot be undone.
+                {t('tasks', 'deleteConfirmText')} <span className="font-semibold text-gray-900 dark:text-white">&quot;{deletingTask?.title}&quot;</span>?
+                {t('tasks', 'actionUndone')}
               </p>
               <div className="flex gap-3">
                 <button
@@ -1165,14 +1171,14 @@ export default function TasksPage() {
                   }}
                   className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
                 >
-                  Cancel
+                  {t('common', 'cancel')}
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={saving}
                   className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all disabled:opacity-50"
                 >
-                  {saving ? 'Deleting...' : 'Delete'}
+                  {saving ? t('common', 'loading') : t('common', 'delete')}
                 </button>
               </div>
             </div>

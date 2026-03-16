@@ -163,7 +163,7 @@ export function Sidebar() {
               className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-all"
             >
               {theme === 'dark' ? <FiSun size={18} /> : <FiMoon size={18} />}
-              <span>{theme === 'dark' ? (language === 'ru' ? 'Светлая тема' : 'Light mode') : (language === 'ru' ? 'Тёмная тема' : 'Dark mode')}</span>
+              <span>{theme === 'dark' ? t('common', 'lightMode') : t('common', 'darkMode')}</span>
             </button>
           </div>
 
@@ -175,7 +175,7 @@ export function Sidebar() {
                 className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-all"
               >
                 <FiGlobe size={18} />
-                <span>{language === 'ru' ? 'Русский' : 'English'}</span>
+                <span>{language === 'ru' ? t('common', 'russian') : t('common', 'english')}</span>
               </button>
 
               {showLangMenu && (
@@ -190,7 +190,7 @@ export function Sidebar() {
                     }`}
                   >
                     <span className="text-xl">🇷🇺</span>
-                    <span className="font-medium">Русский</span>
+                    <span className="font-medium">{t('common', 'russian')}</span>
                   </button>
                   <button
                     onClick={() => {
@@ -202,7 +202,7 @@ export function Sidebar() {
                     }`}
                   >
                     <span className="text-xl">🇺🇸</span>
-                    <span className="font-medium">English</span>
+                    <span className="font-medium">{t('common', 'english')}</span>
                   </button>
                 </div>
               )}
@@ -219,7 +219,7 @@ export function Sidebar() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900 dark:text-white truncate">
-                  {profile?.name || 'User'}
+                  {profile?.name || t('common', 'user')}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-slate-400 truncate">
                   {t('roles', profile?.role || 'Member')}

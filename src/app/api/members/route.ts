@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/members
 export async function GET(request: NextRequest) {
   try {

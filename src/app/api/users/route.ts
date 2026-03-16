@@ -1,93 +1,58 @@
 import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
 // GET /api/users - Get all users with workload info (for dropdowns/assignments)
 export async function GET() {
   try {
-    const { getAuthUser } = await import('@/lib/auth')
-    const { prisma } = await import('@/lib/prisma')
-
-    // const { user: authUser, error } = await getAuthUser()
-    // if (error || !authUser) {
-    //   return NextResponse.json(
-    //     { success: false, message: 'Not authorized' },
-    //     { status: 401 }
-    //   )
-    // }
-
     // Get today's start and end for attendance checking
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    let users = [];
-    try {
-      users = await prisma.user.findMany({
-        where: { isActive: true },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          avatar: true,
-          department: true,
-          _count: {
-            select: {
-              assignedTasks: {
-                where: {
-                  status: { notIn: ['Done', 'Review'] }
-                }
-              },
-              managedProjects: {
-                where: {
-                  status: 'Active'
-                }
+    const users = await prisma.user.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        avatar: true,
+        department: true,
+        _count: {
+          select: {
+            assignedTasks: {
+              where: {
+                status: { notIn: ['Done', 'Review'] }
+              }
+            },
+            managedProjects: {
+              where: {
+                status: 'Active'
               }
             }
-          },
-          attendance: {
-            where: {
-              date: {
-                gte: today,
-                lt: tomorrow
-              }
-            },
-            select: {
-              workType: true,
-              status: true,
-              checkInTime: true
-            },
-            orderBy: { date: 'desc' },
-            take: 1
           }
         },
-        orderBy: { name: 'asc' }
-      });
-    } catch (complexQueryError) {
-      console.error('[Prisma fallback] Complex query failed:', complexQueryError);
-      // Fallback: fetch without complex relations if schema is missing or invalid
-      users = await prisma.user.findMany({
-        where: { isActive: true },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          avatar: true,
-          department: true
-        },
-        orderBy: { name: 'asc' }
-      });
-      
-      // Map it to have empty relations so the `.map` below doesn't crash
-      users = users.map(u => ({
-        ...u,
-        _count: { assignedTasks: 0, managedProjects: 0 },
-        attendance: []
-      }));
-    }
+        attendance: {
+          where: {
+            date: {
+              gte: today,
+              lt: tomorrow
+            }
+          },
+          select: {
+            workType: true,
+            status: true,
+            checkInTime: true
+          },
+          orderBy: { date: 'desc' },
+          take: 1
+        }
+      },
+      orderBy: { name: 'asc' }
+    });
 
     // Format the data to be easier to consume on the frontend
     const formattedUsers = users.map(user => ({

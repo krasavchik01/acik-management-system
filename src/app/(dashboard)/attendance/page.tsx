@@ -39,7 +39,7 @@ interface LocationData {
 
 export default function AttendancePage() {
   const { profile } = useAuth()
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([])
   const [myAttendance, setMyAttendance] = useState<AttendanceRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -196,14 +196,14 @@ export default function AttendancePage() {
 
       const data = await res.json()
       if (data.success) {
-        toast.success(language === 'ru' ? 'Вы отметились!' : 'Checked in successfully!')
+        toast.success(t('attendance', 'checkInSuccess') || 'Checked in successfully!')
         setTodayRecord(data.data)
         fetchMyAttendance()
       } else {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error(language === 'ru' ? 'Ошибка при отметке' : 'Failed to check in')
+      toast.error(t('attendance', 'checkInError') || 'Failed to check in')
     } finally {
       setCheckingIn(false)
     }
@@ -228,14 +228,14 @@ export default function AttendancePage() {
 
       const data = await res.json()
       if (data.success) {
-        toast.success(language === 'ru' ? 'Вы отметились об уходе!' : 'Checked out successfully!')
+        toast.success(t('attendance', 'checkOutSuccess') || 'Checked out successfully!')
         setTodayRecord(data.data)
         fetchMyAttendance()
       } else {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error(language === 'ru' ? 'Ошибка при отметке' : 'Failed to check out')
+      toast.error(t('attendance', 'checkOutError') || 'Failed to check out')
     } finally {
       setCheckingOut(false)
     }
@@ -318,7 +318,7 @@ export default function AttendancePage() {
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
-        title={language === 'ru' ? 'Посещаемость' : 'Attendance'}
+        title={t('attendance', 'title')}
         subtitle={new Date().toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US', {
           weekday: 'long',
           year: 'numeric',
@@ -338,7 +338,7 @@ export default function AttendancePage() {
               }`}
           >
             <FiClock size={18} className={activeTab === 'today' ? 'text-indigo-100' : 'text-gray-400 dark:text-slate-500'} />
-            {language === 'ru' ? 'Сегодня' : 'Today'}
+            {t('attendance', 'today')}
           </button>
           <button
             onClick={() => setActiveTab('calendar')}
@@ -348,7 +348,7 @@ export default function AttendancePage() {
               }`}
           >
             <FiCalendar size={18} className={activeTab === 'calendar' ? 'text-indigo-100' : 'text-gray-400 dark:text-slate-500'} />
-            {language === 'ru' ? 'Календарь' : 'Calendar'}
+            {t('attendance', 'calendar')}
           </button>
           {canManage && (
             <button
@@ -359,7 +359,7 @@ export default function AttendancePage() {
                 }`}
             >
               <FiUsers size={18} className={activeTab === 'team' ? 'text-indigo-100' : 'text-gray-400 dark:text-slate-500'} />
-              {language === 'ru' ? 'Команда' : 'Team'}
+              {t('attendance', 'team')}
             </button>
           )}
         </div>
@@ -375,7 +375,7 @@ export default function AttendancePage() {
               <div className="relative">
                 <div className="text-center mb-8">
                   <p className="text-white/70 text-sm font-medium uppercase tracking-widest mb-2">
-                    {language === 'ru' ? 'Текущее время' : 'Current Time'}
+                    {t('attendance', 'currentTime')}
                   </p>
                   <h1 className="text-6xl font-black tracking-wider drop-shadow-md">{time}</h1>
                 </div>
@@ -391,21 +391,21 @@ export default function AttendancePage() {
                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center hover:bg-white/20 transition-all">
                         <FiLogIn className="mx-auto mb-3 text-white/80" size={28} />
                         <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">
-                          {language === 'ru' ? 'Приход' : 'Check In'}
+                          {t('attendance', 'checkIn')}
                         </p>
                         <p className="text-2xl font-bold">{formatTime(todayRecord.checkIn)}</p>
                       </div>
                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center hover:bg-white/20 transition-all">
                         <FiLogOut className="mx-auto mb-3 text-white/80" size={28} />
                         <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">
-                          {language === 'ru' ? 'Уход' : 'Check Out'}
+                          {t('attendance', 'checkOut')}
                         </p>
                         <p className="text-2xl font-bold">{formatTime(todayRecord.checkOut)}</p>
                       </div>
                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center hover:bg-white/20 transition-all">
                         <FiClock className="mx-auto mb-3 text-white/80" size={28} />
                         <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">
-                          {language === 'ru' ? 'Отработано' : 'Hours'}
+                          {t('attendance', 'hoursWorked')}
                         </p>
                         <p className="text-2xl font-bold">{formatHours(todayRecord.hoursWorked)}</p>
                       </div>
@@ -415,7 +415,7 @@ export default function AttendancePage() {
                     {todayRecord.location && (
                       <div className="flex items-center justify-center gap-2 text-white/80 text-sm bg-white/5 py-2 px-4 rounded-full w-max mx-auto border border-white/10">
                         <FiMapPin size={16} />
-                        <span className="font-medium">{language === 'ru' ? 'Геолокация зафиксирована' : 'Location recorded'}</span>
+                        <span className="font-medium">{t('attendance', 'locationRecorded')}</span>
                       </div>
                     )}
 
@@ -430,14 +430,14 @@ export default function AttendancePage() {
                           <>
                             <FiLoader className="animate-spin" size={22} />
                             {gettingLocation
-                              ? (language === 'ru' ? 'Получение геолокации...' : 'Getting location...')
-                              : (language === 'ru' ? 'Отметка...' : 'Checking out...')
+                              ? t('common', 'gettingLocation')
+                              : t('attendance', 'checkingOut')
                             }
                           </>
                         ) : (
                           <>
                             <FiLogOut size={22} />
-                            {language === 'ru' ? 'Отметить уход' : 'Check Out'}
+                            {t('attendance', 'checkOut')}
                           </>
                         )}
                       </button>
@@ -450,7 +450,7 @@ export default function AttendancePage() {
                           <FiCheckCircle className="text-white" size={32} />
                         </div>
                         <p className="font-bold text-lg">
-                          {language === 'ru' ? 'Рабочий день завершён' : 'Work day completed'}
+                          {t('attendance', 'dayCompleted')}
                         </p>
                       </div>
                     )}
@@ -464,7 +464,7 @@ export default function AttendancePage() {
                           <>
                             <FiLoader className="animate-spin text-white" size={20} />
                             <span className="text-white/90 font-medium">
-                              {language === 'ru' ? 'Получение геолокации...' : 'Getting location...'}
+                              {t('common', 'gettingLocation')}
                             </span>
                           </>
                         ) : locationError ? (
@@ -480,7 +480,7 @@ export default function AttendancePage() {
                               <FiMapPin size={20} className="text-green-300" />
                             </div>
                             <span className="text-green-200 font-medium text-sm">
-                              {language === 'ru' ? 'Геолокация доступна' : 'Location available'}
+                              {t('attendance', 'locationAvailable')}
                             </span>
                           </>
                         ) : (
@@ -489,7 +489,7 @@ export default function AttendancePage() {
                               <FiMapPin size={20} className="text-white/60" />
                             </div>
                             <span className="text-white/60 font-medium text-sm">
-                              {language === 'ru' ? 'Геолокация будет запрошена' : 'Location will be requested'}
+                              {t('attendance', 'locationRequested')}
                             </span>
                           </>
                         )}
@@ -506,14 +506,14 @@ export default function AttendancePage() {
                         <>
                           <FiLoader className="animate-spin" size={22} />
                           {gettingLocation
-                            ? (language === 'ru' ? 'Получение геолокации...' : 'Getting location...')
-                            : (language === 'ru' ? 'Отметка...' : 'Checking in...')
+                            ? t('common', 'gettingLocation')
+                            : t('attendance', 'checkingIn')
                           }
                         </>
                       ) : (
                         <>
                           <FiLogIn size={22} />
-                          {language === 'ru' ? 'Отметить приход' : 'Check In'}
+                          {t('attendance', 'checkIn')}
                         </>
                       )}
                     </button>
@@ -531,7 +531,7 @@ export default function AttendancePage() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
-                      {language === 'ru' ? 'Присутствий' : 'Present'}
+                      {t('attendance', 'present')}
                     </p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">{monthStats.present}</p>
                   </div>
@@ -544,7 +544,7 @@ export default function AttendancePage() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
-                      {language === 'ru' ? 'Пропусков' : 'Absent'}
+                      {t('attendance', 'absent')}
                     </p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">{monthStats.absent}</p>
                   </div>
@@ -557,7 +557,7 @@ export default function AttendancePage() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
-                      {language === 'ru' ? 'Опозданий' : 'Late'}
+                      {t('attendance', 'late')}
                     </p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">{monthStats.late}</p>
                   </div>
@@ -570,7 +570,7 @@ export default function AttendancePage() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
-                      {language === 'ru' ? 'Часов' : 'Hours'}
+                      {t('attendance', 'hours')}
                     </p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">{Math.round(monthStats.totalHours)}</p>
                   </div>
@@ -643,10 +643,7 @@ export default function AttendancePage() {
                     {dayAttendance && (
                       <div className="space-y-1.5 mt-2">
                         <span className={`flex w-full px-2 py-1 rounded-md text-xs font-bold justify-center items-center shadow-sm ${getStatusColor(dayAttendance.status)}`}>
-                          {dayAttendance.status === 'Present' ? (language === 'ru' ? 'Был' : 'P') :
-                            dayAttendance.status === 'Late' ? (language === 'ru' ? 'Опозд' : 'L') :
-                              dayAttendance.status === 'Working' ? (language === 'ru' ? 'Работ' : 'W') :
-                                dayAttendance.status === 'Absent' ? (language === 'ru' ? 'Нет' : 'A') : dayAttendance.status}
+                          {t('attendance', `status${dayAttendance.status}`)}
                         </span>
                         {dayAttendance.hoursWorked && (
                           <div className="text-[11px] font-medium text-gray-500 dark:text-slate-400 text-center bg-gray-50 dark:bg-slate-700/50 rounded-md py-1 border border-gray-100 dark:border-slate-600/50">
@@ -665,25 +662,25 @@ export default function AttendancePage() {
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
                 <span className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
-                  {language === 'ru' ? 'Присутствовал' : 'Present'}
+                  {t('attendance', 'statusPresent')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-yellow-500 shadow-sm shadow-yellow-500/50" />
                 <span className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
-                  {language === 'ru' ? 'Опоздание' : 'Late'}
+                  {t('attendance', 'statusLate')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />
                 <span className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
-                  {language === 'ru' ? 'Работает' : 'Working'}
+                  {t('attendance', 'statusWorking')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-500 shadow-sm shadow-red-500/50" />
                 <span className="text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
-                  {language === 'ru' ? 'Отсутствовал' : 'Absent'}
+                  {t('attendance', 'statusAbsent')}
                 </span>
               </div>
             </div>
@@ -701,10 +698,10 @@ export default function AttendancePage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    {language === 'ru' ? 'Журнал команды' : 'Team Register'}
+                    {t('attendance', 'teamRegister')}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-slate-400">
-                    {language === 'ru' ? 'Просмотр посещаемости за выбранный день' : 'View attendance for the selected date'}
+                    {t('attendance', 'viewSelectedDate')}
                   </p>
                 </div>
               </div>
@@ -715,33 +712,33 @@ export default function AttendancePage() {
                   onChange={(e) => setSelectedDate(new Date(e.target.value))}
                   className="pl-4 pr-10 py-3 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-gray-50 dark:bg-slate-700/50 text-gray-900 dark:text-white font-medium hover:border-gray-300 dark:hover:border-slate-500 transition-colors w-full sm:w-auto appearance-none cursor-pointer"
                 />
-                <FiCalendar className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-indigo-500 transition-colors" size={18} />
+                <FiCalendar className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-indigo-500 pointer-events-none transition-colors" />
               </div>
             </div>
 
             {/* Team Attendance Table */}
             <div className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50/50 dark:bg-slate-800/80 border-b border-gray-100 dark:border-slate-700/50">
+                <table className="min-w-full divide-y divide-gray-100 dark:divide-slate-700/50">
+                  <thead className="bg-gray-50 dark:bg-slate-700/50">
                     <tr>
                       <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
-                        {language === 'ru' ? 'Сотрудник' : 'Employee'}
+                        {t('attendance', 'employee')}
                       </th>
                       <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
-                        {language === 'ru' ? 'Приход' : 'Check In'}
+                        {t('attendance', 'checkIn')}
                       </th>
                       <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
-                        {language === 'ru' ? 'Уход' : 'Check Out'}
+                        {t('attendance', 'checkOut')}
                       </th>
                       <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
-                        {language === 'ru' ? 'Часы' : 'Hours'}
+                        {t('attendance', 'hours')}
                       </th>
                       <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
-                        {language === 'ru' ? 'Статус' : 'Status'}
+                        {t('common', 'status')}
                       </th>
                       <th className="px-6 py-5 text-left text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
-                        {language === 'ru' ? 'Место' : 'Location'}
+                        {t('attendance', 'location')}
                       </th>
                     </tr>
                   </thead>
@@ -753,10 +750,10 @@ export default function AttendancePage() {
                             <FiUsers size={32} className="text-gray-400 dark:text-slate-500" />
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                            {language === 'ru' ? 'Нет записей' : 'No Records'}
+                            {t('attendance', 'noRecords')}
                           </h3>
                           <p className="text-gray-500 dark:text-slate-400">
-                            {language === 'ru' ? 'Нет записей за эту дату' : 'No attendance records for this date'}
+                            {t('attendance', 'noRecordsDate')}
                           </p>
                         </td>
                       </tr>
@@ -819,10 +816,7 @@ export default function AttendancePage() {
                           </td>
                           <td className="px-6 py-4">
                             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm ${getStatusColor(record.status)}`}>
-                              {record.status === 'Present' ? (language === 'ru' ? 'В ОФИСЕ' : 'PRESENT') :
-                                record.status === 'Late' ? (language === 'ru' ? 'ОПОЗДАНИЕ' : 'LATE') :
-                                  record.status === 'Working' ? (language === 'ru' ? 'РАБОТАЕТ' : 'WORKING') :
-                                    record.status === 'Absent' ? (language === 'ru' ? 'ОТСУТСТВУЕТ' : 'ABSENT') : record.status}
+                              {t('attendance', `status${record.status}`)}
                             </span>
                           </td>
                           <td className="px-6 py-4">

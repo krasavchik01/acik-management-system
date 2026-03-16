@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { getAuthUser } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const { getAuthUser } = await import('@/lib/auth')
-    const { prisma } = await import('@/lib/prisma')
-
     const { user, error } = await getAuthUser()
     if (error || !user) {
       return NextResponse.json(

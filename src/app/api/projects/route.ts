@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAuthUser, hasRole, MANAGER_ROLES } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/projects - Get all projects with filters
 export async function GET(request: NextRequest) {
   try {

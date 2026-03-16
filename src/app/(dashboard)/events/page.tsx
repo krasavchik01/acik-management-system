@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header'
 import { FiCalendar, FiMapPin, FiUsers, FiClock, FiPlus, FiEdit2, FiTrash2, FiVideo, FiX } from 'react-icons/fi'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'react-toastify'
+import { useLanguage } from '@/lib/i18n'
 
 interface Event {
   id: string
@@ -24,6 +25,8 @@ interface Event {
 
 export default function EventsPage() {
   const { profile } = useAuth()
+  const { t } = useLanguage()
+  const { language } = useLanguage()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -80,7 +83,7 @@ export default function EventsPage() {
 
       const data = await res.json()
       if (data.success) {
-        toast.success(editingEvent ? 'Event updated!' : 'Event created!')
+        toast.success(editingEvent ? t('events', 'eventUpdated') : t('events', 'eventCreated'))
         setShowModal(false)
         resetForm()
         fetchEvents()
@@ -88,23 +91,23 @@ export default function EventsPage() {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error('Failed to save event')
+      toast.error(t('events', 'failedToSave'))
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this event?')) return
+    if (!confirm(t('events', 'deleteConfirm'))) return
     try {
       const res = await fetch(`/api/events/${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
-        toast.success('Event deleted!')
+        toast.success(t('events', 'eventDeleted'))
         fetchEvents()
       } else {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error('Failed to delete event')
+      toast.error(t('events', 'failedToDelete'))
     }
   }
 
@@ -153,13 +156,23 @@ export default function EventsPage() {
     }
   }
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'Planned': return t('events', 'statusPlanned')
+      case 'Ongoing': return t('events', 'statusOngoing')
+      case 'Completed': return t('events', 'statusCompleted')
+      case 'Cancelled': return t('events', 'statusCancelled')
+      default: return status
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
       <Header
-        title="Events"
-        subtitle="Manage organization events"
+        title={t('events', 'title')}
+        subtitle={t('events', 'subtitle')}
         action={canManage ? {
-          label: 'New Event',
+          label: t('events', 'newEvent'),
           onClick: () => { resetForm(); setShowModal(true) }
         } : undefined}
       />
@@ -168,15 +181,15 @@ export default function EventsPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-12 h-12 border-4 border-indigo-200 dark:border-indigo-900 border-t-indigo-600 dark:border-t-indigo-500 rounded-full animate-spin"></div>
-            <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium">Loading events...</p>
+            <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium">{t('events', 'loadingEvents')}</p>
           </div>
         ) : events.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50 shadow-sm">
             <div className="w-20 h-20 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiCalendar className="text-gray-400 dark:text-slate-500" size={32} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Events Found</h3>
-            <p className="text-gray-500 dark:text-slate-400">There are no events scheduled at the moment.</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('events', 'noEventsFound')}</h3>
+            <p className="text-gray-500 dark:text-slate-400">{t('events', 'noEventsScheduled')}</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -186,7 +199,7 @@ export default function EventsPage() {
                   <div>
                     <h3 className="font-bold text-gray-900 dark:text-white text-lg">{event.title}</h3>
                     <span className={`inline-block mt-2 px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold ${getStatusColor(event.status)}`}>
-                      {event.status}
+                      {getStatusLabel(event.status)}
                     </span>
                   </div>
                   {canManage && (
@@ -225,7 +238,7 @@ export default function EventsPage() {
                       <div className="p-1.5 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
                         <FiVideo size={14} className="text-purple-600 dark:text-purple-400" />
                       </div>
-                      <span className="text-purple-600 dark:text-purple-400 font-medium">Virtual Event</span>
+                      <span className="text-purple-600 dark:text-purple-400 font-medium">{t('events', 'virtualEvent')}</span>
                     </div>
                   )}
                   {event.maxAttendees && (
@@ -233,7 +246,7 @@ export default function EventsPage() {
                       <div className="p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                         <FiUsers size={14} className="text-blue-600 dark:text-blue-400" />
                       </div>
-                      <span>Max {event.maxAttendees} attendees</span>
+                      <span>{t('events', 'maxAttendees')}: {event.maxAttendees}</span>
                     </div>
                   )}
                 </div>
@@ -252,38 +265,38 @@ export default function EventsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700/50">
-            <div className="p-6 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{editingEvent ? 'Edit Event' : 'New Event'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 rounded-xl transition-all">
+         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+           <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700/50">
+             <div className="p-6 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{editingEvent ? t('events', 'editEvent') : t('events', 'newEvent')}</h2>
+               <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 rounded-xl transition-all">
                 <FiX size={20} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Title *</label>
-                <input
+             <form onSubmit={handleSubmit} className="p-6 space-y-5">
+               <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'titleRequired')}</label>
+                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   required
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Description</label>
-                <textarea
+               </div>
+               <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'descriptionLabel')}</label>
+                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
                   rows={3}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Type</label>
-                  <select
+               <div className="grid grid-cols-2 gap-4">
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'typeLabel')}</label>
+                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
@@ -294,67 +307,67 @@ export default function EventsPage() {
                     <option value="Social">Social</option>
                     <option value="Training">Training</option>
                     <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Status</label>
-                  <select
+                   </select>
+                 </div>
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'statusLabel')}</label>
+                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
-                  >
-                    <option value="Planned">Planned</option>
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </div>
+                   >
+                    <option value="Planned">{t('events', 'statusPlanned')}</option>
+                    <option value="Ongoing">{t('events', 'statusOngoing')}</option>
+                    <option value="Completed">{t('events', 'statusCompleted')}</option>
+                    <option value="Cancelled">{t('events', 'statusCancelled')}</option>
+                   </select>
+                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Start Date *</label>
-                  <input
+               <div className="grid grid-cols-2 gap-4">
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'startDateRequired')}</label>
+                   <input
                     type="date"
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">End Date</label>
-                  <input
+                 </div>
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'endDateLabel')}</label>
+                   <input
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   />
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Location</label>
-                <input
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                  placeholder="Event location"
-                />
-              </div>
+               </div>
+               <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'locationLabel')}</label>
+                 <input
+                   type="text"
+                   value={formData.location}
+                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
+                  placeholder={t('events', 'locationPlaceholder')}
+                 />
+               </div>
               <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-700/30 p-4 rounded-xl border border-gray-100 dark:border-slate-600">
                 <input
                   type="checkbox"
                   id="isVirtual"
                   checked={formData.isVirtual}
-                  onChange={(e) => setFormData({ ...formData, isVirtual: e.target.checked })}
-                  className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <label htmlFor="isVirtual" className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer">This is a virtual event</label>
-              </div>
-              {formData.isVirtual && (
-                <div className="animate-in slide-in-from-top-2 duration-200">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Virtual Link</label>
-                  <input
+                   onChange={(e) => setFormData({ ...formData, isVirtual: e.target.checked })}
+                   className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                 />
+                <label htmlFor="isVirtual" className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer">{t('events', 'isVirtualLabel')}</label>
+               </div>
+               {formData.isVirtual && (
+                 <div className="animate-in slide-in-from-top-2 duration-200">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'virtualLinkLabel')}</label>
+                   <input
                     type="url"
                     value={formData.virtualLink}
                     onChange={(e) => setFormData({ ...formData, virtualLink: e.target.value })}
@@ -363,19 +376,19 @@ export default function EventsPage() {
                   />
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Max Attendees</label>
-                  <input
+               <div className="grid grid-cols-2 gap-4">
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'maxAttendeesLabel')}</label>
+                   <input
                     type="number"
                     value={formData.maxAttendees}
                     onChange={(e) => setFormData({ ...formData, maxAttendees: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Budget ($)</label>
-                  <input
+                 </div>
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'budgetLabel')}</label>
+                   <input
                     type="number"
                     value={formData.budget}
                     onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
@@ -386,17 +399,17 @@ export default function EventsPage() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
-                >
-                  Cancel
-                </button>
+                   onClick={() => setShowModal(false)}
+                   className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
+                 >
+                  {t('common', 'cancel')}
+                 </button>
                 <button
-                  type="submit"
-                  className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-95"
-                >
-                  {editingEvent ? 'Update Event' : 'Create Event'}
-                </button>
+                   type="submit"
+                   className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-95"
+                 >
+                  {editingEvent ? t('events', 'updateEvent') : t('events', 'createEvent')}
+                 </button>
               </div>
             </form>
           </div>
