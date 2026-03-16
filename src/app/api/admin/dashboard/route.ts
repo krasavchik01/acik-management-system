@@ -83,8 +83,8 @@ export async function GET() {
     const activeUsersCount = await prisma.user.count({ where: { isActive: true } })
 
     const totalIncome = financeStats
-      .filter(f => f.type === 'Income')
-      .reduce((sum, f) => sum + (f.amount || 0), 0)
+      .filter((f: { type: string; amount: number | null }) => f.type === 'Income')
+      .reduce((sum: number, f: { amount: number | null }) => sum + (f.amount || 0), 0)
 
     return NextResponse.json({
       success: true,
