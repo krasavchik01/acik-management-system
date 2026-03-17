@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/lib/i18n'
@@ -9,8 +9,8 @@ import { CurrencySwitcher } from '@/components/ui/CurrencySwitcher'
 import Link from 'next/link'
 import {
   FiFolder, FiCheckSquare, FiUsers, FiDollarSign, FiTrendingUp,
-  FiCalendar, FiClock, FiActivity, FiPieChart, FiBarChart2,
-  FiArrowRight, FiPlus, FiStar, FiAward, FiTarget, FiZap
+  FiCalendar, FiActivity, FiPieChart,
+  FiPlus, FiStar, FiAward, FiTarget
 } from 'react-icons/fi'
 import { StatsCard } from './components/StatsCard'
 import { ProgressCircle } from './components/ProgressCircle'
@@ -75,11 +75,7 @@ export default function DashboardPage() {
 
   const can = (module: string) => isAdmin || permissions.includes(module)
 
-  useEffect(() => {
-    if (profile) fetchDashboardData()
-  }, [profile])
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const fetches: Promise<Response>[] = []
       const keys: string[] = []
@@ -90,11 +86,10 @@ export default function DashboardPage() {
       if (can('tasks')) { fetches.push(fetch('/api/tasks')); keys.push('tasks') }
 
       const responses = await Promise.all(fetches)
+      // Parse all JSON in parallel instead of sequentially
+      const parsed = await Promise.all(responses.map(r => r.json()))
       const results: Record<string, any[]> = {}
-      for (let i = 0; i < keys.length; i++) {
-        const data = await responses[i].json()
-        results[keys[i]] = data.data || []
-      }
+      keys.forEach((key, i) => { results[key] = parsed[i].data || [] })
 
       const projects = results.projects || []
       const members = results.members || []
@@ -132,7 +127,7 @@ export default function DashboardPage() {
 
       setRecentProjects(projects.slice(0, 5).map((p: any) => ({
         ...p,
-        progress: Math.floor(Math.random() * 100),
+        progress: p.taskCount > 0 ? Math.round((p.completedTasks / p.taskCount) * 100) : 0,
       })))
       setRecentTasks(tasks.slice(0, 5))
     } catch (error) {
@@ -140,7 +135,11 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [isAdmin, permissions]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (profile) fetchDashboardData()
+  }, [profile, fetchDashboardData])
 
   const getGreeting = () => {
     const hour = new Date().getHours()
@@ -292,7 +291,7 @@ export default function DashboardPage() {
   const filteredActions = allActions.filter(a => can(a.module))
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
+    <div className="min-h-screen">
       <Header
         title={`${getGreeting()}, ${profile?.name?.split(' ')[0] || 'User'}!`}
         subtitle={new Date().toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}

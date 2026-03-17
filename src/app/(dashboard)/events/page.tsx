@@ -26,7 +26,6 @@ interface Event {
 export default function EventsPage() {
   const { profile } = useAuth()
   const { t } = useLanguage()
-  const { language } = useLanguage()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -167,7 +166,7 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
+    <div className="min-h-screen">
       <Header
         title={t('events', 'title')}
         subtitle={t('events', 'subtitle')}
@@ -203,11 +202,11 @@ export default function EventsPage() {
                     </span>
                   </div>
                   {canManage && (
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => openEditModal(event)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all">
+                    <div className="flex gap-1">
+                      <button onClick={() => openEditModal(event)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all" title="Edit">
                         <FiEdit2 size={16} />
                       </button>
-                      <button onClick={() => handleDelete(event.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all">
+                      <button onClick={() => handleDelete(event.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all" title="Delete">
                         <FiTrash2 size={16} />
                       </button>
                     </div>

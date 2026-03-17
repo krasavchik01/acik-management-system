@@ -316,7 +316,7 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
+    <div className="min-h-screen">
       <Header
         title={t('attendance', 'title')}
         subtitle={new Date().toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US', {

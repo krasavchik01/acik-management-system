@@ -267,7 +267,7 @@ export default function NotificationsPage() {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         {!notification.isRead && (
                           <button
                             onClick={(e) => { e.stopPropagation(); markAsRead(notification.id) }}

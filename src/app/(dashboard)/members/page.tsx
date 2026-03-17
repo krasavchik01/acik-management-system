@@ -223,7 +223,7 @@ export default function MembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
+    <div className="min-h-screen">
       <Header title={t('members', 'title')} subtitle={t('members', 'subtitle')} />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
@@ -394,7 +394,7 @@ export default function MembersPage() {
                     <div className="absolute top-4 right-4">
                       <button
                         onClick={() => setOpenDropdown(openDropdown === member.id ? null : member.id)}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl opacity-0 group-hover:opacity-100 transition-all"
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-all"
                       >
                         <FiMoreVertical size={18} />
                       </button>
@@ -545,7 +545,7 @@ export default function MembersPage() {
                         </td>
                         {canManage && (
                           <td className="py-4 px-6 text-right">
-                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => openEditModal(member)}
                                 className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"

@@ -40,7 +40,11 @@ export async function GET() {
       recentProjects,
       financeTotal,
       sponsorsTotal,
-      membersTotal
+      membersTotal,
+      activeProjectsCount,
+      completedTasksCount,
+      activeMembersCount,
+      activeUsersCount,
     ] = await Promise.all([
       prisma.user.aggregate({ _count: { id: true, isActive: true } }),
       prisma.project.aggregate({ _count: { id: true } }),
@@ -73,14 +77,12 @@ export async function GET() {
       }),
       prisma.finance.count(),
       prisma.sponsor.count(),
-      prisma.member.count()
+      prisma.member.count(),
+      prisma.project.count({ where: { status: 'Active' } }),
+      prisma.task.count({ where: { status: 'Done' } }),
+      prisma.member.count({ where: { status: 'Active' } }),
+      prisma.user.count({ where: { isActive: true } }),
     ])
-
-    // Get specific status counts
-    const activeProjectsCount = await prisma.project.count({ where: { status: 'Active' } })
-    const completedTasksCount = await prisma.task.count({ where: { status: 'Done' } })
-    const activeMembersCount = await prisma.member.count({ where: { status: 'Active' } })
-    const activeUsersCount = await prisma.user.count({ where: { isActive: true } })
 
     const totalIncome = financeStats
       .filter((f: { type: string; amount: number | null }) => f.type === 'Income')

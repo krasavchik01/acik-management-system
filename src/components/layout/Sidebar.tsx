@@ -18,8 +18,6 @@ import {
   FiSettings,
   FiShield,
   FiLogOut,
-  FiMenu,
-  FiX,
   FiGlobe,
   FiMoon,
   FiSun,
@@ -28,20 +26,20 @@ import {
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 const menuItems = [
-  { key: 'dashboard', href: '/', icon: FiHome, module: null },
-  { key: 'projects', href: '/projects', icon: FiFolder, module: 'projects' },
-  { key: 'tasks', href: '/tasks', icon: FiCheckSquare, module: 'tasks' },
-  { key: 'members', href: '/members', icon: FiUsers, module: 'members' },
-  { key: 'events', href: '/events', icon: FiCalendar, module: 'events' },
-  { key: 'finance', href: '/finance', icon: FiDollarSign, module: 'finance' },
-  { key: 'sponsors', href: '/sponsors', icon: FiHeart, module: 'sponsors' },
-  { key: 'attendance', href: '/attendance', icon: FiClock, module: 'attendance' },
-  { key: 'notifications', href: '/notifications', icon: FiBell, module: null },
-  { key: 'reports', href: '/reports', icon: FiBarChart2, module: 'reports' },
+  { key: 'dashboard',      href: '/',             icon: FiHome,       module: null },
+  { key: 'projects',       href: '/projects',     icon: FiFolder,     module: 'projects' },
+  { key: 'tasks',          href: '/tasks',        icon: FiCheckSquare,module: 'tasks' },
+  { key: 'members',        href: '/members',      icon: FiUsers,      module: 'members' },
+  { key: 'events',         href: '/events',       icon: FiCalendar,   module: 'events' },
+  { key: 'finance',        href: '/finance',      icon: FiDollarSign, module: 'finance' },
+  { key: 'sponsors',       href: '/sponsors',     icon: FiHeart,      module: 'sponsors' },
+  { key: 'attendance',     href: '/attendance',   icon: FiClock,      module: 'attendance' },
+  { key: 'notifications',  href: '/notifications',icon: FiBell,       module: null },
+  { key: 'reports',        href: '/reports',      icon: FiBarChart2,  module: 'reports' },
 ]
 
 const adminItems = [
-  { key: 'admin', href: '/admin', icon: FiShield },
+  { key: 'admin',    href: '/admin',    icon: FiShield },
   { key: 'settings', href: '/settings', icon: FiSettings },
 ]
 
@@ -79,7 +77,6 @@ export function Sidebar() {
       const data = await res.json()
       if (data.success) {
         const newCount = data.unreadCount || 0
-        // Play sound if count increased
         if (newCount > prevCountRef.current && prevCountRef.current >= 0) {
           playNotificationSound()
         }
@@ -96,19 +93,28 @@ export function Sidebar() {
     return () => clearInterval(interval)
   }, [profile, fetchUnreadCount])
 
-  // Reset badge on visiting notifications page
   useEffect(() => {
     if (pathname === '/notifications') {
       prevCountRef.current = unreadCount
     }
   }, [pathname, unreadCount])
 
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (!item.module) return true
+    if (isAdmin) return true
+    return (profile?.permissions || []).includes(item.module)
+  })
+
+  const initials = profile?.name
+    ? profile.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : 'U'
+
   return (
     <>
-      {/* Overlay (triggered by MobileNav "More" menu) */}
+      {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -117,176 +123,192 @@ export function Sidebar() {
       <aside
         className={`
           fixed top-0 left-0 h-full w-64 z-40
-          bg-white dark:bg-slate-900
-          border-r border-gray-200 dark:border-slate-700
-          transform transition-transform duration-200 ease-in-out
+          flex flex-col
+          bg-white/90 dark:bg-[#0a1020]/95
+          border-r border-slate-200/60 dark:border-white/[0.06]
+          backdrop-blur-xl
+          transform transition-transform duration-300 ease-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
         `}
+        style={{
+          boxShadow: '4px 0 32px rgba(0,0,0,0.06)',
+        }}
       >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-6 border-b border-gray-200 dark:border-slate-700">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <div>
-                <h1 className="font-bold text-xl text-gray-900 dark:text-white">ACIK</h1>
-                <p className="text-xs text-gray-500 dark:text-slate-400">{t('auth', 'managementSystem')}</p>
-              </div>
-            </Link>
-          </div>
+        {/* Subtle top gradient line */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-500 opacity-80" />
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {menuItems.filter((item) => {
-              if (!item.module) return true
-              if (isAdmin) return true
-              return (profile?.permissions || []).includes(item.module)
-            }).map((item) => {
-              const isActive = pathname === item.href
-              const isNotification = item.key === 'notifications'
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all relative
-                    ${isActive
-                      ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-medium'
-                      : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
-                    }
-                  `}
-                >
-                  <div className="relative">
-                    <item.icon size={20} />
-                    {isNotification && unreadCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full leading-none">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
-                  </div>
-                  <span>{t('nav', item.key)}</span>
-                  {isNotification && unreadCount > 0 && (
-                    <span className="ml-auto bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 text-xs font-medium px-2 py-0.5 rounded-full">
-                      {unreadCount}
+        {/* Logo */}
+        <div className="px-5 py-5 border-b border-slate-100 dark:border-white/[0.05]">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-10 h-10 flex-shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:shadow-indigo-500/50 transition-shadow duration-300">
+                <span className="text-white font-black text-lg tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>A</span>
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white dark:border-[#0a1020] shadow-sm" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="font-black text-lg text-slate-900 dark:text-white tracking-tight leading-none" style={{ fontFamily: 'var(--font-display)' }}>ACIK</h1>
+              <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">
+                {t('auth', 'managementSystem')}
+              </p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-4 overflow-y-auto no-scrollbar space-y-0.5">
+          {visibleMenuItems.map((item, i) => {
+            const isActive = pathname === item.href
+            const isNotif = item.key === 'notifications'
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className={`
+                  group relative flex items-center gap-3 px-3 py-2.5 rounded-xl
+                  text-sm font-medium transition-all duration-200
+                  ${isActive
+                    ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white'
+                  }
+                `}
+                style={{ animationDelay: `${i * 30}ms` }}
+              >
+                {/* Active indicator */}
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 rounded-full bg-indigo-500" />
+                )}
+
+                {/* Icon */}
+                <span className={`relative flex-shrink-0 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+                  <item.icon size={18} />
+                  {isNotif && unreadCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 flex items-center justify-center bg-red-500 text-white text-[9px] font-bold rounded-full">
+                      {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
-                </Link>
-              )
-            })}
-
-            {isAdmin && (
-              <>
-                <div className="pt-4 pb-2">
-                  <p className="px-4 text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
-                    {t('nav', 'admin')}
-                  </p>
-                </div>
-                {adminItems.map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`
-                        flex items-center gap-3 px-4 py-3 rounded-xl transition-all
-                        ${isActive
-                          ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-medium'
-                          : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
-                        }
-                      `}
-                    >
-                      <item.icon size={20} />
-                      <span>{t('nav', item.key)}</span>
-                    </Link>
-                  )
-                })}
-              </>
-            )}
-          </nav>
-
-          {/* Theme Toggle */}
-          <div className="px-4 py-2 border-t border-gray-100 dark:border-slate-700">
-            <button
-              onClick={toggleTheme}
-              className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-all"
-            >
-              {theme === 'dark' ? <FiSun size={18} /> : <FiMoon size={18} />}
-              <span>{theme === 'dark' ? t('common', 'lightMode') : t('common', 'darkMode')}</span>
-            </button>
-          </div>
-
-          {/* Language Selector */}
-          <div className="px-4 py-2 border-t border-gray-100 dark:border-slate-700">
-            <div className="relative">
-              <button
-                onClick={() => setShowLangMenu(!showLangMenu)}
-                className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-all"
-              >
-                <FiGlobe size={18} />
-                <span>{language === 'ru' ? t('common', 'russian') : t('common', 'english')}</span>
-              </button>
-
-              {showLangMenu && (
-                <div className="absolute bottom-full left-0 mb-2 w-full bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 overflow-hidden z-50">
-                  <button
-                    onClick={() => {
-                      setLanguage('ru')
-                      setShowLangMenu(false)
-                    }}
-                    className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 ${
-                      language === 'ru' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-slate-300'
-                    }`}
-                  >
-                    <span className="text-xl">🇷🇺</span>
-                    <span className="font-medium">{t('common', 'russian')}</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setLanguage('en')
-                      setShowLangMenu(false)
-                    }}
-                    className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 ${
-                      language === 'en' ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-slate-300'
-                    }`}
-                  >
-                    <span className="text-xl">🇺🇸</span>
-                    <span className="font-medium">{t('common', 'english')}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* User section */}
-          <div className="p-4 border-t border-gray-200 dark:border-slate-700">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium">
-                  {profile?.name?.charAt(0) || 'U'}
                 </span>
+
+                <span className="flex-1 truncate">{t('nav', item.key)}</span>
+
+                {isNotif && unreadCount > 0 && (
+                  <span className="flex-shrink-0 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </Link>
+            )
+          })}
+
+          {/* Admin section */}
+          {isAdmin && (
+            <div className="pt-3">
+              <p className="px-3 pb-1.5 text-[10px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest">
+                {t('nav', 'admin')}
+              </p>
+              {adminItems.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`
+                      group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                      transition-all duration-200 relative
+                      ${isActive
+                        ? 'bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white'
+                      }
+                    `}
+                  >
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 rounded-full bg-violet-500" />
+                    )}
+                    <span className={`flex-shrink-0 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+                      <item.icon size={18} />
+                    </span>
+                    <span className="flex-1 truncate">{t('nav', item.key)}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </nav>
+
+        {/* Bottom controls */}
+        <div className="border-t border-slate-100 dark:border-white/[0.05] px-3 py-3 space-y-0.5">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white transition-all duration-200"
+          >
+            <span className="flex-shrink-0 transition-transform duration-300" style={{ transform: theme === 'dark' ? 'rotate(0deg)' : 'rotate(180deg)' }}>
+              {theme === 'dark' ? <FiSun size={18} /> : <FiMoon size={18} />}
+            </span>
+            <span>{theme === 'dark' ? t('common', 'lightMode') : t('common', 'darkMode')}</span>
+          </button>
+
+          {/* Language */}
+          <div className="relative">
+            <button
+              onClick={() => setShowLangMenu(!showLangMenu)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white transition-all duration-200"
+            >
+              <FiGlobe size={18} className="flex-shrink-0" />
+              <span>{language === 'ru' ? t('common', 'russian') : t('common', 'english')}</span>
+            </button>
+
+            {showLangMenu && (
+              <div className="absolute bottom-full left-0 mb-2 w-full bg-white dark:bg-[#111927] rounded-xl shadow-xl border border-slate-100 dark:border-white/[0.06] overflow-hidden z-50 animate-slide-down">
+                {[
+                  { code: 'ru', flag: '🇷🇺', label: t('common', 'russian') },
+                  { code: 'en', flag: '🇺🇸', label: t('common', 'english') },
+                ].map(({ code, flag, label }) => (
+                  <button
+                    key={code}
+                    onClick={() => { setLanguage(code as 'ru' | 'en'); setShowLangMenu(false) }}
+                    className={`w-full px-4 py-3 text-left flex items-center gap-3 text-sm font-medium transition-colors ${
+                      language === code
+                        ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <span className="text-base">{flag}</span>
+                    <span>{label}</span>
+                  </button>
+                ))}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 dark:text-white truncate">
-                  {profile?.name || t('common', 'user')}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 truncate">
-                  {t('roles', profile?.role || 'Member')}
-                </p>
+            )}
+          </div>
+        </div>
+
+        {/* User profile */}
+        <div className="px-3 pb-4 border-t border-slate-100 dark:border-white/[0.05] pt-3">
+          <div className="flex items-center gap-3 px-2 py-2 mb-2">
+            <div className="relative w-9 h-9 flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-600 flex items-center justify-center shadow-md">
+                <span className="text-white text-sm font-bold">{initials}</span>
               </div>
             </div>
-            <button
-              onClick={logout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 text-gray-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
-            >
-              <FiLogOut size={18} />
-              <span>{t('nav', 'logout')}</span>
-            </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate leading-tight">
+                {profile?.name || t('common', 'user')}
+              </p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                {t('roles', profile?.role || 'Member')}
+              </p>
+            </div>
           </div>
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/[0.08] transition-all duration-200"
+          >
+            <FiLogOut size={16} className="flex-shrink-0" />
+            <span>{t('nav', 'logout')}</span>
+          </button>
         </div>
       </aside>
     </>

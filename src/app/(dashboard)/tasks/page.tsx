@@ -151,7 +151,7 @@ export default function TasksPage() {
     }
   }, [search, projectFilter, priorityFilter, activeTab, profile?.id])
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       const res = await fetch('/api/projects')
       const data = await res.json()
@@ -161,9 +161,9 @@ export default function TasksPage() {
     } catch (error) {
       console.error('Error fetching projects:', error)
     }
-  }
+  }, [])
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const res = await fetch('/api/users')
       const data = await res.json()
@@ -173,7 +173,7 @@ export default function TasksPage() {
     } catch (error) {
       console.error('Error fetching users:', error)
     }
-  }
+  }, [])
 
   // Initial load — parallel fetch
   useEffect(() => {
@@ -339,13 +339,12 @@ export default function TasksPage() {
     }
   }
 
-  const groupedTasks = statusColumns.reduce((acc, col) => {
+  const groupedTasks = useMemo(() => statusColumns.reduce((acc, col) => {
     acc[col.key] = tasks.filter(t => t.status === col.key)
     return acc
-  }, {} as Record<string, Task[]>)
+  }, {} as Record<string, Task[]>), [tasks, statusColumns])
 
-  // Stats
-  const stats = {
+  const stats = useMemo(() => ({
     total: tasks.length,
     todo: tasks.filter(t => t.status === 'TODO').length,
     inProgress: tasks.filter(t => t.status === 'InProgress').length,
@@ -354,10 +353,10 @@ export default function TasksPage() {
       if (!t.dueDate) return false
       return new Date(t.dueDate) < new Date() && t.status !== 'Done'
     }).length,
-  }
+  }), [tasks])
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
+    <div className="min-h-screen">
       <Header title={t('tasks', 'title')} subtitle={t('tasks', 'subtitle')} />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
@@ -584,7 +583,7 @@ export default function TasksPage() {
                                   e.stopPropagation()
                                   setOpenDropdown(openDropdown === task.id ? null : task.id)
                                 }}
-                                className="p-1 text-gray-400 hover:text-gray-600 rounded opacity-0 group-hover:opacity-100 transition-all"
+                                className="p-1 text-gray-400 hover:text-gray-600 rounded transition-all"
                               >
                                 <FiMoreVertical size={16} />
                               </button>
@@ -821,7 +820,7 @@ export default function TasksPage() {
                         </td>
                         {canManage && (
                           <td className="py-4 px-6 text-right">
-                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => openEditModal(task)}
                                 className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"

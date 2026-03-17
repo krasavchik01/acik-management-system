@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'react-toastify'
 import {
-  FiUsers, FiActivity, FiMapPin, FiSettings, FiRefreshCw, FiPlus, FiShield, FiX
+  FiUsers, FiActivity, FiMapPin, FiSettings, FiShield, FiX
 } from 'react-icons/fi'
 import { useLanguage } from '@/lib/i18n'
 
@@ -72,11 +72,6 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     if (!isAdmin) return
     try {
-      // Backend fetch logic remains the same (Next.js/Supabase for now as per codebase check)
-      const params = new URLSearchParams()
-      // Note: roleFilter and deptFilter need to be handled by the server for full power, 
-      // but we do local filtering for now to ensure UI responsiveness.
-      
       const [dashboardRes, usersRes] = await Promise.all([
         fetch('/api/admin/dashboard'),
         fetch('/api/admin/users'),
@@ -325,17 +320,17 @@ export default function AdminPage() {
     setShowPasswordModal(true)
   }
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = useMemo(() => users.filter(user => {
     const matchesSearch = !search || user.name.toLowerCase().includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
     const matchesRole = roleFilter === 'all' || user.role === roleFilter
     const matchesDept = deptFilter === 'all' || user.department === deptFilter
     const matchesDemo = !demoFilter || user.isDemo === true
     return matchesSearch && matchesRole && matchesDept && matchesDemo
-  })
+  }), [users, search, roleFilter, deptFilter, demoFilter])
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <Header title={t('admin', 'title')} subtitle={t('admin', 'accessDenied')} />
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="bg-white dark:bg-slate-900 border border-red-100 dark:border-red-900/30 rounded-[3rem] p-12 text-center shadow-2xl max-w-lg w-full">
@@ -351,12 +346,12 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 pb-20">
+    <div className="min-h-screen pb-20">
       <Header title={t('admin', 'title')} subtitle={t('admin', 'subtitle')} />
 
       <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-10">
-        {/* Superior Tabs Navigation */}
-        <div className="bg-white dark:bg-slate-900 p-2 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 inline-flex flex-wrap gap-2 overflow-x-auto max-w-full no-scrollbar">
+        {/* Tabs Navigation */}
+        <div className="bg-white dark:bg-slate-900 p-1.5 rounded-2xl sm:rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 flex gap-1 overflow-x-auto no-scrollbar">
           {[
             { id: 'overview', label: t('admin', 'tabOverview'), icon: FiActivity },
             { id: 'users', label: t('admin', 'tabUsers'), icon: FiUsers },
@@ -366,14 +361,15 @@ export default function AdminPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-3 px-8 py-4 rounded-[2rem] font-black uppercase tracking-widest text-xs transition-all duration-300 ${
+              className={`flex items-center justify-center gap-2 px-4 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-[2rem] font-bold sm:font-black uppercase tracking-wider sm:tracking-widest text-[10px] sm:text-xs transition-all duration-300 flex-1 sm:flex-none whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 -translate-y-1'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
                   : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              <tab.icon size={18} />
-              {tab.label}
+              <tab.icon size={16} />
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
             </button>
           ))}
         </div>

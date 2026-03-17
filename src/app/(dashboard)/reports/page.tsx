@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Header } from '@/components/layout/Header'
 import { FiFileText, FiDownload, FiBarChart2, FiPieChart, FiTrendingUp } from 'react-icons/fi'
 import { useAuth } from '@/hooks/useAuth'
@@ -14,24 +14,22 @@ interface Stats {
 }
 
 export default function ReportsPage() {
-  const { profile } = useAuth()
-  const { language, t } = useLanguage()
+  useAuth()
+  const { t } = useLanguage()
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchStats()
-  }, [])
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const [projectsRes, membersRes] = await Promise.all([
         fetch('/api/projects/stats'),
         fetch('/api/members/stats'),
       ])
 
-      const projectsData = await projectsRes.json()
-      const membersData = await membersRes.json()
+      const [projectsData, membersData] = await Promise.all([
+        projectsRes.json(),
+        membersRes.json(),
+      ])
 
       setStats({
         projects: {
@@ -57,7 +55,11 @@ export default function ReportsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchStats()
+  }, [fetchStats])
 
   const reports = [
     {
@@ -87,7 +89,7 @@ export default function ReportsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
+    <div className="min-h-screen">
       <Header
         title={t('reports', 'title')}
         subtitle={t('reports', 'subtitle')}

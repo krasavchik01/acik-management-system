@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Header } from '@/components/layout/Header'
 import { FiDollarSign, FiTrendingUp, FiTrendingDown, FiPlus, FiEdit2, FiTrash2, FiX, FiFilter } from 'react-icons/fi'
 import { useAuth } from '@/hooks/useAuth'
@@ -23,7 +23,7 @@ interface Transaction {
 
 export default function FinancePage() {
   const { profile } = useAuth()
-  const { language, t } = useLanguage()
+  const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
@@ -43,11 +43,7 @@ export default function FinancePage() {
 
   const canManage = profile && ['Admin', 'President', 'CEO', 'ProjectManager'].includes(profile.role)
 
-  useEffect(() => {
-    fetchTransactions()
-  }, [filter])
-
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (filter.type) params.append('type', filter.type)
@@ -64,7 +60,11 @@ export default function FinancePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filter])
+
+  useEffect(() => {
+    fetchTransactions()
+  }, [fetchTransactions])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -146,7 +146,7 @@ export default function FinancePage() {
   const balance = totalIncome - totalExpenses
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-900/50">
+    <div className="min-h-screen">
       <Header
         title={t('finance', 'title')}
         subtitle={t('finance', 'subtitle')}
@@ -243,8 +243,63 @@ export default function FinancePage() {
             <p className="text-gray-500 dark:text-slate-400">{t('finance', 'noTransactionsMatching')}</p>
           </div>
         ) : (
-          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
-            <div className="overflow-x-auto">
+          <>
+            {/* Mobile cards */}
+            <div className="lg:hidden space-y-3">
+              {transactions.map((transaction) => (
+                <div key={transaction.id} className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-slate-700/50">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 dark:text-white text-sm leading-tight">{transaction.description}</p>
+                      {transaction.reference && <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Ref: {transaction.reference}</p>}
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                        {new Date(transaction.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                        {' · '}
+                        {transaction.category === 'Sponsorship' ? t('finance', 'catSponsorship') :
+                         transaction.category === 'Membership' ? t('finance', 'catMembership') :
+                         transaction.category === 'Events' ? t('finance', 'catEvents') :
+                         transaction.category === 'Operations' ? t('finance', 'catOperations') :
+                         transaction.category === 'Marketing' ? t('finance', 'catMarketing') :
+                         transaction.category === 'Salary' ? t('finance', 'catSalary') :
+                         t('finance', 'catOther')}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <span className={`text-base font-black ${transaction.type === 'Income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {transaction.type === 'Income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${transaction.type === 'Income' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
+                          {transaction.type === 'Income' ? t('finance', 'income') : t('finance', 'expense')}
+                        </span>
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${transaction.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : transaction.status === 'Pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : transaction.status === 'Approved' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
+                          {transaction.status === 'Completed' ? t('common', 'completed') : transaction.status === 'Pending' ? t('common', 'pending') : transaction.status === 'Approved' ? t('projects', 'statusActive') : t('projects', 'statusCancelled')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {canManage && (
+                    <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-slate-700/50">
+                      <button
+                        onClick={() => openEditModal(transaction)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                      >
+                        <FiEdit2 size={14} /> {t('common', 'edit')}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(transaction.id)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
+                      >
+                        <FiTrash2 size={14} /> {t('common', 'delete')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden lg:block bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50 overflow-hidden">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-700/50">
@@ -259,7 +314,7 @@ export default function FinancePage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
                   {transactions.map((transaction) => (
-                    <tr key={transaction.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors group">
+                    <tr key={transaction.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-400">
                         {new Date(transaction.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </td>
@@ -277,30 +332,21 @@ export default function FinancePage() {
                          t('finance', 'catOther')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${transaction.type === 'Income' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                          }`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${transaction.type === 'Income' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
                           {transaction.type === 'Income' ? t('finance', 'income') : t('finance', 'expense')}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${transaction.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                            transaction.status === 'Pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' :
-                              transaction.status === 'Approved' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-                                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                          }`}>
-                          {transaction.status === 'Completed' ? t('common', 'completed') :
-                            transaction.status === 'Pending' ? t('common', 'pending') :
-                            transaction.status === 'Approved' ? t('projects', 'statusActive') :
-                            t('projects', 'statusCancelled')}
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${transaction.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : transaction.status === 'Pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : transaction.status === 'Approved' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
+                          {transaction.status === 'Completed' ? t('common', 'completed') : transaction.status === 'Pending' ? t('common', 'pending') : transaction.status === 'Approved' ? t('projects', 'statusActive') : t('projects', 'statusCancelled')}
                         </span>
                       </td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold text-right ${transaction.type === 'Income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                        }`}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold text-right ${transaction.type === 'Income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {transaction.type === 'Income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                       </td>
                       {canManage && (
                         <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center justify-end gap-2">
                             <button onClick={() => openEditModal(transaction)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all" title="Edit">
                               <FiEdit2 size={16} />
                             </button>
@@ -315,7 +361,7 @@ export default function FinancePage() {
                 </tbody>
               </table>
             </div>
-          </div>
+          </>
         )}
       </div>
 

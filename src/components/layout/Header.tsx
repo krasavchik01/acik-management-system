@@ -207,25 +207,36 @@ export function Header({ title, subtitle, action }: HeaderProps) {
     }
   }
 
+  const initials = profile?.name
+    ? profile.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
+    : 'U'
+
   return (
-    <header className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
+    <header className="sticky top-0 z-30 bg-white/80 dark:bg-[#080d14]/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-white/[0.05] px-6 py-3.5">
+      <div className="flex items-center justify-between gap-4">
+        {/* Title */}
+        <div className="min-w-0">
+          <h1
+            className="text-xl font-bold text-slate-900 dark:text-white truncate tracking-tight"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {title}
+          </h1>
           {subtitle && (
-            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{subtitle}</p>
+            <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5 truncate">{subtitle}</p>
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Action button */}
           {action && (
             <>
               {typeof action === 'object' && 'label' in action && 'onClick' in action ? (
                 <button
                   onClick={(action as { onClick: () => void }).onClick}
-                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-500 hover:to-violet-500 transition-all duration-200 text-sm font-semibold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:-translate-y-px"
                 >
-                  <FiPlus size={18} />
+                  <FiPlus size={16} />
                   {(action as { label: string }).label}
                 </button>
               ) : (
@@ -235,12 +246,13 @@ export function Header({ title, subtitle, action }: HeaderProps) {
           )}
 
           {/* Search */}
-          <div className="hidden md:flex items-center bg-gray-100 dark:bg-slate-700 rounded-xl px-4 py-2">
-            <FiSearch className="text-gray-400 dark:text-slate-400" size={18} />
+          <div className="hidden lg:flex items-center gap-2 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] rounded-xl px-3 py-2 w-48 focus-within:ring-2 focus-within:ring-indigo-500/30 focus-within:border-indigo-400/50 transition-all">
+            <FiSearch className="text-slate-400 flex-shrink-0" size={15} />
             <input
               type="text"
               placeholder={language === 'ru' ? 'Поиск...' : 'Search...'}
-              className="bg-transparent border-none outline-none ml-2 w-48 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
+              className="bg-transparent border-none outline-none w-full text-sm text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-600"
+              style={{ boxShadow: 'none' }}
             />
           </div>
 
@@ -248,49 +260,59 @@ export function Header({ title, subtitle, action }: HeaderProps) {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-all"
+              className={`relative p-2.5 rounded-xl text-slate-500 dark:text-slate-400 transition-all duration-200 ${
+                showNotifications
+                  ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                  : 'hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-700 dark:hover:text-white'
+              }`}
             >
-              <FiBell size={20} />
+              <FiBell size={18} />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-medium">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#080d14]" />
               )}
             </button>
 
-            {/* Notifications Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 z-50 overflow-hidden">
+              <div className="absolute right-0 mt-2 w-[360px] bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-100 dark:border-white/[0.06] z-50 overflow-hidden animate-scale-in">
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {language === 'ru' ? 'Уведомления' : 'Notifications'}
-                  </h3>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-white/[0.05]">
                   <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                      {language === 'ru' ? 'Уведомления' : 'Notifications'}
+                    </h3>
+                    {unreadCount > 0 && (
+                      <span className="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}
                         disabled={loading}
-                        className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+                        className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 px-2 py-1 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
                       >
                         {language === 'ru' ? 'Прочитать всё' : 'Mark all read'}
                       </button>
                     )}
                     <button
                       onClick={() => setShowNotifications(false)}
-                      className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg"
+                      className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.05] rounded-lg transition-colors"
                     >
-                      <FiX size={16} className="text-gray-400" />
+                      <FiX size={14} className="text-slate-400" />
                     </button>
                   </div>
                 </div>
 
-                {/* Notifications List */}
-                <div className="max-h-96 overflow-y-auto">
+                {/* List */}
+                <div className="max-h-80 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className="py-12 text-center">
-                      <FiBell size={32} className="mx-auto text-gray-300 dark:text-slate-600 mb-3" />
-                      <p className="text-gray-500 dark:text-slate-400 text-sm">
+                    <div className="py-10 text-center">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/[0.04] flex items-center justify-center mx-auto mb-3">
+                        <FiBell size={20} className="text-slate-300 dark:text-slate-600" />
+                      </div>
+                      <p className="text-sm font-medium text-slate-400 dark:text-slate-500">
                         {language === 'ru' ? 'Нет уведомлений' : 'No notifications'}
                       </p>
                     </div>
@@ -300,29 +322,30 @@ export function Header({ title, subtitle, action }: HeaderProps) {
                         key={notification.id}
                         onClick={() => {
                           if (!notification.isRead) markAsRead(notification.id)
-                          if (notification.link) {
-                            window.location.href = notification.link
-                          }
+                          if (notification.link) window.location.href = notification.link
                         }}
-                        className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors ${!notification.isRead ? 'bg-indigo-50/50 dark:bg-indigo-900/20' : ''
-                          }`}
+                        className={`flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-slate-50 dark:border-white/[0.03] last:border-0 ${
+                          !notification.isRead
+                            ? 'bg-indigo-50/60 dark:bg-indigo-500/[0.05] hover:bg-indigo-50 dark:hover:bg-indigo-500/[0.08]'
+                            : 'hover:bg-slate-50 dark:hover:bg-white/[0.02]'
+                        }`}
                       >
-                        <div className="flex-shrink-0 mt-1">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/[0.04] flex items-center justify-center mt-0.5">
                           {getNotificationIcon(notification.type)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm ${!notification.isRead ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-700 dark:text-slate-300'}`}>
+                          <p className={`text-[13px] leading-snug ${!notification.isRead ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-600 dark:text-slate-300'}`}>
                             {notification.title}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5 line-clamp-2">
+                          <p className="text-xs text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
+                          <p className="text-[10px] text-slate-300 dark:text-slate-600 mt-1 font-medium">
                             {formatTime(notification.createdAt)}
                           </p>
                         </div>
                         {!notification.isRead && (
-                          <div className="w-2 h-2 bg-indigo-500 rounded-full flex-shrink-0 mt-2" />
+                          <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full flex-shrink-0 mt-2" />
                         )}
                       </div>
                     ))
@@ -331,20 +354,20 @@ export function Header({ title, subtitle, action }: HeaderProps) {
 
                 {/* Footer */}
                 {notifications.length > 0 && (
-                  <div className="border-t border-gray-100 dark:border-slate-700 p-2 space-y-2">
+                  <div className="border-t border-slate-100 dark:border-white/[0.05] p-2 space-y-1.5">
                     {!pushEnabled && (
                       <button
                         onClick={subscribeToPushWorker}
-                        className="w-full flex items-center justify-center gap-2 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl font-medium transition-colors"
+                        className="w-full flex items-center justify-center gap-2 py-2 text-xs text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl font-semibold transition-all shadow-sm"
                       >
-                        <FiBell className="animate-pulse" />
+                        <FiBell size={13} />
                         {language === 'ru' ? 'Включить Push-уведомления' : 'Enable Push Notifications'}
                       </button>
                     )}
                     <Link
                       href="/notifications"
                       onClick={() => setShowNotifications(false)}
-                      className="block w-full text-center py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-xl font-medium transition-colors"
+                      className="block w-full text-center py-2 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl font-semibold transition-colors"
                     >
                       {language === 'ru' ? 'Смотреть все' : 'View all'}
                     </Link>
@@ -355,19 +378,17 @@ export function Header({ title, subtitle, action }: HeaderProps) {
           </div>
 
           {/* User avatar */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <div className="hidden md:block text-right">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-tight">
                 {profile?.name || 'User'}
               </p>
-              <p className="text-xs text-gray-500 dark:text-slate-400">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
                 {profile?.role || 'Member'}
               </p>
             </div>
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-medium">
-                {profile?.name?.charAt(0) || 'U'}
-              </span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-500/20 flex-shrink-0">
+              <span className="text-white text-xs font-bold">{initials}</span>
             </div>
           </div>
         </div>
