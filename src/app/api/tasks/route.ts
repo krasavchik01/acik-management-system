@@ -122,6 +122,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!body.projectId) {
+      return NextResponse.json(
+        { success: false, message: 'Project is required' },
+        { status: 400 }
+      )
+    }
+
     const task = await prisma.task.create({
       data: {
         title: body.title,

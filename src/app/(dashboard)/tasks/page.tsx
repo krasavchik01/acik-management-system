@@ -235,6 +235,10 @@ export default function TasksPage() {
       toast.error('Task title is required')
       return
     }
+    if (!formData.projectId) {
+      toast.error('Project is required')
+      return
+    }
 
     setSaving(true)
     try {
@@ -910,20 +914,24 @@ export default function TasksPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   <FiFolder className="inline mr-2" size={14} />
-                  {t('tasks', 'project')}
+                  {t('tasks', 'project')} <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formData.projectId}
                   onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                  required
+                  className={`w-full px-4 py-3 bg-white dark:bg-slate-700/50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white ${!formData.projectId ? 'border-amber-300 dark:border-amber-600' : 'border-gray-200 dark:border-slate-600'}`}
                 >
                   <option value="">{t('tasks', 'noProject')}</option>
                   {projects.map(project => (
                     <option key={project.id} value={project.id}>{project.name}</option>
                   ))}
                 </select>
+                {!formData.projectId && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">Выберите проект для задачи</p>
+                )}
               </div>
 
               <div>
@@ -1075,31 +1083,33 @@ export default function TasksPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('common', 'status')}
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as Task['status'] })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  >
-                    {statusColumns.map(col => (
-                      <option key={col.key} value={col.key}>{col.label}</option>
-                    ))}
-                  </select>
-                </div>
+              <div className={editingTask ? 'grid grid-cols-2 gap-4' : ''}>
+                {editingTask && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                      {t('common', 'status')}
+                    </label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value as Task['status'] })}
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-700/50"
+                    >
+                      {statusColumns.map(col => (
+                        <option key={col.key} value={col.key}>{col.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     <FiFlag className="inline mr-2" size={14} />
                     {t('common', 'priority')}
                   </label>
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value as Task['priority'] })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-700/50"
                   >
                     {priorityOptions.map(p => (
                       <option key={p.value} value={p.value}>{p.label}</option>
