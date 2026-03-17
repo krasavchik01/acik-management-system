@@ -8,7 +8,7 @@ import { toast } from 'react-toastify'
 import {
   FiPlus, FiSearch, FiX, FiCalendar, FiUser, FiFlag, FiFolder,
   FiMoreVertical, FiEdit2, FiTrash2, FiCheckCircle, FiClock,
-  FiAlertCircle, FiList, FiGrid, FiChevronDown
+  FiAlertCircle, FiList, FiGrid, FiChevronDown, FiUsers, FiCheckSquare
 } from 'react-icons/fi'
 import UserPicker from './UserPicker'
 
@@ -106,6 +106,12 @@ export default function TasksPage() {
 
   // Dropdown state
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+
+  // Form optional section toggles
+  const [showReviewer, setShowReviewer] = useState(false)
+  const [showCoExecutors, setShowCoExecutors] = useState(false)
+  const [showParentTask, setShowParentTask] = useState(false)
+  const [showStages, setShowStages] = useState(false)
 
   // Form data
   const [formData, setFormData] = useState({
@@ -206,6 +212,10 @@ export default function TasksPage() {
       coExecutors: [],
       stages: [],
     })
+    setShowReviewer(false)
+    setShowCoExecutors(false)
+    setShowParentTask(false)
+    setShowStages(false)
     setShowModal(true)
   }
 
@@ -225,6 +235,10 @@ export default function TasksPage() {
       coExecutors: task.coExecutors?.map(ce => ce.userId) || [],
       stages: task.stages?.map(s => ({ title: s.title, isCompleted: s.isCompleted })) || [],
     })
+    setShowReviewer(!!task.reviewerId)
+    setShowCoExecutors((task.coExecutors?.length ?? 0) > 0)
+    setShowParentTask(!!task.parentId)
+    setShowStages((task.stages?.length ?? 0) > 0)
     setShowModal(true)
     setOpenDropdown(null)
   }
@@ -872,277 +886,280 @@ export default function TasksPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 sm:p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">
-                {editingTask ? t('tasks', 'editTask') : t('tasks', 'newTask')}
-              </h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all"
-              >
+          <div className="bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-lg max-h-[92vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-700/50 z-10 rounded-t-3xl">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {editingTask ? t('tasks', 'editTask') : t('tasks', 'newTask')}
+                </h2>
+                {!editingTask && <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Статус автоматически — "К выполнению"</p>}
+              </div>
+              <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-all">
                 <FiX size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+              {/* ── CORE FIELDS ── */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('tasks', 'taskTitle')} *
-                </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                  placeholder={t('tasks', 'enterTaskTitle')}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-base font-medium"
+                  placeholder={`${t('tasks', 'taskTitle')} *`}
                   required
+                  autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('common', 'description')}
-                </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
+                  rows={2}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-sm"
                   placeholder={t('tasks', 'describeTask')}
                 />
               </div>
 
+              {/* Project */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                  <FiFolder className="inline mr-2" size={14} />
-                  {t('tasks', 'project')} <span className="text-red-500">*</span>
-                </label>
                 <select
                   value={formData.projectId}
                   onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
                   required
-                  className={`w-full px-4 py-3 bg-white dark:bg-slate-700/50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white ${!formData.projectId ? 'border-amber-300 dark:border-amber-600' : 'border-gray-200 dark:border-slate-600'}`}
+                  className={`w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm ${!formData.projectId ? 'border-amber-300 dark:border-amber-600' : 'border-gray-200 dark:border-slate-600'}`}
                 >
-                  <option value="">{t('tasks', 'noProject')}</option>
-                  {projects.map(project => (
-                    <option key={project.id} value={project.id}>{project.name}</option>
-                  ))}
-                </select>
-                {!formData.projectId && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">Выберите проект для задачи</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                  <FiUser className="inline mr-2 text-indigo-500" size={14} />
-                  {t('tasks', 'assignedTo')}
-                </label>
-                <UserPicker
-                  users={users}
-                  value={formData.assignedToId}
-                  onChange={(id) => setFormData({ ...formData, assignedToId: id })}
-                  placeholder={t('tasks', 'unassigned')}
-                  language={language}
-                  showWorkload
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                  <FiCheckCircle className="inline mr-2 text-blue-500" size={14} />
-                  {t('tasks', 'reviewer')}
-                </label>
-                <UserPicker
-                  users={users}
-                  value={formData.reviewerId}
-                  onChange={(id) => setFormData({ ...formData, reviewerId: id })}
-                  placeholder={t('tasks', 'noReviewer')}
-                  language={language}
-                  showWorkload={false}
-                />
-              </div>
-
-              <div className="flex items-center gap-2 py-2">
-                <input
-                  type="checkbox"
-                  id="isApprovalRequired"
-                  checked={formData.isApprovalRequired}
-                  onChange={(e) => setFormData({ ...formData, isApprovalRequired: e.target.checked })}
-                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <label htmlFor="isApprovalRequired" className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer">
-                  {t('tasks', 'mandatoryConfirmation')}
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                  <FiFolder className="inline mr-2 text-purple-500" size={14} />
-                  {t('tasks', 'parentTask')}
-                </label>
-                <select
-                  value={formData.parentId}
-                  onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
-                >
-                  <option value="">{t('tasks', 'topLevelTask')}</option>
-                  {tasks.filter(t => t.id !== editingTask?.id && !t.parentId).map(task => (
-                    <option key={task.id} value={task.id}>{task.title}</option>
-                  ))}
+                  <option value="">📁 {t('tasks', 'project')} *</option>
+                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>
 
+              {/* Assigned To */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">
-                  {t('tasks', 'coExecutors')}
-                </label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {formData.coExecutors.map(userId => {
-                    const u = users.find(user => user.id === userId)
-                    return (
-                      <span key={userId} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-bold border border-indigo-100 dark:border-indigo-800">
-                        {u?.name || 'User'}
-                        <button
-                          type="button"
-                          onClick={() => setFormData({ ...formData, coExecutors: formData.coExecutors.filter(id => id !== userId) })}
-                          className="hover:text-red-500 ml-1"
-                        >
-                          <FiX size={14} />
-                        </button>
-                      </span>
-                    )
-                  })}
-                  <select
-                    onChange={(e) => {
-                      if (e.target.value && !formData.coExecutors.includes(e.target.value)) {
-                        setFormData({ ...formData, coExecutors: [...formData.coExecutors, e.target.value] })
-                      }
-                      e.target.value = ''
-                    }}
-                    className="px-3 py-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full text-xs outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="">+ {t('common', 'add')} {t('tasks', 'coExecutors')}</option>
-                    {users.filter(u => u.id !== formData.assignedToId && !formData.coExecutors.includes(u.id)).map(user => (
-                      <option key={user.id} value={user.id}>{user.name}</option>
-                    ))}
-                  </select>
-                </div>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
+                  <FiUser size={12} /> {t('tasks', 'assignedTo')}
+                </p>
+                <UserPicker users={users} value={formData.assignedToId} onChange={(id) => setFormData({ ...formData, assignedToId: id })} placeholder={t('tasks', 'unassigned')} language={language} showWorkload />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 flex items-center justify-between">
-                  <span>{t('tasks', 'taskStages')}</span>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, stages: [...formData.stages, { title: '', isCompleted: false }] })}
-                    className="text-xs text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1"
-                  >
-                    <FiPlus size={12} /> {t('tasks', 'addStage')}
-                  </button>
-                </label>
-                <div className="space-y-3">
-                  {formData.stages.map((stage, index) => (
-                    <div key={index} className="flex items-center gap-3 animate-in slide-in-from-left-2">
-                       <input
-                        type="checkbox"
-                        checked={stage.isCompleted}
-                        onChange={(e) => {
-                          const newStages = [...formData.stages]
-                          newStages[index].isCompleted = e.target.checked
-                          setFormData({ ...formData, stages: newStages })
-                        }}
-                        className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                      />
-                      <input
-                        type="text"
-                        value={stage.title}
-                        onChange={(e) => {
-                          const newStages = [...formData.stages]
-                          newStages[index].title = e.target.value
-                          setFormData({ ...formData, stages: newStages })
-                        }}
-                        className="flex-1 px-4 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        placeholder={t('tasks', 'stageTitle')}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, stages: formData.stages.filter((_, i) => i !== index) })}
-                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
-                  {formData.stages.length === 0 && (
-                    <p className="text-xs text-center py-4 text-gray-400 bg-gray-50 dark:bg-slate-800/30 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
-                      —
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className={editingTask ? 'grid grid-cols-2 gap-4' : ''}>
+              {/* Priority + Deadline (+ Status when editing) */}
+              <div className="grid grid-cols-2 gap-3">
                 {editingTask && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                      {t('common', 'status')}
-                    </label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value as Task['status'] })}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-700/50"
-                    >
-                      {statusColumns.map(col => (
-                        <option key={col.key} value={col.key}>{col.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    <FiFlag className="inline mr-2" size={14} />
-                    {t('common', 'priority')}
-                  </label>
                   <select
-                    value={formData.priority}
-                    onChange={(e) => setFormData({ ...formData, priority: e.target.value as Task['priority'] })}
-                    className="w-full px-4 py-3 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-700/50"
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as Task['status'] })}
+                    className="col-span-2 w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
                   >
-                    {priorityOptions.map(p => (
-                      <option key={p.value} value={p.value}>{p.label}</option>
-                    ))}
+                    {statusColumns.map(col => <option key={col.key} value={col.key}>{col.label}</option>)}
                   </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FiCalendar className="inline mr-2" size={14} />
-                  {t('common', 'deadline')}
-                </label>
+                )}
+                <select
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as Task['priority'] })}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                >
+                  {priorityOptions.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                </select>
                 <input
                   type="date"
                   value={formData.dueDate}
                   onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              {/* ── OPTIONAL SECTIONS ── */}
+              <div className="border-t border-gray-100 dark:border-slate-700/50 pt-4 space-y-3">
+                <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2">Дополнительно</p>
+
+                {/* Reviewer toggle */}
+                <div className="bg-gray-50 dark:bg-slate-700/30 rounded-2xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowReviewer(!showReviewer)
+                      if (showReviewer) setFormData({ ...formData, reviewerId: '', isApprovalRequired: false })
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <FiCheckCircle size={16} className={showReviewer ? 'text-blue-500' : 'text-gray-400'} />
+                      {t('tasks', 'reviewer')}
+                      {formData.reviewerId && <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-bold">{users.find(u => u.id === formData.reviewerId)?.name}</span>}
+                    </span>
+                    <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${showReviewer ? 'bg-blue-500' : 'bg-gray-200 dark:bg-slate-600'}`}>
+                      <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${showReviewer ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                  {showReviewer && (
+                    <div className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                      <UserPicker users={users} value={formData.reviewerId} onChange={(id) => setFormData({ ...formData, reviewerId: id })} placeholder={t('tasks', 'noReviewer')} language={language} showWorkload={false} />
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <div
+                          onClick={() => setFormData({ ...formData, isApprovalRequired: !formData.isApprovalRequired })}
+                          className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 cursor-pointer ${formData.isApprovalRequired ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-slate-600'}`}
+                        >
+                          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${formData.isApprovalRequired ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                        </div>
+                        <span className="text-sm text-gray-600 dark:text-slate-300">{t('tasks', 'mandatoryConfirmation')}</span>
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* Co-executors toggle */}
+                <div className="bg-gray-50 dark:bg-slate-700/30 rounded-2xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCoExecutors(!showCoExecutors)
+                      if (showCoExecutors) setFormData({ ...formData, coExecutors: [] })
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <FiUsers size={16} className={showCoExecutors ? 'text-indigo-500' : 'text-gray-400'} />
+                      {t('tasks', 'coExecutors')}
+                      {formData.coExecutors.length > 0 && <span className="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full font-bold">{formData.coExecutors.length}</span>}
+                    </span>
+                    <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${showCoExecutors ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-slate-600'}`}>
+                      <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${showCoExecutors ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                  {showCoExecutors && (
+                    <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-200">
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {formData.coExecutors.map(userId => {
+                          const u = users.find(user => user.id === userId)
+                          return (
+                            <span key={userId} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-bold border border-indigo-100 dark:border-indigo-800">
+                              {u?.name || 'User'}
+                              <button type="button" onClick={() => setFormData({ ...formData, coExecutors: formData.coExecutors.filter(id => id !== userId) })} className="hover:text-red-500"><FiX size={12} /></button>
+                            </span>
+                          )
+                        })}
+                      </div>
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value && !formData.coExecutors.includes(e.target.value)) {
+                            setFormData({ ...formData, coExecutors: [...formData.coExecutors, e.target.value] })
+                          }
+                          e.target.value = ''
+                        }}
+                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 dark:text-slate-300"
+                      >
+                        <option value="">+ Добавить соисполнителя</option>
+                        {users.filter(u => u.id !== formData.assignedToId && !formData.coExecutors.includes(u.id)).map(user => (
+                          <option key={user.id} value={user.id}>{user.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {/* Parent task toggle */}
+                <div className="bg-gray-50 dark:bg-slate-700/30 rounded-2xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowParentTask(!showParentTask)
+                      if (showParentTask) setFormData({ ...formData, parentId: '' })
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <FiFolder size={16} className={showParentTask ? 'text-purple-500' : 'text-gray-400'} />
+                      {t('tasks', 'parentTask')}
+                      {formData.parentId && <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full font-bold truncate max-w-[120px]">{tasks.find(t => t.id === formData.parentId)?.title}</span>}
+                    </span>
+                    <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${showParentTask ? 'bg-purple-500' : 'bg-gray-200 dark:bg-slate-600'}`}>
+                      <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${showParentTask ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                  {showParentTask && (
+                    <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-200">
+                      <select
+                        value={formData.parentId}
+                        onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 dark:text-slate-300"
+                      >
+                        <option value="">{t('tasks', 'topLevelTask')}</option>
+                        {tasks.filter(t => t.id !== editingTask?.id && !t.parentId).map(task => (
+                          <option key={task.id} value={task.id}>{task.title}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {/* Stages toggle */}
+                <div className="bg-gray-50 dark:bg-slate-700/30 rounded-2xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowStages(!showStages)
+                      if (showStages) setFormData({ ...formData, stages: [] })
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <FiCheckSquare size={16} className={showStages ? 'text-emerald-500' : 'text-gray-400'} />
+                      {t('tasks', 'taskStages')}
+                      {formData.stages.length > 0 && <span className="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold">{formData.stages.length}</span>}
+                    </span>
+                    <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${showStages ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-slate-600'}`}>
+                      <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${showStages ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                  {showStages && (
+                    <div className="px-4 pb-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
+                      {formData.stages.map((stage, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={stage.title}
+                            onChange={(e) => {
+                              const newStages = [...formData.stages]
+                              newStages[index].title = e.target.value
+                              setFormData({ ...formData, stages: newStages })
+                            }}
+                            className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder={`Этап ${index + 1}`}
+                          />
+                          <button type="button" onClick={() => setFormData({ ...formData, stages: formData.stages.filter((_, i) => i !== index) })} className="p-2 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0">
+                            <FiTrash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, stages: [...formData.stages, { title: '', isCompleted: false }] })}
+                        className="w-full py-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-200 dark:border-emerald-800 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors flex items-center justify-center gap-1"
+                      >
+                        <FiPlus size={12} /> {t('tasks', 'addStage')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Submit */}
+              <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
+                  className="flex-1 px-6 py-3 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
                 >
                   {t('common', 'cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20"
                 >
                   {saving ? t('common', 'loading') : editingTask ? t('common', 'save') : t('common', 'create')}
                 </button>
