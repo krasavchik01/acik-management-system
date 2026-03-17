@@ -83,6 +83,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [supabase.auth, fetchProfile, router])
 
+  // Refresh profile every 60s and on window focus to pick up permission changes
+  useEffect(() => {
+    let currentUserId: string | null = null
+
+    const handleFocus = () => {
+      if (currentUserId) fetchProfile(currentUserId)
+    }
+
+    const unsubscribe = supabase.auth.onAuthStateChange((_, session) => {
+      currentUserId = session?.user?.id ?? null
+    })
+
+    window.addEventListener('focus', handleFocus)
+    const interval = setInterval(() => {
+      if (currentUserId) fetchProfile(currentUserId)
+    }, 60000)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      clearInterval(interval)
+      unsubscribe.data.subscription.unsubscribe()
+    }
+  }, [supabase.auth, fetchProfile])
+
   const login = async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
