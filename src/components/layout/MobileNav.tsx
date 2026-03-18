@@ -24,7 +24,7 @@ export function MobileNav() {
 
   const isAdmin = profile?.role === 'Admin' || profile?.role === 'President' || profile?.role === 'CEO'
   const permissions = profile?.permissions || []
-  const can = (module: string) => isAdmin || permissions.includes(module)
+  const can = (module: string) => isAdmin || permissions.some(p => p.startsWith(module + '.'))
 
   const fetchUnread = useCallback(async () => {
     try {

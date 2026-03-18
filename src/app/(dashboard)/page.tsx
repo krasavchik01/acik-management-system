@@ -73,7 +73,7 @@ export default function DashboardPage() {
   const isAdmin = profile?.role === 'Admin' || profile?.role === 'President' || profile?.role === 'CEO'
   const permissions = profile?.permissions || []
 
-  const can = (module: string) => isAdmin || permissions.includes(module)
+  const can = (module: string) => isAdmin || permissions.some(p => p.startsWith(module + '.'))
 
   const fetchDashboardData = useCallback(async () => {
     try {

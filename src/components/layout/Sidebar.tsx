@@ -102,7 +102,7 @@ export function Sidebar() {
   const visibleMenuItems = menuItems.filter((item) => {
     if (!item.module) return true
     if (isAdmin) return true
-    return (profile?.permissions || []).includes(item.module)
+    return (profile?.permissions || []).some(p => p.startsWith(item.module + '.'))
   })
 
   const initials = profile?.name
