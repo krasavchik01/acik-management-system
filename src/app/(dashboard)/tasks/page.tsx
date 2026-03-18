@@ -251,11 +251,6 @@ export default function TasksPage() {
       toast.error('Task title is required')
       return
     }
-    if (!formData.projectId) {
-      toast.error('Project is required')
-      return
-    }
-
     setSaving(true)
     try {
       const url = editingTask ? `/api/tasks/${editingTask.id}` : '/api/tasks'
