@@ -411,8 +411,8 @@ model Task {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  projectId    String
-  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    String?
+  project      Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   assignedToId String?
   assignedTo   User?   @relation("TaskAssignee", fields: [assignedToId], references: [id])
   createdById  String

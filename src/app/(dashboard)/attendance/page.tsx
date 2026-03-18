@@ -53,7 +53,8 @@ export default function AttendancePage() {
   const [gettingLocation, setGettingLocation] = useState(false)
   const [activeTab, setActiveTab] = useState<'today' | 'calendar' | 'team'>('today')
 
-  const canManage = profile && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
+  const isAdminRole = profile && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
+  const canManage = isAdminRole
   const today = new Date().toISOString().split('T')[0]
 
   const getLocation = useCallback(async () => {

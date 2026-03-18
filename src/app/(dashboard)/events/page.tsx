@@ -44,7 +44,9 @@ export default function EventsPage() {
     budget: '',
   })
 
-  const canManage = profile && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
+  const isAdminRole = profile && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
+  const permissions = profile?.permissions || []
+  const canManage = isAdminRole || permissions.includes('events.manage')
 
   useEffect(() => {
     fetchEvents()

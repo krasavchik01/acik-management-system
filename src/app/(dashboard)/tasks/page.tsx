@@ -129,7 +129,9 @@ export default function TasksPage() {
     stages: [] as { title: string, isCompleted: boolean }[],
   })
 
-  const canManage = profile?.role && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
+  const isAdminRole = profile?.role && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
+  const permissions = profile?.permissions || []
+  const canManage = isAdminRole || permissions.some(p => p.startsWith('tasks.') && p !== 'tasks.view')
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -925,15 +927,14 @@ export default function TasksPage() {
                 />
               </div>
 
-              {/* Project */}
+              {/* Project (optional) */}
               <div>
                 <select
                   value={formData.projectId}
                   onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-                  required
-                  className={`w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm ${!formData.projectId ? 'border-amber-300 dark:border-amber-600' : 'border-gray-200 dark:border-slate-600'}`}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
                 >
-                  <option value="">📁 {t('tasks', 'project')} *</option>
+                  <option value="">📁 {t('tasks', 'project')}</option>
                   {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>

@@ -122,13 +122,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!body.projectId) {
-      return NextResponse.json(
-        { success: false, message: 'Project is required' },
-        { status: 400 }
-      )
-    }
-
     const task = await prisma.task.create({
       data: {
         title: body.title,
@@ -139,7 +132,7 @@ export async function POST(request: NextRequest) {
         estimatedHours: body.estimatedHours || 0,
         actualHours: 0,
         tags: body.tags || [],
-        projectId: body.projectId,
+        projectId: body.projectId || null,
         assignedToId: body.assignedToId || null,
         createdById: user.id,
         reviewerId: body.reviewerId || null,

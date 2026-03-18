@@ -41,7 +41,9 @@ export default function FinancePage() {
     notes: '',
   })
 
-  const canManage = profile && ['Admin', 'President', 'CEO', 'ProjectManager'].includes(profile.role)
+  const isAdminRole = profile && ['Admin', 'President', 'CEO', 'ProjectManager'].includes(profile.role)
+  const permissions = profile?.permissions || []
+  const canManage = isAdminRole || permissions.includes('finance.manage')
 
   const fetchTransactions = useCallback(async () => {
     try {

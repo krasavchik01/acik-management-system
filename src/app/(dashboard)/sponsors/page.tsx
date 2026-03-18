@@ -48,7 +48,9 @@ export default function SponsorsPage() {
     notes: '',
   })
 
-  const canManage = profile && ['Admin', 'President', 'CEO', 'ProjectManager'].includes(profile.role)
+  const isAdminRole = profile && ['Admin', 'President', 'CEO', 'ProjectManager'].includes(profile.role)
+  const permissions = profile?.permissions || []
+  const canManage = isAdminRole || permissions.some(p => p.startsWith('finance.') || p.startsWith('projects.')) || isAdminRole
 
   useEffect(() => {
     fetchSponsors()
