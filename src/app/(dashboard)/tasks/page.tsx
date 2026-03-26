@@ -96,6 +96,7 @@ export default function TasksPage() {
   const [priorityFilter, setPriorityFilter] = useState('')
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban')
   const [activeTab, setActiveTab] = useState<'my' | 'assignedByMe' | 'all'>('my')
+  const [mobileStatusTab, setMobileStatusTab] = useState<string>('TODO')
 
   // Modal states
   const [showModal, setShowModal] = useState(false)
@@ -545,8 +546,134 @@ export default function TasksPage() {
             </div>
           </div>
         ) : viewMode === 'kanban' ? (
-          /* Kanban Board */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <>
+          {/* ═══ MOBILE: Tab + Card view ═══ */}
+          <div className="md:hidden">
+            {/* Status tabs — horizontal scroll */}
+            <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar -mx-2 px-2">
+              {statusColumns.map(col => {
+                const count = groupedTasks[col.key]?.length || 0
+                const isActive = mobileStatusTab === col.key
+                return (
+                  <button
+                    key={col.key}
+                    onClick={() => setMobileStatusTab(col.key)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 ${
+                      isActive
+                        ? `${col.headerColor} text-white shadow-lg`
+                        : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700'
+                    }`}
+                  >
+                    <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-white/60' : col.headerColor}`} />
+                    {col.label}
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'}`}>
+                      {count}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Cards for selected tab */}
+            <div className="space-y-3">
+              {groupedTasks[mobileStatusTab]?.map(task => {
+                const dateInfo = formatDate(task.dueDate)
+                const priorityStyle = getPriorityStyle(task.priority)
+                const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
+                const canInteract = canManage || isParticipant
+
+                return (
+                  <div
+                    key={task.id}
+                    className={`bg-white dark:bg-slate-800 rounded-2xl shadow-sm border ${task.status === 'Review' ? 'border-purple-400 dark:border-purple-500/50' : 'border-gray-100 dark:border-slate-700/50'} overflow-hidden`}
+                  >
+                    {/* Card body */}
+                    <div className="p-4" onClick={() => canInteract && openEditModal(task)}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold ${priorityStyle.color}`}>
+                          {task.priority}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {dateInfo && (
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${dateInfo.color}`}>{dateInfo.text}</span>
+                          )}
+                          {task.assignedTo && (
+                            <div className="w-7 h-7 bg-indigo-500 rounded-full flex items-center justify-center shadow-sm">
+                              <span className="text-[10px] font-black text-white">{task.assignedTo.name.charAt(0)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <h4 className="font-bold text-gray-900 dark:text-white text-[15px] leading-snug mb-1">{task.title}</h4>
+
+                      {task.description && (
+                        <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-1 mb-2">{task.description}</p>
+                      )}
+
+                      {task.project && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
+                          <FiFolder size={10} /> {task.project.name}
+                        </span>
+                      )}
+
+                      {/* Stages progress */}
+                      {(task._count?.stages || 0) > 0 && (
+                        <div className="mt-3">
+                          <div className="h-1.5 w-full bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden flex gap-0.5">
+                            {task.stages?.map((s, idx) => (
+                              <div key={idx} className={`h-full flex-1 ${s.isCompleted ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-slate-600'}`} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Status action bar — big touch targets */}
+                    {canInteract && (
+                      <div className="grid grid-cols-4 border-t border-gray-100 dark:border-slate-700/50">
+                        {statusColumns.map(col => {
+                          const isActive = task.status === col.key
+                          return (
+                            <button
+                              key={col.key}
+                              onClick={() => { if (!isActive) handleStatusChange(task, col.key as Task['status']) }}
+                              className={`py-3 text-[11px] font-bold uppercase tracking-wide transition-all ${
+                                isActive
+                                  ? `${col.headerColor} text-white`
+                                  : 'text-gray-400 dark:text-slate-500 active:bg-gray-100 dark:active:bg-slate-700'
+                              }`}
+                            >
+                              {col.label}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+
+              {(!groupedTasks[mobileStatusTab] || groupedTasks[mobileStatusTab].length === 0) && (
+                <div className="text-center py-16 text-gray-400">
+                  <FiCheckSquare size={36} className="mx-auto mb-3 opacity-40" />
+                  <p className="text-sm font-medium">{t('tasks', 'noTasks')}</p>
+                  {canManage && (
+                    <button
+                      onClick={() => openCreateModal(mobileStatusTab as Task['status'])}
+                      className="mt-3 px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl"
+                    >
+                      <FiPlus size={14} className="inline mr-1.5" />
+                      {t('tasks', 'newTask')}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ═══ DESKTOP: Kanban columns ═══ */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {statusColumns.map(column => (
               <div key={column.key} className={`${column.color} rounded-3xl p-5 min-h-[500px] border border-transparent dark:border-slate-700/30`}>
                 <div className="flex items-center justify-between mb-5">
@@ -579,7 +706,6 @@ export default function TasksPage() {
                         key={task.id}
                         className={`bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_2px_10px_rgb(0,0,0,0.02)] dark:shadow-[0_2px_10px_rgb(0,0,0,0.1)] hover:shadow-xl dark:hover:shadow-indigo-900/30 transition-all border ${task.status === 'Review' ? 'border-purple-400 dark:border-purple-500/50 ring-2 ring-purple-400/10' : 'border-gray-100 dark:border-slate-700/50'} hover:-translate-y-1 group relative overflow-hidden`}
                       >
-                        {/* Review Badge */}
                         {task.status === 'Review' && (
                           <div className="absolute top-0 right-0 px-2 py-0.5 bg-purple-500 text-[10px] font-bold text-white uppercase tracking-tighter rounded-bl-lg animate-pulse">
                             {t('tasks', 'reviewNeeded')}
@@ -591,50 +717,26 @@ export default function TasksPage() {
                             {task.priority}
                           </span>
 
-                          {/* Actions: ⋮ menu — visible to participants & managers */}
                           {(() => {
                             const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
                             if (!canManage && !isParticipant) return null
                             return (
                             <div className="relative">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setOpenDropdown(openDropdown === task.id ? null : task.id)
-                                }}
-                                className="p-1 text-gray-400 hover:text-gray-600 rounded transition-all"
-                              >
+                              <button onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === task.id ? null : task.id) }} className="p-1 text-gray-400 hover:text-gray-600 rounded transition-all">
                                 <FiMoreVertical size={16} />
                               </button>
-
                               {openDropdown === task.id && (
                                 <div className="absolute right-0 top-8 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 z-20 min-w-[140px] animate-in zoom-in-95">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      openEditModal(task)
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
-                                  >
-                                    <FiEdit2 size={14} />
-                                    {t('tasks', 'editTask')}
+                                  <button onClick={(e) => { e.stopPropagation(); openEditModal(task) }} className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2">
+                                    <FiEdit2 size={14} /> {t('tasks', 'editTask')}
                                   </button>
                                   {canManage && (
-                                  <>
-                                  <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      setDeletingTask(task)
-                                      setShowDeleteModal(true)
-                                      setOpenDropdown(null)
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium"
-                                  >
-                                    <FiTrash2 size={14} />
-                                    {t('common', 'delete')}
-                                  </button>
-                                  </>
+                                    <>
+                                      <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
+                                      <button onClick={(e) => { e.stopPropagation(); setDeletingTask(task); setShowDeleteModal(true); setOpenDropdown(null) }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium">
+                                        <FiTrash2 size={14} /> {t('common', 'delete')}
+                                      </button>
+                                    </>
                                   )}
                                 </div>
                               )}
@@ -643,10 +745,7 @@ export default function TasksPage() {
                           })()}
                         </div>
 
-                        <h4
-                          className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-snug hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
-                          onClick={() => openEditModal(task)}
-                        >
+                        <h4 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-snug hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer" onClick={() => openEditModal(task)}>
                           {task.title}
                         </h4>
 
@@ -654,25 +753,21 @@ export default function TasksPage() {
                           <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-2 mb-3 leading-relaxed">{task.description}</p>
                         )}
 
-                        {/* Progress Infographic */}
                         {(task._count?.stages || 0) > 0 && (
                           <div className="mb-4">
-                             <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                            <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
                               <span>{t('common', 'progress')}</span>
                               <span>{Math.round(((task.stages?.filter(s => s.isCompleted).length || 0) / (task.stages?.length || 1)) * 100)}%</span>
                             </div>
                             <div className="h-1.5 w-full bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden flex gap-0.5">
                               {task.stages?.map((stage, idx) => (
-                                <div 
-                                  key={idx} 
-                                  className={`h-full flex-1 transition-all duration-500 ${stage.isCompleted ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-gray-200 dark:bg-slate-600'}`} 
-                                />
+                                <div key={idx} className={`h-full flex-1 transition-all duration-500 ${stage.isCompleted ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-gray-200 dark:bg-slate-600'}`} />
                               ))}
                             </div>
                           </div>
                         )}
 
-                        {/* Quick Status Selector */}
+                        {/* Desktop quick status */}
                         {(() => {
                           const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
                           if (!canManage && !isParticipant) return null
@@ -681,17 +776,8 @@ export default function TasksPage() {
                               {statusColumns.map(col => {
                                 const isActive = task.status === col.key
                                 return (
-                                  <button
-                                    key={col.key}
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      if (!isActive) handleStatusChange(task, col.key as Task['status'])
-                                    }}
-                                    className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                      isActive
-                                        ? `${col.headerColor} text-white shadow-sm`
-                                        : 'bg-gray-50 dark:bg-slate-700/30 text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-600 dark:hover:text-slate-300'
-                                    }`}
+                                  <button key={col.key} onClick={(e) => { e.stopPropagation(); if (!isActive) handleStatusChange(task, col.key as Task['status']) }}
+                                    className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${isActive ? `${col.headerColor} text-white shadow-sm` : 'bg-gray-50 dark:bg-slate-700/30 text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-600 dark:hover:text-slate-300'}`}
                                     title={col.label}
                                   >
                                     {col.label.length > 10 ? col.label.substring(0, 8) + '..' : col.label}
@@ -706,54 +792,27 @@ export default function TasksPage() {
                           <div className="flex items-center gap-2">
                             {task.project && (
                               <span className="flex items-center gap-1.5 text-[10px] font-bold text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/30 uppercase tracking-tight">
-                                <FiFolder size={10} className="text-gray-400" />
-                                {task.project.name.substring(0, 15)}
+                                <FiFolder size={10} className="text-gray-400" /> {task.project.name.substring(0, 15)}
                               </span>
-                            )}
-                            {task._count?.subtasks !== undefined && task._count.subtasks > 0 && (
-                               <span className="flex items-center gap-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1.5 rounded-lg border border-blue-100 dark:border-blue-800/30">
-                               <FiList size={10} />
-                               {task._count.subtasks}
-                             </span>
                             )}
                           </div>
-                          
                           <div className="flex items-center gap-1.5">
-                            {dateInfo && (
-                              <span className={`text-[10px] font-bold px-2 py-1.5 rounded-lg uppercase tracking-tight ${dateInfo.color}`}>
-                                {dateInfo.text}
-                              </span>
-                            )}
-                            
+                            {dateInfo && <span className={`text-[10px] font-bold px-2 py-1.5 rounded-lg uppercase tracking-tight ${dateInfo.color}`}>{dateInfo.text}</span>}
                             <div className="flex -space-x-2">
-                                {/* Assignee */}
-                                {task.assignedTo ? (
-                                <div className="w-7 h-7 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-10" title={`${t('tasks', 'assignedTo')}: ${task.assignedTo.name}`}>
-                                    <span className="text-[10px] font-black text-white">{task.assignedTo.name.charAt(0)}</span>
+                              {task.assignedTo && (
+                                <div className="w-7 h-7 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-10" title={task.assignedTo.name}>
+                                  <span className="text-[10px] font-black text-white">{task.assignedTo.name.charAt(0)}</span>
                                 </div>
-                                ) : (
-                                <div className="w-7 h-7 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800" title={t('tasks', 'unassigned')}>
-                                    <FiUser className="text-gray-400 dark:text-slate-500" size={12} />
+                              )}
+                              {task.coExecutors?.slice(0, 2).map((ce, idx) => (
+                                <div key={idx} className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm" title={ce.user.name}>
+                                  <span className="text-[10px] font-black text-white">{ce.user.name.charAt(0)}</span>
                                 </div>
-                                )}
-
-                                {/* Co-executors */}
-                                {task.coExecutors?.slice(0, 2).map((ce, idx) => (
-                                    <div key={idx} className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-0" title={`${t('tasks', 'coExecutors')}: ${ce.user.name}`}>
-                                        <span className="text-[10px] font-black text-white">{ce.user.name.charAt(0)}</span>
-                                    </div>
-                                ))}
-
-                                {task.coExecutors && task.coExecutors.length > 2 && (
-                                    <div className="w-7 h-7 bg-gray-200 dark:bg-slate-600 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm relative z-0">
-                                        <span className="text-[9px] font-bold text-gray-600 dark:text-slate-300">+{task.coExecutors.length - 2}</span>
-                                    </div>
-                                )}
+                              ))}
                             </div>
                           </div>
                         </div>
                       </div>
-
                     )
                   })}
 
@@ -762,10 +821,7 @@ export default function TasksPage() {
                       <FiList size={32} className="mx-auto mb-2 opacity-50" />
                       <p className="text-sm">{t('tasks', 'noTasks')}</p>
                       {canManage && (
-                        <button
-                          onClick={() => openCreateModal(column.key as Task['status'])}
-                          className="mt-2 text-xs text-indigo-600 hover:underline"
-                        >
+                        <button onClick={() => openCreateModal(column.key as Task['status'])} className="mt-2 text-xs text-indigo-600 hover:underline">
                           + {t('common', 'add')} {t('tasks', 'title').toLowerCase()}
                         </button>
                       )}
@@ -775,6 +831,7 @@ export default function TasksPage() {
               </div>
             ))}
           </div>
+          </>
         ) : (
           /* List View */
           <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border border-gray-100 dark:border-slate-700/50 overflow-hidden">
