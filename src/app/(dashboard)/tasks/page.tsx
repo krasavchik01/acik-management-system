@@ -574,13 +574,10 @@ export default function TasksPage() {
                     const dateInfo = formatDate(task.dueDate)
                     const priorityStyle = getPriorityStyle(task.priority)
 
-                    return (                      <div
+                    return (
+                      <div
                         key={task.id}
-                        className={`bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_2px_10px_rgb(0,0,0,0.02)] dark:shadow-[0_2px_10px_rgb(0,0,0,0.1)] hover:shadow-xl dark:hover:shadow-indigo-900/30 transition-all cursor-pointer border ${task.status === 'Review' ? 'border-purple-400 dark:border-purple-500/50 ring-2 ring-purple-400/10' : 'border-gray-100 dark:border-slate-700/50'} hover:-translate-y-1 group relative overflow-hidden`}
-                        onClick={() => {
-                          const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
-                          if (canManage || isParticipant) openEditModal(task)
-                        }}
+                        className={`bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_2px_10px_rgb(0,0,0,0.02)] dark:shadow-[0_2px_10px_rgb(0,0,0,0.1)] hover:shadow-xl dark:hover:shadow-indigo-900/30 transition-all border ${task.status === 'Review' ? 'border-purple-400 dark:border-purple-500/50 ring-2 ring-purple-400/10' : 'border-gray-100 dark:border-slate-700/50'} hover:-translate-y-1 group relative overflow-hidden`}
                       >
                         {/* Review Badge */}
                         {task.status === 'Review' && (
@@ -594,10 +591,8 @@ export default function TasksPage() {
                             {task.priority}
                           </span>
 
-                          {(() => {
-                            const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
-                            if (!canManage && !isParticipant) return null
-                            return (
+                          {/* Actions: ⋮ menu for edit/delete */}
+                          {canManage && (
                             <div className="relative">
                               <button
                                 onClick={(e) => {
@@ -610,58 +605,34 @@ export default function TasksPage() {
                               </button>
 
                               {openDropdown === task.id && (
-                                <div className="absolute right-0 top-8 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 z-20 min-w-[160px] animate-in zoom-in-95">
-                                  {canManage && (
-                                    <>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          openEditModal(task)
-                                        }}
-                                        className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
-                                      >
-                                        <FiEdit2 size={14} />
-                                        {t('tasks', 'editTask')}
-                                      </button>
-                                      <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
-                                    </>
-                                  )}
-                                  <div className="px-4 py-1 text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-widest">{t('tasks', 'moveTo')}</div>
-                                  {statusColumns.filter(c => c.key !== task.status).map(col => (
-                                    <button
-                                      key={col.key}
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleStatusChange(task, col.key as Task['status'])
-                                      }}
-                                      className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
-                                    >
-                                      <div className={`w-2 h-2 ${col.headerColor} rounded-full`} />
-                                      {col.label}
-                                    </button>
-                                  ))}
-                                  {canManage && (
-                                    <>
-                                      <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          setDeletingTask(task)
-                                          setShowDeleteModal(true)
-                                          setOpenDropdown(null)
-                                        }}
-                                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium"
-                                      >
-                                        <FiTrash2 size={14} />
-                                        {t('common', 'delete')}
-                                      </button>
-                                    </>
-                                  )}
+                                <div className="absolute right-0 top-8 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 z-20 min-w-[140px] animate-in zoom-in-95">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      openEditModal(task)
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                                  >
+                                    <FiEdit2 size={14} />
+                                    {t('tasks', 'editTask')}
+                                  </button>
+                                  <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setDeletingTask(task)
+                                      setShowDeleteModal(true)
+                                      setOpenDropdown(null)
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium"
+                                  >
+                                    <FiTrash2 size={14} />
+                                    {t('common', 'delete')}
+                                  </button>
                                 </div>
                               )}
                             </div>
-                            )
-                          })()}
+                          )}
                         </div>
 
                         <h4 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
@@ -690,7 +661,37 @@ export default function TasksPage() {
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-700/50">
+                        {/* Quick Status Selector */}
+                        {(() => {
+                          const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
+                          if (!canManage && !isParticipant) return null
+                          return (
+                            <div className="flex items-center gap-1.5 pt-3 border-t border-gray-100 dark:border-slate-700/50 mb-3">
+                              {statusColumns.map(col => {
+                                const isActive = task.status === col.key
+                                return (
+                                  <button
+                                    key={col.key}
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      if (!isActive) handleStatusChange(task, col.key as Task['status'])
+                                    }}
+                                    className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                      isActive
+                                        ? `${col.headerColor} text-white shadow-sm`
+                                        : 'bg-gray-50 dark:bg-slate-700/30 text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-600 dark:hover:text-slate-300'
+                                    }`}
+                                    title={col.label}
+                                  >
+                                    {col.label.length > 10 ? col.label.substring(0, 8) + '..' : col.label}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )
+                        })()}
+
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {task.project && (
                               <span className="flex items-center gap-1.5 text-[10px] font-bold text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/30 uppercase tracking-tight">
@@ -808,19 +809,37 @@ export default function TasksPage() {
                           )}
                         </td>
                         <td className="py-4 px-6">
-                           <div className="space-y-1.5">
-                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${statusCol?.color || 'bg-gray-100'}`}>
+                          {(() => {
+                            const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
+                            const canChangeStatus = canManage || isParticipant
+                            return (
+                              <div className="space-y-1.5">
+                                {canChangeStatus ? (
+                                  <select
+                                    value={task.status}
+                                    onChange={(e) => handleStatusChange(task, e.target.value as Task['status'])}
+                                    className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border-0 cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500/30 ${statusCol?.color || 'bg-gray-100'}`}
+                                  >
+                                    {statusColumns.map(col => (
+                                      <option key={col.key} value={col.key}>{col.label}</option>
+                                    ))}
+                                  </select>
+                                ) : (
+                                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${statusCol?.color || 'bg-gray-100'}`}>
                                     <div className={`w-2 h-2 ${statusCol?.headerColor || 'bg-gray-500'} rounded-full`} />
                                     {statusCol?.label || task.status}
-                                </span>
-                                {(task._count?.stages || 0) > 0 && (
-                                    <div className="w-24 h-1 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden flex">
-                                        {task.stages?.map((s, idx) => (
-                                            <div key={idx} className={`h-full flex-1 ${s.isCompleted ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-slate-600'}`} />
-                                        ))}
-                                    </div>
+                                  </span>
                                 )}
-                           </div>
+                                {(task._count?.stages || 0) > 0 && (
+                                  <div className="w-24 h-1 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden flex">
+                                    {task.stages?.map((s, idx) => (
+                                      <div key={idx} className={`h-full flex-1 ${s.isCompleted ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-slate-600'}`} />
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })()}
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${priorityStyle.color}`}>
