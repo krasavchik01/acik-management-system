@@ -591,8 +591,11 @@ export default function TasksPage() {
                             {task.priority}
                           </span>
 
-                          {/* Actions: ⋮ menu for edit/delete */}
-                          {canManage && (
+                          {/* Actions: ⋮ menu — visible to participants & managers */}
+                          {(() => {
+                            const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
+                            if (!canManage && !isParticipant) return null
+                            return (
                             <div className="relative">
                               <button
                                 onClick={(e) => {
@@ -616,6 +619,8 @@ export default function TasksPage() {
                                     <FiEdit2 size={14} />
                                     {t('tasks', 'editTask')}
                                   </button>
+                                  {canManage && (
+                                  <>
                                   <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
                                   <button
                                     onClick={(e) => {
@@ -629,13 +634,19 @@ export default function TasksPage() {
                                     <FiTrash2 size={14} />
                                     {t('common', 'delete')}
                                   </button>
+                                  </>
+                                  )}
                                 </div>
                               )}
                             </div>
-                          )}
+                            )
+                          })()}
                         </div>
 
-                        <h4 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        <h4
+                          className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-snug hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                          onClick={() => openEditModal(task)}
+                        >
                           {task.title}
                         </h4>
 
