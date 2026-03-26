@@ -577,7 +577,10 @@ export default function TasksPage() {
                     return (                      <div
                         key={task.id}
                         className={`bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-[0_2px_10px_rgb(0,0,0,0.02)] dark:shadow-[0_2px_10px_rgb(0,0,0,0.1)] hover:shadow-xl dark:hover:shadow-indigo-900/30 transition-all cursor-pointer border ${task.status === 'Review' ? 'border-purple-400 dark:border-purple-500/50 ring-2 ring-purple-400/10' : 'border-gray-100 dark:border-slate-700/50'} hover:-translate-y-1 group relative overflow-hidden`}
-                        onClick={() => canManage && openEditModal(task)}
+                        onClick={() => {
+                          const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
+                          if (canManage || isParticipant) openEditModal(task)
+                        }}
                       >
                         {/* Review Badge */}
                         {task.status === 'Review' && (
@@ -591,7 +594,10 @@ export default function TasksPage() {
                             {task.priority}
                           </span>
 
-                          {canManage && (
+                          {(() => {
+                            const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
+                            if (!canManage && !isParticipant) return null
+                            return (
                             <div className="relative">
                               <button
                                 onClick={(e) => {
@@ -605,17 +611,21 @@ export default function TasksPage() {
 
                               {openDropdown === task.id && (
                                 <div className="absolute right-0 top-8 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 z-20 min-w-[160px] animate-in zoom-in-95">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      openEditModal(task)
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
-                                  >
-                                    <FiEdit2 size={14} />
-                                    {t('tasks', 'editTask')}
-                                  </button>
-                                  <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
+                                  {canManage && (
+                                    <>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          openEditModal(task)
+                                        }}
+                                        className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                                      >
+                                        <FiEdit2 size={14} />
+                                        {t('tasks', 'editTask')}
+                                      </button>
+                                      <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
+                                    </>
+                                  )}
                                   <div className="px-4 py-1 text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-widest">{t('tasks', 'moveTo')}</div>
                                   {statusColumns.filter(c => c.key !== task.status).map(col => (
                                     <button
@@ -630,23 +640,28 @@ export default function TasksPage() {
                                       {col.label}
                                     </button>
                                   ))}
-                                  <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      setDeletingTask(task)
-                                      setShowDeleteModal(true)
-                                      setOpenDropdown(null)
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium"
-                                  >
-                                    <FiTrash2 size={14} />
-                                    {t('common', 'delete')}
-                                  </button>
+                                  {canManage && (
+                                    <>
+                                      <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          setDeletingTask(task)
+                                          setShowDeleteModal(true)
+                                          setOpenDropdown(null)
+                                        }}
+                                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium"
+                                      >
+                                        <FiTrash2 size={14} />
+                                        {t('common', 'delete')}
+                                      </button>
+                                    </>
+                                  )}
                                 </div>
                               )}
                             </div>
-                          )}
+                            )
+                          })()}
                         </div>
 
                         <h4 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
