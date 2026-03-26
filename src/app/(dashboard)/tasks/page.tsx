@@ -944,76 +944,112 @@ export default function TasksPage() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
 
+              {(() => {
+                // Determine if this user is a restricted participant (can only change status/stages/hours)
+                const isCreator = editingTask?.createdById === profile?.id
+                const isReviewer = editingTask?.reviewerId === profile?.id
+                const isRestricted = editingTask && !canManage && !isCreator && !isReviewer
+
+                return (
+                <>
               {/* ── CORE FIELDS ── */}
+              {/* Task info header for restricted users */}
+              {isRestricted && (
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl px-4 py-3 text-sm text-amber-700 dark:text-amber-400">
+                  Вы можете менять только статус и отмечать этапы
+                </div>
+              )}
+
+              {/* Title — read-only for restricted */}
               <div>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-base font-medium"
-                  placeholder={`${t('tasks', 'taskTitle')} *`}
-                  required
-                  autoFocus
-                />
+                {isRestricted ? (
+                  <p className="px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl text-gray-900 dark:text-white text-base font-medium">{formData.title}</p>
+                ) : (
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-base font-medium"
+                    placeholder={`${t('tasks', 'taskTitle')} *`}
+                    required
+                    autoFocus
+                  />
+                )}
               </div>
 
-              <div>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={2}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-sm"
-                  placeholder={t('tasks', 'describeTask')}
-                />
-              </div>
+              {/* Description — read-only for restricted */}
+              {isRestricted ? (
+                formData.description && (
+                  <p className="px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl text-gray-600 dark:text-slate-400 text-sm">{formData.description}</p>
+                )
+              ) : (
+                <div>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={2}
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-sm"
+                    placeholder={t('tasks', 'describeTask')}
+                  />
+                </div>
+              )}
 
-              {/* Project (optional) */}
-              <div>
-                <select
-                  value={formData.projectId}
-                  onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
-                >
-                  <option value="">📁 {t('tasks', 'project')}</option>
-                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-              </div>
+              {/* Project — hidden for restricted */}
+              {!isRestricted && (
+                <div>
+                  <select
+                    value={formData.projectId}
+                    onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                  >
+                    <option value="">📁 {t('tasks', 'project')}</option>
+                    {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+              )}
 
-              {/* Assigned To */}
-              <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
-                  <FiUser size={12} /> {t('tasks', 'assignedTo')}
-                </p>
-                <UserPicker users={users} value={formData.assignedToId} onChange={(id) => setFormData({ ...formData, assignedToId: id })} placeholder={t('tasks', 'unassigned')} language={language} showWorkload />
-              </div>
+              {/* Assigned To — hidden for restricted */}
+              {!isRestricted && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
+                    <FiUser size={12} /> {t('tasks', 'assignedTo')}
+                  </p>
+                  <UserPicker users={users} value={formData.assignedToId} onChange={(id) => setFormData({ ...formData, assignedToId: id })} placeholder={t('tasks', 'unassigned')} language={language} showWorkload />
+                </div>
+              )}
 
-              {/* Priority + Deadline (+ Status when editing) */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Status (always for editing) + Priority/Deadline (not for restricted) */}
+              <div className={`grid gap-3 ${isRestricted ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 {editingTask && (
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as Task['status'] })}
-                    className="col-span-2 w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                    className={`${isRestricted ? '' : 'col-span-2'} w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm`}
                   >
                     {statusColumns.map(col => <option key={col.key} value={col.key}>{col.label}</option>)}
                   </select>
                 )}
-                <select
-                  value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as Task['priority'] })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
-                >
-                  {priorityOptions.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-                </select>
-                <input
-                  type="date"
-                  value={formData.dueDate}
-                  onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
-                />
+                {!isRestricted && (
+                  <>
+                    <select
+                      value={formData.priority}
+                      onChange={(e) => setFormData({ ...formData, priority: e.target.value as Task['priority'] })}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                    >
+                      {priorityOptions.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                    </select>
+                    <input
+                      type="date"
+                      value={formData.dueDate}
+                      onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                    />
+                  </>
+                )}
               </div>
 
-              {/* ── OPTIONAL SECTIONS ── */}
+              {/* ── OPTIONAL SECTIONS — hidden for restricted ── */}
+              {!isRestricted && (
               <div className="border-t border-gray-100 dark:border-slate-700/50 pt-4 space-y-3">
                 <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2">Дополнительно</p>
 
@@ -1187,6 +1223,37 @@ export default function TasksPage() {
                   )}
                 </div>
               </div>
+              )}
+
+              {/* Stages checklist for restricted users (can only toggle completion) */}
+              {isRestricted && formData.stages.length > 0 && (
+                <div className="border-t border-gray-100 dark:border-slate-700/50 pt-4">
+                  <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-3">{t('tasks', 'taskStages')}</p>
+                  <div className="space-y-2">
+                    {formData.stages.map((stage, index) => (
+                      <label key={index} className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-slate-700/30 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={stage.isCompleted}
+                          onChange={(e) => {
+                            const newStages = [...formData.stages]
+                            newStages[index].isCompleted = e.target.checked
+                            setFormData({ ...formData, stages: newStages })
+                          }}
+                          className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                        />
+                        <span className={`text-sm font-medium ${stage.isCompleted ? 'line-through text-gray-400 dark:text-slate-500' : 'text-gray-700 dark:text-slate-300'}`}>
+                          {stage.title}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              </>
+                )
+              })()}
 
               {/* Submit */}
               <div className="flex gap-3 pt-2">
