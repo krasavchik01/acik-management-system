@@ -111,17 +111,19 @@ export async function POST(request: NextRequest) {
     const projectData = {
       id: crypto.randomUUID(),
       name: body.name,
-      description: body.description || null,
+      description: body.description || '',
       category: body.category || 'Other',
       status: body.status || 'Planning',
       priority: body.priority || 'Medium',
-      startDate: body.startDate || new Date().toISOString(),
-      endDate: body.endDate || null,
+      startDate: body.startDate ? new Date(body.startDate).toISOString() : new Date().toISOString(),
+      endDate: body.endDate ? new Date(body.endDate).toISOString() : null,
       budgetAllocated: body.budget?.allocated || body.budgetAllocated || 0,
       budgetSpent: body.budget?.spent || body.budgetSpent || 0,
       budgetRemaining: (body.budget?.allocated || body.budgetAllocated || 0) - (body.budget?.spent || body.budgetSpent || 0),
       tags: body.tags || [],
+      progress: 0,
       managerId: user.id,
+      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
 
