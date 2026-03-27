@@ -112,15 +112,24 @@ export async function PUT(
     const isCoExecutor = currentTask.coExecutors.some((ce: any) => ce.userId === user.id)
     const isReviewer = currentTask.reviewerId === user.id
 
-    // Assignees can ONLY change status and actualHours or update stages
-    if (!isAdmin && !isCreator && !isReviewer && (isAssignee || isCoExecutor)) {
-      const allowedKeys = ['status', 'actualHours', 'stages']
-      const bodyKeys = Object.keys(body)
-      const forbiddenKeys = bodyKeys.filter((k: string) => !allowedKeys.includes(k))
+    // Non-admin, non-creator users: restrict what they can change
+    if (!isAdmin && !isCreator) {
+      if (isAssignee || isCoExecutor || isReviewer) {
+        // Participants can ONLY change status, actualHours, and stages
+        const allowedKeys = ['status', 'actualHours', 'stages']
+        const bodyKeys = Object.keys(body)
+        const forbiddenKeys = bodyKeys.filter((k: string) => !allowedKeys.includes(k))
 
-      if (forbiddenKeys.length > 0) {
+        if (forbiddenKeys.length > 0) {
+          return NextResponse.json(
+            { success: false, message: 'You only have permission to update status and actual hours' },
+            { status: 403 }
+          )
+        }
+      } else {
+        // Not a participant at all — no access
         return NextResponse.json(
-          { success: false, message: 'You only have permission to update status and actual hours' },
+          { success: false, message: 'Not authorized to edit this task' },
           { status: 403 }
         )
       }
