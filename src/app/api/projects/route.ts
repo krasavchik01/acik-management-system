@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { getAuthUser, hasRole, MANAGER_ROLES } from '@/lib/auth'
+import { getAuthUser, hasPermission } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!hasRole(user.role, MANAGER_ROLES)) {
+    if (!hasPermission(user, 'projects.create')) {
       return NextResponse.json(
         { success: false, message: 'Not authorized to create projects' },
         { status: 403 }

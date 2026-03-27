@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { getAuthUser, hasRole, MANAGER_ROLES, ADMIN_ROLES } from '@/lib/auth'
+import { getAuthUser, hasPermission } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,7 +57,7 @@ export async function PUT(
       )
     }
 
-    if (!hasRole(user.role, MANAGER_ROLES)) {
+    if (!hasPermission(user, 'events.manage')) {
       return NextResponse.json(
         { success: false, message: 'Not authorized to update events' },
         { status: 403 }
@@ -142,7 +142,7 @@ export async function DELETE(
       )
     }
 
-    if (!hasRole(user.role, ADMIN_ROLES)) {
+    if (!hasPermission(user, 'events.manage')) {
       return NextResponse.json(
         { success: false, message: 'Not authorized to delete events' },
         { status: 403 }

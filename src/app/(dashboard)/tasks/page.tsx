@@ -50,6 +50,8 @@ interface Task {
   dueDate?: string
   projectId?: string
   assignedToId?: string
+  createdById?: string
+  createdBy?: { id: string, name: string }
   reviewerId?: string
   parentId?: string
   isApprovalRequired: boolean
@@ -132,7 +134,10 @@ export default function TasksPage() {
 
   const isAdminRole = profile?.role && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
   const permissions = profile?.permissions || []
-  const canManage = isAdminRole || permissions.some(p => p.startsWith('tasks.') && p !== 'tasks.view')
+  // canCreate: can create new tasks (admin OR has tasks.create permission)
+  const canCreate = isAdminRole || permissions.some(p => p === 'tasks.create' || p === 'tasks.edit')
+  // canManageAny: can edit/delete ANY task (admin roles only)
+  const canManageAny = !!isAdminRole
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -524,7 +529,7 @@ export default function TasksPage() {
                 </button>
               </div>
 
-              {canManage && (
+              {canCreate && (
                 <button
                   onClick={() => openCreateModal()}
                   className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 font-medium"
@@ -580,7 +585,7 @@ export default function TasksPage() {
                 const dateInfo = formatDate(task.dueDate)
                 const priorityStyle = getPriorityStyle(task.priority)
                 const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
-                const canInteract = canManage || isParticipant
+                const canInteract = canManageAny || isParticipant
 
                 return (
                   <div
@@ -658,7 +663,7 @@ export default function TasksPage() {
                 <div className="text-center py-16 text-gray-400">
                   <FiCheckSquare size={36} className="mx-auto mb-3 opacity-40" />
                   <p className="text-sm font-medium">{t('tasks', 'noTasks')}</p>
-                  {canManage && (
+                  {canCreate && (
                     <button
                       onClick={() => openCreateModal(mobileStatusTab as Task['status'])}
                       className="mt-3 px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl"
@@ -685,7 +690,7 @@ export default function TasksPage() {
                     <span className="text-sm font-medium text-gray-600 dark:text-slate-400 bg-white/60 dark:bg-slate-800/60 px-2.5 py-1 rounded-lg">
                       {groupedTasks[column.key]?.length || 0}
                     </span>
-                    {canManage && (
+                    {canCreate && (
                       <button
                         onClick={() => openCreateModal(column.key as Task['status'])}
                         className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
@@ -719,7 +724,7 @@ export default function TasksPage() {
 
                           {(() => {
                             const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
-                            if (!canManage && !isParticipant) return null
+                            if (!canManageAny && !isParticipant) return null
                             return (
                             <div className="relative">
                               <button onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === task.id ? null : task.id) }} className="p-1 text-gray-400 hover:text-gray-600 rounded transition-all">
@@ -730,7 +735,7 @@ export default function TasksPage() {
                                   <button onClick={(e) => { e.stopPropagation(); openEditModal(task) }} className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2">
                                     <FiEdit2 size={14} /> {t('tasks', 'editTask')}
                                   </button>
-                                  {canManage && (
+                                  {canManageAny && (
                                     <>
                                       <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
                                       <button onClick={(e) => { e.stopPropagation(); setDeletingTask(task); setShowDeleteModal(true); setOpenDropdown(null) }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2 font-medium">
@@ -770,7 +775,7 @@ export default function TasksPage() {
                         {/* Desktop quick status */}
                         {(() => {
                           const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
-                          if (!canManage && !isParticipant) return null
+                          if (!canManageAny && !isParticipant) return null
                           return (
                             <div className="flex items-center gap-1.5 pt-3 border-t border-gray-100 dark:border-slate-700/50 mb-3">
                               {statusColumns.map(col => {
@@ -820,7 +825,7 @@ export default function TasksPage() {
                     <div className="text-center py-12 text-gray-400">
                       <FiList size={32} className="mx-auto mb-2 opacity-50" />
                       <p className="text-sm">{t('tasks', 'noTasks')}</p>
-                      {canManage && (
+                      {canCreate && (
                         <button onClick={() => openCreateModal(column.key as Task['status'])} className="mt-2 text-xs text-indigo-600 hover:underline">
                           + {t('common', 'add')} {t('tasks', 'title').toLowerCase()}
                         </button>
@@ -845,7 +850,7 @@ export default function TasksPage() {
                     <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'priority')}</th>
                     <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('tasks', 'assignedTo')}</th>
                     <th className="text-left py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'deadline')}</th>
-                    {canManage && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'actions')}</th>}
+                    {canManageAny && <th className="text-right py-4 px-6 text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common', 'actions')}</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
@@ -879,7 +884,7 @@ export default function TasksPage() {
                         <td className="py-4 px-6">
                           {(() => {
                             const isParticipant = task.assignedToId === profile?.id || task.createdById === profile?.id || task.reviewerId === profile?.id || task.coExecutors?.some(ce => ce.userId === profile?.id)
-                            const canChangeStatus = canManage || isParticipant
+                            const canChangeStatus = canManageAny || isParticipant
                             return (
                               <div className="space-y-1.5">
                                 {canChangeStatus ? (
@@ -935,7 +940,7 @@ export default function TasksPage() {
                             <span className="text-sm text-gray-400">—</span>
                           )}
                         </td>
-                        {canManage && (
+                        {canManageAny && (
                           <td className="py-4 px-6 text-right">
                             <div className="flex items-center justify-end gap-2">
                               <button
@@ -961,10 +966,10 @@ export default function TasksPage() {
                   })}
                   {tasks.length === 0 && (
                     <tr>
-                      <td colSpan={canManage ? 7 : 6} className="py-20 text-center">
+                      <td colSpan={canManageAny ? 7 : 6} className="py-20 text-center">
                         <FiList size={48} className="mx-auto text-gray-300 mb-4" />
                         <p className="text-gray-500">{t('tasks', 'noTasks')}</p>
-                        {canManage && (
+                        {canCreate && (
                           <button
                             onClick={() => openCreateModal()}
                             className="mt-4 text-indigo-600 hover:underline"
@@ -1005,7 +1010,7 @@ export default function TasksPage() {
                 // Determine if this user is a restricted participant (can only change status/stages/hours)
                 const isCreator = editingTask?.createdById === profile?.id
                 const isReviewer = editingTask?.reviewerId === profile?.id
-                const isRestricted = editingTask && !canManage && !isCreator && !isReviewer
+                const isRestricted = editingTask && !canManageAny && !isCreator && !isReviewer
 
                 return (
                 <>

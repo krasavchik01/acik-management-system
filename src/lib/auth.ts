@@ -39,6 +39,13 @@ export function hasRole(userRole: string, allowedRoles: string[]): boolean {
   return allowedRoles.includes(userRole)
 }
 
+export function hasPermission(user: { role: string; permissions?: string[] }, permission: string): boolean {
+  // Admin roles always have all permissions
+  if (['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(user.role)) return true
+  // Check user-specific permissions
+  return (user.permissions || []).includes(permission)
+}
+
 export const ADMIN_ROLES = ['Admin', 'President', 'CEO']
 export const MANAGER_ROLES = ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager']
 export const FINANCE_ROLES = ['Admin', 'President', 'CEO', 'CFO']

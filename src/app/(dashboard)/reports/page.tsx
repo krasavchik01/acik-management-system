@@ -2,54 +2,70 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Header } from '@/components/layout/Header'
-import { FiFileText, FiDownload, FiBarChart2, FiPieChart, FiTrendingUp } from 'react-icons/fi'
+import { FiFileText, FiDownload, FiBarChart2, FiPieChart, FiTrendingUp, FiActivity } from 'react-icons/fi'
 import { useAuth } from '@/hooks/useAuth'
-import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { useLanguage } from '@/lib/i18n'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js'
+import { Line, Bar, Doughnut } from 'react-chartjs-2'
 
-interface Stats {
-  projects: { total: number; active: number; completed: number }
-  tasks: { total: number; completed: number }
-  members: { total: number; active: number }
-  finance: { income: number; expenses: number }
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
+
+interface ReportStats {
+  projects: {
+    distribution: { status: string; _count: { id: number } }[]
+    categories: { category: string; _count: { id: number } }[]
+  }
+  budget: {
+    allocated: number
+    spent: number
+    remaining: number
+  }
+  tasks: {
+    distribution: { status: string; _count: { id: number } }[]
+  }
+  trends: {
+    month: string
+    projects: number
+    tasksCompleted: number
+  }[]
 }
 
 export default function ReportsPage() {
   useAuth()
-  const { t } = useLanguage()
-  const [stats, setStats] = useState<Stats | null>(null)
+  const { t, language } = useLanguage()
+  const [stats, setStats] = useState<ReportStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   const fetchStats = useCallback(async () => {
     try {
-      const [projectsRes, membersRes] = await Promise.all([
-        fetch('/api/projects/stats'),
-        fetch('/api/members/stats'),
-      ])
-
-      const [projectsData, membersData] = await Promise.all([
-        projectsRes.json(),
-        membersRes.json(),
-      ])
-
-      setStats({
-        projects: {
-          total: projectsData.data?.total || 0,
-          active: projectsData.data?.byStatus?.active || 0,
-          completed: projectsData.data?.byStatus?.completed || 0,
-        },
-        tasks: {
-          total: 0,
-          completed: 0,
-        },
-        members: {
-          total: membersData.data?.total || 0,
-          active: membersData.data?.byStatus?.active || 0,
-        },
-        finance: {
-          income: projectsData.data?.budget?.totalAllocated || 0,
-          expenses: projectsData.data?.budget?.totalSpent || 0,
-        },
-      })
+      const response = await fetch('/api/reports/stats')
+      const result = await response.json()
+      if (result.success) {
+        setStats(result.data)
+      }
     } catch (error) {
       console.error('Error fetching stats:', error)
     } finally {
@@ -61,168 +77,187 @@ export default function ReportsPage() {
     fetchStats()
   }, [fetchStats])
 
-  const reports = [
-    {
-      title: t('reports', 'projectsOverview'),
-      description: t('reports', 'projectsDesc'),
-      icon: FiBarChart2,
-      color: 'bg-blue-500',
-    },
-    {
-      title: t('reports', 'financialReport'),
-      description: t('reports', 'financialDesc'),
-      icon: FiTrendingUp,
-      color: 'bg-green-500',
-    },
-    {
-      title: t('reports', 'memberStats'),
-      description: t('reports', 'memberDesc'),
-      icon: FiPieChart,
-      color: 'bg-purple-500',
-    },
-    {
-      title: t('reports', 'taskCompletion'),
-      description: t('reports', 'taskDesc'),
-      icon: FiFileText,
-      color: 'bg-orange-500',
-    },
-  ]
+  const exportToCSV = () => {
+    if (!stats) return
+    
+    // Create simple CSV content for projects
+    let csvContent = "data:text/csv;charset=utf-8,"
+    csvContent += "Metric,Value\n"
+    csvContent += `Total Budget Allocated,${stats.budget.allocated}\n`
+    csvContent += `Total Budget Spent,${stats.budget.spent}\n`
+    csvContent += `Remaining Budget,${stats.budget.remaining}\n\n`
+    
+    csvContent += "Month,Projects Created,Tasks Completed\n"
+    stats.trends.forEach(row => {
+      csvContent += `${row.month},${row.projects},${row.tasksCompleted}\n`
+    })
+
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", `ACIK_Report_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  // Chart Data Configurations
+  const projectStatusData = {
+    labels: stats?.projects.distribution.map(d => d.status) || [],
+    datasets: [{
+      data: stats?.projects.distribution.map(d => d._count.id) || [],
+      backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1'],
+      borderWidth: 0,
+    }]
+  }
+
+  const budgetData = {
+    labels: [t('reports', 'budgetAllocated'), t('reports', 'budgetSpent')],
+    datasets: [{
+      label: '$',
+      data: [stats?.budget.allocated || 0, stats?.budget.spent || 0],
+      backgroundColor: ['#3b82f6', '#ef4444'],
+      borderRadius: 12,
+    }]
+  }
+
+  const trendData = {
+    labels: stats?.trends.map(t => t.month) || [],
+    datasets: [
+      {
+        label: t('nav', 'projects'),
+        data: stats?.trends.map(t => t.projects) || [],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        fill: true,
+        tension: 0.4,
+      },
+      {
+        label: t('nav', 'tasks'),
+        data: stats?.trends.map(t => t.tasksCompleted) || [],
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        fill: true,
+        tension: 0.4,
+      }
+    ]
+  }
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: { family: 'inherit', size: 12, weight: 'bold' as any }
+        }
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen">
       <Header
         title={t('reports', 'title')}
         subtitle={t('reports', 'subtitle')}
+        action={
+          <button
+            onClick={exportToCSV}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-indigo-200 dark:shadow-none transition-all hover:scale-105 active:scale-95"
+          >
+            <FiDownload size={18} />
+            {t('reports', 'downloadReport')}
+          </button>
+        }
       />
 
       <div className="p-6 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
-        {/* Quick Stats */}
+        {/* Quick Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3.5 bg-blue-50 dark:bg-blue-900/30 rounded-2xl group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-2xl">
                 <FiBarChart2 className="text-blue-600 dark:text-blue-400" size={24} />
               </div>
-              <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50 px-3 py-1 rounded-full">
-                {t('projects', 'title')}
-              </p>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('nav', 'projects')}</span>
             </div>
-            <div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                {loading ? '...' : stats?.projects.total || 0}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                <span className="text-blue-600 dark:text-blue-400 font-bold">{stats?.projects.active || 0}</span> {t('reports', 'active')}, <span className="text-gray-900 dark:text-slate-300 font-bold">{stats?.projects.completed || 0}</span> {t('reports', 'completed')}
-              </p>
-            </div>
+            <p className="text-3xl font-black text-gray-900 dark:text-white">
+              {loading ? '...' : stats?.projects.distribution.reduce((acc, curr) => acc + curr._count.id, 0) || 0}
+            </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3.5 bg-purple-50 dark:bg-purple-900/30 rounded-2xl group-hover:scale-110 transition-transform">
-                <FiPieChart className="text-purple-600 dark:text-purple-400" size={24} />
+              <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-2xl">
+                <FiActivity className="text-green-600 dark:text-green-400" size={24} />
               </div>
-              <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50 px-3 py-1 rounded-full">
-                {t('members', 'title')}
-              </p>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('nav', 'tasks')}</span>
             </div>
-            <div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                {loading ? '...' : stats?.members.total || 0}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                <span className="text-purple-600 dark:text-purple-400 font-bold">{stats?.members.active || 0}</span> {t('reports', 'activeMembers')}
-              </p>
-            </div>
+            <p className="text-3xl font-black text-gray-900 dark:text-white">
+              {loading ? '...' : stats?.tasks.distribution.reduce((acc, curr) => acc + curr._count.id, 0) || 0}
+            </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3.5 bg-green-50 dark:bg-green-900/30 rounded-2xl group-hover:scale-110 transition-transform">
-                <FiTrendingUp className="text-green-600 dark:text-green-400" size={24} />
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl">
+                <FiTrendingUp className="text-indigo-600 dark:text-indigo-400" size={24} />
               </div>
-              <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50 px-3 py-1 rounded-full">
-                {t('finance', 'income')}
-              </p>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('finance', 'income')}</span>
             </div>
-            <div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                ${(stats?.finance.income || 0).toLocaleString()}
-              </p>
-              <p className="text-xs text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-green-900/30 w-max px-2 py-0.5 rounded-md mt-1">
-                {t('reports', 'budgetAllocated')}
-              </p>
-            </div>
+            <p className="text-3xl font-black text-gray-900 dark:text-white">
+              ${(stats?.budget.allocated || 0).toLocaleString()}
+            </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg transition-all">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3.5 bg-red-50 dark:bg-red-900/30 rounded-2xl group-hover:scale-110 transition-transform">
-                <FiFileText className="text-red-600 dark:text-red-400" size={24} />
+              <div className="p-3 bg-rose-50 dark:bg-rose-900/30 rounded-2xl">
+                <FiPieChart className="text-rose-600 dark:text-rose-400" size={24} />
               </div>
-              <p className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider bg-gray-50 dark:bg-slate-700/50 px-3 py-1 rounded-full">
-                {t('finance', 'expense')}
-              </p>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('finance', 'expense')}</span>
             </div>
-            <div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                ${(stats?.finance.expenses || 0).toLocaleString()}
-              </p>
-              <p className="text-xs text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/30 w-max px-2 py-0.5 rounded-md mt-1">
-                {t('reports', 'budgetSpent')}
-              </p>
-            </div>
+            <p className="text-3xl font-black text-gray-900 dark:text-white">
+              ${(stats?.budget.spent || 0).toLocaleString()}
+            </p>
           </div>
         </div>
 
-        {/* Reports Grid */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
-            {t('reports', 'availableReports')}
-          </h2>
-        </div>
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Project Distribution */}
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-slate-700/50 flex flex-col">
+            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-8 flex items-center gap-3">
+              <FiPieChart className="text-indigo-600" />
+              {t('dashboard', 'projectsDistribution')}
+            </h3>
+            <div className="flex-1 min-h-[300px] flex items-center justify-center">
+              {loading ? <div className="animate-pulse w-full h-full bg-gray-50 dark:bg-slate-700 rounded-2xl" /> : <Doughnut data={projectStatusData} options={chartOptions} />}
+            </div>
+          </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {reports.map((report, index) => {
-            const Icon = report.icon
-            return (
-              <div key={index} className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg dark:hover:shadow-indigo-900/20 hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
-                <div className={`absolute top-0 right-0 w-32 h-32 ${report.color} opacity-5 rounded-bl-[100px] -z-10 group-hover:scale-110 transition-transform`} />
-                <div className="flex items-start gap-5">
-                  <div className={`p-4 ${report.color} shadow-lg shadow-${report.color.split('-')[1]}-500/30 rounded-2xl group-hover:scale-110 transition-transform`}>
-                    <Icon className="text-white" size={24} />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1">{report.title}</h3>
-                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400 leading-relaxed">{report.description}</p>
-                    <button className="mt-5 flex items-center justify-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-4 py-2 rounded-xl transition-colors w-max">
-                      <FiDownload size={16} />
-                      {t('reports', 'downloadReport')}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+          {/* Budget vs Spent */}
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-slate-700/50 flex flex-col">
+            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-8 flex items-center gap-3">
+              <FiTrendingUp className="text-blue-600" />
+              {t('reports', 'financialReport')}
+            </h3>
+            <div className="flex-1 min-h-[300px]">
+              {loading ? <div className="animate-pulse w-full h-full bg-gray-50 dark:bg-slate-700 rounded-2xl" /> : <Bar data={budgetData} options={chartOptions} />}
+            </div>
+          </div>
 
-        {/* Chart Placeholder */}
-        <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-slate-700/50">
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-6">
-            {t('reports', 'monthlyOverview')}
-          </h2>
-          <div className="h-[300px] flex items-center justify-center bg-gray-50/50 dark:bg-slate-900/30 rounded-2xl border border-dashed border-gray-200 dark:border-slate-700 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-indigo-50/50 dark:bg-indigo-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="text-center relative z-10">
-              <div className="w-20 h-20 bg-white dark:bg-slate-800 shadow-xl shadow-indigo-600/10 dark:shadow-indigo-900/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce-slow">
-                <FiBarChart2 size={32} className="text-indigo-600 dark:text-indigo-400" />
-              </div>
-              <p className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                {t('reports', 'chartComingSoon')}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-slate-400">
-                {t('reports', 'workingOnCharts')}
-              </p>
+          {/* Monthly Trend */}
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-slate-700/50 lg:col-span-2 flex flex-col">
+            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-8 flex items-center gap-3">
+              <FiActivity className="text-green-600" />
+              {t('reports', 'monthlyOverview')}
+            </h3>
+            <div className="flex-1 min-h-[350px]">
+              {loading ? <div className="animate-pulse w-full h-full bg-gray-50 dark:bg-slate-700 rounded-2xl" /> : <Line data={trendData} options={{...chartOptions, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }} />}
             </div>
           </div>
         </div>
