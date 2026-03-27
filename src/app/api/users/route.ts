@@ -54,8 +54,8 @@ export async function GET() {
       orderBy: { name: 'asc' }
     });
 
-    // Format the data to be easier to consume on the frontend
-    const formattedUsers = users.map(user => ({
+    // Format the data to be easier to consume on the frontend (filter out users with no name)
+    const formattedUsers = users.filter(user => user.name && user.name.trim()).map(user => ({
       id: user.id,
       name: user.name,
       email: user.email,
