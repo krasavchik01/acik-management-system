@@ -412,8 +412,13 @@ export default function AdminPage() {
               handlePermissionsClick={(user) => {
                 setEditingUser(user)
                 setFormData({
-                  ...formData,
-                  permissions: user.permissions || []
+                  name: user.name,
+                  email: user.email,
+                  role: user.role,
+                  department: user.department || 'Operations',
+                  permissions: user.permissions || [],
+                  isActive: user.isActive,
+                  isDemo: user.isDemo,
                 })
                 setShowPermissionsModal(true)
               }}

@@ -43,7 +43,7 @@ export async function PUT(
     }
 
     const updateData: any = {}
-    if (body.name !== undefined) updateData.name = body.name
+    if (body.name !== undefined && body.name.trim()) updateData.name = body.name.trim()
     if (body.role !== undefined) updateData.role = body.role
     if (body.department !== undefined) updateData.department = body.department
     if (body.phone !== undefined) updateData.phone = body.phone
