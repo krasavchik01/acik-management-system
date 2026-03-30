@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.addEventListener('focus', handleFocus)
     const interval = setInterval(() => {
       if (currentUserId) fetchProfile(currentUserId)
-    }, 60000)
+    }, 300000)
 
     return () => {
       window.removeEventListener('focus', handleFocus)

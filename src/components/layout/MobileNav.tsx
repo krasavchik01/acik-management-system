@@ -39,7 +39,7 @@ export function MobileNav() {
   useEffect(() => {
     if (!profile) return
     fetchUnread()
-    const interval = setInterval(fetchUnread, 30000)
+    const interval = setInterval(fetchUnread, 120000)
     return () => clearInterval(interval)
   }, [profile, fetchUnread])
 

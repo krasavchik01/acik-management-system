@@ -89,7 +89,7 @@ export function Sidebar() {
   useEffect(() => {
     if (!profile) return
     fetchUnreadCount()
-    const interval = setInterval(fetchUnreadCount, 30000)
+    const interval = setInterval(fetchUnreadCount, 120000)
     return () => clearInterval(interval)
   }, [profile, fetchUnreadCount])
 
