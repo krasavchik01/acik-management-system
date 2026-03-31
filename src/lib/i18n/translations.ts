@@ -600,6 +600,7 @@ export const translations = {
     'projects.edit': { en: 'Edit projects', ru: 'Редактирование проектов' },
     'projects.delete': { en: 'Delete projects', ru: 'Удаление проектов' },
     'tasks.view': { en: 'View tasks', ru: 'Просмотр задач' },
+    'tasks.viewAll': { en: 'View all tasks', ru: 'Просмотр всех задач' },
     'tasks.create': { en: 'Create tasks', ru: 'Создание задач' },
     'tasks.edit': { en: 'Edit tasks', ru: 'Редактирование задач' },
     'tasks.delete': { en: 'Delete tasks', ru: 'Удаление задач' },

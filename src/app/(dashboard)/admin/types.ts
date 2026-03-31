@@ -52,6 +52,7 @@ export const getPermissionsList = (t: (cat: string, key: string) => string) => [
   { id: 'projects.edit', label: t('permissions', 'projects.edit'), category: 'Projects' },
   { id: 'projects.delete', label: t('permissions', 'projects.delete'), category: 'Projects' },
   { id: 'tasks.view', label: t('permissions', 'tasks.view'), category: 'Tasks' },
+  { id: 'tasks.viewAll', label: t('permissions', 'tasks.viewAll'), category: 'Tasks' },
   { id: 'tasks.create', label: t('permissions', 'tasks.create'), category: 'Tasks' },
   { id: 'tasks.edit', label: t('permissions', 'tasks.edit'), category: 'Tasks' },
   { id: 'tasks.delete', label: t('permissions', 'tasks.delete'), category: 'Tasks' },

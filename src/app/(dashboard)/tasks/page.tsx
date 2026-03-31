@@ -138,6 +138,8 @@ export default function TasksPage() {
   const canCreate = isAdminRole || permissions.some(p => p === 'tasks.create' || p === 'tasks.edit')
   // canManageAny: can edit/delete ANY task (admin roles only)
   const canManageAny = !!isAdminRole
+  // canViewAll: can see ALL tasks tab (admin roles OR tasks.viewAll permission)
+  const canViewAll = !!isAdminRole || permissions.includes('tasks.viewAll')
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -150,6 +152,9 @@ export default function TasksPage() {
         params.append('my', 'true')
       } else if (activeTab === 'assignedByMe' && profile?.id) {
         params.append('createdBy', profile.id)
+      } else if (activeTab === 'all' && !canViewAll) {
+        // Fallback: if no permission, show own tasks
+        params.append('my', 'true')
       }
 
       const res = await fetch(`/api/tasks?${params}`)
@@ -469,15 +474,17 @@ export default function TasksPage() {
           >
             {t('tasks', 'assignedByMeTab')}
           </button>
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'all'
-                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-          >
-            {t('tasks', 'allTasksTab')}
-          </button>
+          {canViewAll && (
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'all'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+            >
+              {t('tasks', 'allTasksTab')}
+            </button>
+          )}
         </div>
 
         {/* Toolbar */}
