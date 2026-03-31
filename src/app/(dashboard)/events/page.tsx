@@ -369,7 +369,7 @@ export default function EventsPage() {
                  <div className="animate-in slide-in-from-top-2 duration-200">
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('events', 'virtualLinkLabel')}</label>
                    <input
-                    type="url"
+                    type="text"
                     value={formData.virtualLink}
                     onChange={(e) => setFormData({ ...formData, virtualLink: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"

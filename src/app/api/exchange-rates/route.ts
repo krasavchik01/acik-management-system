@@ -35,11 +35,8 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       base: 'KZT',
       rates: {
-        USD: rates.USD,
-        EUR: rates.EUR,
-        // Calculate the rate relative to USD since our DB values are stored assuming USD
-        // 1 USD = X KZT 
-        // 1 EUR = Y KZT
+        USD: { buy: rates.USD.buy, sell: rates.USD.sell },
+        EUR: { buy: rates.EUR.buy, sell: rates.EUR.sell },
       }
     })
   } catch (error) {
