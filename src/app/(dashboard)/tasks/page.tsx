@@ -262,18 +262,27 @@ export default function TasksPage() {
       const url = editingTask ? `/api/tasks/${editingTask.id}` : '/api/tasks'
       const method = editingTask ? 'PUT' : 'POST'
 
+      // For restricted users (assignee/co-executor only), send only allowed fields
+      const isCreator = editingTask?.createdById === profile?.id
+      const isReviewer = editingTask?.reviewerId === profile?.id
+      const isRestricted = editingTask && !canManageAny && !isCreator && !isReviewer
+
+      const bodyData = isRestricted
+        ? { status: formData.status, stages: formData.stages }
+        : {
+            ...formData,
+            dueDate: formData.dueDate || null,
+            projectId: formData.projectId || null,
+            assignedToId: formData.assignedToId || null,
+            reviewerId: formData.reviewerId || null,
+            parentId: formData.parentId || null,
+            createdById: profile?.id,
+          }
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          dueDate: formData.dueDate || null,
-          projectId: formData.projectId || null,
-          assignedToId: formData.assignedToId || null,
-          reviewerId: formData.reviewerId || null,
-          parentId: formData.parentId || null,
-          createdById: profile?.id,
-        }),
+        body: JSON.stringify(bodyData),
       })
 
       const data = await res.json()
