@@ -132,6 +132,7 @@ export default function TasksPage() {
     parentId: '',
     coExecutors: [] as string[],
     stages: [] as { title: string, isCompleted: boolean }[],
+    actualHours: 0,
   })
 
   const isAdminRole = profile?.role && ['Admin', 'President', 'VicePresident', 'CEO', 'ProjectManager'].includes(profile.role)
@@ -239,6 +240,7 @@ export default function TasksPage() {
       parentId: '',
       coExecutors: [],
       stages: [],
+      actualHours: 0,
     })
     setShowReviewer(false)
     setShowCoExecutors(false)
@@ -263,6 +265,7 @@ export default function TasksPage() {
       parentId: task.parentId || '',
       coExecutors: task.coExecutors?.map(ce => ce.userId) || [],
       stages: task.stages?.map(s => ({ title: s.title, isCompleted: s.isCompleted })) || [],
+      actualHours: (task as any).actualHours || 0,
     })
     setShowReviewer(!!task.reviewerId)
     setShowCoExecutors((task.coExecutors?.length ?? 0) > 0)
@@ -1057,112 +1060,193 @@ export default function TasksPage() {
 
                 return (
                 <>
-              {/* ── CORE FIELDS ── */}
-              {/* Task info header for restricted users */}
-              {isRestricted && (
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl px-4 py-3 text-sm text-amber-700 dark:text-amber-400">
-                  Вы можете менять только статус и отмечать этапы
-                </div>
-              )}
+              {isRestricted ? (
+                /* ═══ FULL TASK DETAIL VIEW FOR ASSIGNEE ═══ */
+                <>
+                  {/* Task title */}
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-snug">{formData.title}</h3>
 
-              {/* Title — read-only for restricted */}
+                  {/* Description */}
+                  {formData.description && (
+                    <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed bg-gray-50 dark:bg-slate-700/30 rounded-xl px-4 py-3">{formData.description}</p>
+                  )}
+
+                  {/* Task metadata grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Status — editable */}
+                    <div className="col-span-2">
+                      <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">{t('common', 'status')}</p>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {statusColumns.map(col => {
+                          const isActive = formData.status === col.key
+                          return (
+                            <button
+                              key={col.key}
+                              type="button"
+                              onClick={() => setFormData({ ...formData, status: col.key as Task['status'] })}
+                              className={`py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${
+                                isActive
+                                  ? `${col.headerColor} text-white shadow-md`
+                                  : 'bg-gray-100 dark:bg-slate-700/50 text-gray-400 dark:text-slate-500 hover:bg-gray-200 dark:hover:bg-slate-700'
+                              }`}
+                            >
+                              {col.label}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Priority — read-only */}
+                    <div>
+                      <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">{t('common', 'priority')}</p>
+                      <span className={`inline-flex px-3 py-1.5 rounded-lg text-xs font-bold uppercase ${getPriorityStyle(editingTask?.priority || 'Medium').color}`}>
+                        {editingTask?.priority}
+                      </span>
+                    </div>
+
+                    {/* Deadline — read-only */}
+                    <div>
+                      <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">{t('common', 'deadline')}</p>
+                      <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
+                        {editingTask?.dueDate ? new Date(editingTask.dueDate).toLocaleDateString() : '—'}
+                      </span>
+                    </div>
+
+                    {/* Project — read-only */}
+                    {editingTask?.project && (
+                      <div>
+                        <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">{t('tasks', 'project')}</p>
+                        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-slate-300">
+                          <FiFolder size={12} className="text-gray-400" /> {editingTask.project.name}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Event — read-only */}
+                    {(editingTask as any)?.event && (
+                      <div>
+                        <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">{t('tasks', 'event')}</p>
+                        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 dark:text-violet-400">
+                          📅 {(editingTask as any).event.title}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Created by */}
+                    {editingTask?.createdBy && (
+                      <div>
+                        <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">Постановщик</p>
+                        <span className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-300">
+                          <span className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold text-white">{editingTask.createdBy.name.charAt(0)}</span>
+                          {editingTask.createdBy.name}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Reviewer */}
+                    {editingTask?.reviewer && (
+                      <div>
+                        <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">{t('tasks', 'reviewer')}</p>
+                        <span className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-300">
+                          <span className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white">{editingTask.reviewer.name.charAt(0)}</span>
+                          {editingTask.reviewer.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actual hours — editable */}
+                  <div>
+                    <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">Затраченные часы</p>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      value={formData.actualHours || ''}
+                      onChange={(e) => setFormData({ ...formData, actualHours: parseFloat(e.target.value) || 0 })}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                      placeholder="0"
+                    />
+                  </div>
+                </>
+              ) : (
+                /* ═══ FULL EDIT FORM FOR MANAGERS/CREATORS ═══ */
+                <>
               <div>
-                {isRestricted ? (
-                  <p className="px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl text-gray-900 dark:text-white text-base font-medium">{formData.title}</p>
-                ) : (
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-base font-medium"
-                    placeholder={`${t('tasks', 'taskTitle')} *`}
-                    required
-                    autoFocus
-                  />
-                )}
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-base font-medium"
+                  placeholder={`${t('tasks', 'taskTitle')} *`}
+                  required
+                  autoFocus
+                />
               </div>
 
-              {/* Description — read-only for restricted */}
-              {isRestricted ? (
-                formData.description && (
-                  <p className="px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl text-gray-600 dark:text-slate-400 text-sm">{formData.description}</p>
-                )
-              ) : (
-                <div>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={2}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-sm"
-                    placeholder={t('tasks', 'describeTask')}
-                  />
-                </div>
-              )}
+              <div>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={2}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 text-sm"
+                  placeholder={t('tasks', 'describeTask')}
+                />
+              </div>
 
-              {/* Project + Event — hidden for restricted */}
-              {!isRestricted && (
-                <div className="grid grid-cols-2 gap-3">
-                  <select
-                    value={formData.projectId}
-                    onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
-                  >
-                    <option value="">📁 {t('tasks', 'project')}</option>
-                    {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                  </select>
-                  <select
-                    value={formData.eventId}
-                    onChange={(e) => setFormData({ ...formData, eventId: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
-                  >
-                    <option value="">📅 {t('tasks', 'event') || 'Мероприятие'}</option>
-                    {events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}
-                  </select>
-                </div>
-              )}
+              <div className="grid grid-cols-2 gap-3">
+                <select
+                  value={formData.projectId}
+                  onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                >
+                  <option value="">📁 {t('tasks', 'project')}</option>
+                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+                <select
+                  value={formData.eventId}
+                  onChange={(e) => setFormData({ ...formData, eventId: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                >
+                  <option value="">📅 {t('tasks', 'event') || 'Мероприятие'}</option>
+                  {events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}
+                </select>
+              </div>
 
-              {/* Assigned To — hidden for restricted */}
-              {!isRestricted && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
-                    <FiUser size={12} /> {t('tasks', 'assignedTo')}
-                  </p>
-                  <UserPicker users={users} value={formData.assignedToId} onChange={(id) => setFormData({ ...formData, assignedToId: id })} placeholder={t('tasks', 'unassigned')} language={language} showWorkload />
-                </div>
-              )}
+              <div>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
+                  <FiUser size={12} /> {t('tasks', 'assignedTo')}
+                </p>
+                <UserPicker users={users} value={formData.assignedToId} onChange={(id) => setFormData({ ...formData, assignedToId: id })} placeholder={t('tasks', 'unassigned')} language={language} showWorkload />
+              </div>
 
-              {/* Status (always for editing) + Priority/Deadline (not for restricted) */}
-              <div className={`grid gap-3 ${isRestricted ? 'grid-cols-1' : 'grid-cols-2'}`}>
+              <div className="grid grid-cols-2 gap-3">
                 {editingTask && (
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as Task['status'] })}
-                    className={`${isRestricted ? '' : 'col-span-2'} w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm`}
+                    className="col-span-2 w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
                   >
                     {statusColumns.map(col => <option key={col.key} value={col.key}>{col.label}</option>)}
                   </select>
                 )}
-                {!isRestricted && (
-                  <>
-                    <select
-                      value={formData.priority}
-                      onChange={(e) => setFormData({ ...formData, priority: e.target.value as Task['priority'] })}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
-                    >
-                      {priorityOptions.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-                    </select>
-                    <input
-                      type="date"
-                      value={formData.dueDate}
-                      onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
-                    />
-                  </>
-                )}
+                <select
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as Task['priority'] })}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                >
+                  {priorityOptions.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                </select>
+                <input
+                  type="date"
+                  value={formData.dueDate}
+                  onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                />
               </div>
 
-              {/* ── OPTIONAL SECTIONS — hidden for restricted ── */}
-              {!isRestricted && (
+              {/* ── OPTIONAL SECTIONS ── */}
               <div className="border-t border-gray-100 dark:border-slate-700/50 pt-4 space-y-3">
                 <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2">Дополнительно</p>
 
@@ -1336,34 +1420,9 @@ export default function TasksPage() {
                   )}
                 </div>
               </div>
-              )}
 
-              {/* Stages checklist for restricted users (can only toggle completion) */}
-              {isRestricted && formData.stages.length > 0 && (
-                <div className="border-t border-gray-100 dark:border-slate-700/50 pt-4">
-                  <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-3">{t('tasks', 'taskStages')}</p>
-                  <div className="space-y-2">
-                    {formData.stages.map((stage, index) => (
-                      <label key={index} className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-slate-700/30 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
-                        <input
-                          type="checkbox"
-                          checked={stage.isCompleted}
-                          onChange={(e) => {
-                            const newStages = [...formData.stages]
-                            newStages[index].isCompleted = e.target.checked
-                            setFormData({ ...formData, stages: newStages })
-                          }}
-                          className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                        />
-                        <span className={`text-sm font-medium ${stage.isCompleted ? 'line-through text-gray-400 dark:text-slate-500' : 'text-gray-700 dark:text-slate-300'}`}>
-                          {stage.title}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
+              </>
               )}
-
               </>
                 )
               })()}
