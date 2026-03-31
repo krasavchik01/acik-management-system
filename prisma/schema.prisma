@@ -413,6 +413,8 @@ model Task {
 
   projectId    String?
   project      Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  eventId      String?
+  event        Event?   @relation("EventTasks", fields: [eventId], references: [id], onDelete: SetNull)
   assignedToId String?
   assignedTo   User?   @relation("TaskAssignee", fields: [assignedToId], references: [id])
   createdById  String
@@ -618,6 +620,7 @@ model Event {
   finance          Finance[]
   sponsorEvents    SponsorEvent[]
   reportEvents     ReportEvent[]
+  tasks            Task[]              @relation("EventTasks")
 
   @@index([status])
   @@index([startDate])

@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
       where,
       include: {
         project: { select: { id: true, name: true } },
+        event: { select: { id: true, title: true } },
         assignedTo: { select: { id: true, name: true, avatar: true, email: true } },
         createdBy: { select: { id: true, name: true } },
         reviewer: { select: { id: true, name: true, avatar: true } },
@@ -133,6 +134,7 @@ export async function POST(request: NextRequest) {
         actualHours: 0,
         tags: body.tags || [],
         projectId: body.projectId || null,
+        eventId: body.eventId || null,
         assignedToId: body.assignedToId || null,
         createdById: user.id,
         reviewerId: body.reviewerId || null,

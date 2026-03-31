@@ -169,6 +169,7 @@ export async function PUT(
     if (body.estimatedHours !== undefined) updateData.estimatedHours = body.estimatedHours
     if (body.actualHours !== undefined) updateData.actualHours = body.actualHours
     if (body.assignedToId !== undefined) updateData.assignedToId = body.assignedToId
+    if (body.eventId !== undefined) updateData.eventId = body.eventId || null
     if (body.reviewerId !== undefined) updateData.reviewerId = body.reviewerId
     if (body.isApprovalRequired !== undefined) updateData.isApprovalRequired = body.isApprovalRequired
     if (body.tags !== undefined) updateData.tags = body.tags

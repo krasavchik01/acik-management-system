@@ -178,6 +178,7 @@ export const translations = {
     addStage: { en: 'Add Stage', ru: 'Добавить этап' },
     stageTitle: { en: 'Stage title...', ru: 'Название этапа...' },
     noProject: { en: 'No project', ru: 'Без проекта' },
+    event: { en: 'Event', ru: 'Мероприятие' },
     unassigned: { en: 'Unassigned', ru: 'Не назначено' },
     noReviewer: { en: 'No Reviewer', ru: 'Нет проверяющего' },
     topLevelTask: { en: 'Top-level Task', ru: 'Задача верхнего уровня' },

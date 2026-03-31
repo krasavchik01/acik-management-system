@@ -91,6 +91,7 @@ export default function TasksPage() {
   ], [t])
   const [tasks, setTasks] = useState<Task[]>([])
   const [projects, setProjects] = useState<Project[]>([])
+  const [events, setEvents] = useState<{ id: string; title: string }[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -124,6 +125,7 @@ export default function TasksPage() {
     priority: 'Medium' as Task['priority'],
     dueDate: '',
     projectId: '',
+    eventId: '',
     assignedToId: '',
     reviewerId: '',
     isApprovalRequired: false,
@@ -194,9 +196,21 @@ export default function TasksPage() {
     }
   }, [])
 
+  const fetchEvents = useCallback(async () => {
+    try {
+      const res = await fetch('/api/events')
+      const data = await res.json()
+      if (data.success) {
+        setEvents((data.data || []).map((e: any) => ({ id: e.id, title: e.title })))
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error)
+    }
+  }, [])
+
   // Initial load — parallel fetch
   useEffect(() => {
-    Promise.all([fetchTasks(), fetchProjects(), fetchUsers()])
+    Promise.all([fetchTasks(), fetchProjects(), fetchUsers(), fetchEvents()])
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced refetch on filter changes
@@ -218,6 +232,7 @@ export default function TasksPage() {
       priority: 'Medium',
       dueDate: '',
       projectId: '',
+      eventId: '',
       assignedToId: '',
       reviewerId: '',
       isApprovalRequired: false,
@@ -241,6 +256,7 @@ export default function TasksPage() {
       priority: task.priority,
       dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
       projectId: task.projectId || '',
+      eventId: (task as any).eventId || '',
       assignedToId: task.assignedToId || '',
       reviewerId: task.reviewerId || '',
       isApprovalRequired: task.isApprovalRequired || false,
@@ -278,6 +294,7 @@ export default function TasksPage() {
             ...formData,
             dueDate: formData.dueDate || null,
             projectId: formData.projectId || null,
+            eventId: formData.eventId || null,
             assignedToId: formData.assignedToId || null,
             reviewerId: formData.reviewerId || null,
             parentId: formData.parentId || null,
@@ -637,6 +654,11 @@ export default function TasksPage() {
                           <FiFolder size={10} /> {task.project.name}
                         </span>
                       )}
+                      {(task as any).event && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded-lg">
+                          📅 {(task as any).event.title}
+                        </span>
+                      )}
 
                       {/* Stages progress */}
                       {(task._count?.stages || 0) > 0 && (
@@ -814,6 +836,11 @@ export default function TasksPage() {
                             {task.project && (
                               <span className="flex items-center gap-1.5 text-[10px] font-bold text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700/50 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/30 uppercase tracking-tight">
                                 <FiFolder size={10} className="text-gray-400" /> {task.project.name.substring(0, 15)}
+                              </span>
+                            )}
+                            {(task as any).event && (
+                              <span className="flex items-center gap-1.5 text-[10px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1.5 rounded-lg border border-violet-100 dark:border-violet-800/30">
+                                📅 {(task as any).event.title.substring(0, 15)}
                               </span>
                             )}
                           </div>
@@ -1072,9 +1099,9 @@ export default function TasksPage() {
                 </div>
               )}
 
-              {/* Project — hidden for restricted */}
+              {/* Project + Event — hidden for restricted */}
               {!isRestricted && (
-                <div>
+                <div className="grid grid-cols-2 gap-3">
                   <select
                     value={formData.projectId}
                     onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
@@ -1082,6 +1109,14 @@ export default function TasksPage() {
                   >
                     <option value="">📁 {t('tasks', 'project')}</option>
                     {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                  <select
+                    value={formData.eventId}
+                    onChange={(e) => setFormData({ ...formData, eventId: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white text-sm"
+                  >
+                    <option value="">📅 {t('tasks', 'event') || 'Мероприятие'}</option>
+                    {events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}
                   </select>
                 </div>
               )}
