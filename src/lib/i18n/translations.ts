@@ -84,6 +84,7 @@ export const translations = {
     more: { en: 'More', ru: 'Ещё' },
     menu: { en: 'Menu', ru: 'Меню' },
     deliveryPlan: { en: 'Delivery Plan', ru: 'План сдачи' },
+    taskHub: { en: 'Task Hub', ru: 'Хаб задач' },
   },
 
   // Dashboard
@@ -203,6 +204,8 @@ export const translations = {
     deleteConfirmTitle: { en: 'Delete Task', ru: 'Удалить задачу' },
     deleteConfirmText: { en: 'Are you sure you want to delete', ru: 'Вы уверены, что хотите удалить' },
     actionUndone: { en: 'This action cannot be undone.', ru: 'Это действие нельзя отменить.' },
+    taskHub: { en: 'Task Hub', ru: 'Хаб задач' },
+    taskHubSubtitle: { en: 'Who assigned tasks to whom', ru: 'Кто кому какие задачи поставил' },
   },
 
   // Members

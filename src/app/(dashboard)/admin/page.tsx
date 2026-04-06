@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'react-toastify'
 import {
-  FiUsers, FiActivity, FiMapPin, FiSettings, FiShield, FiX
+  FiUsers, FiActivity, FiMapPin, FiSettings, FiShield, FiX, FiFileText
 } from 'react-icons/fi'
 import { useLanguage } from '@/lib/i18n'
 
@@ -15,6 +15,7 @@ import UsersTab from './components/UsersTab'
 import OfficeTab from './components/OfficeTab'
 import SystemTab from './components/SystemTab'
 import UserModals from './components/UserModals'
+import TicketsTab from './components/TicketsTab'
 
 export default function AdminPage() {
   const { profile } = useAuth()
@@ -22,7 +23,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'office' | 'system'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'office' | 'tickets' | 'system'>('overview')
 
   // Office settings
   const [officeForm, setOfficeForm] = useState({
@@ -356,6 +357,7 @@ export default function AdminPage() {
             { id: 'overview', label: t('admin', 'tabOverview'), icon: FiActivity },
             { id: 'users', label: t('admin', 'tabUsers'), icon: FiUsers },
             { id: 'office', label: t('admin', 'tabOffice'), icon: FiMapPin },
+            { id: 'tickets', label: language === 'ru' ? 'Билеты' : 'Tickets', icon: FiFileText },
             { id: 'system', label: t('admin', 'tabSystem'), icon: FiSettings },
           ].map((tab) => (
             <button
@@ -438,6 +440,10 @@ export default function AdminPage() {
               t={t}
               language={language}
             />
+          )}
+
+          {activeTab === 'tickets' && (
+            <TicketsTab t={t} language={language} />
           )}
 
           {activeTab === 'system' && (

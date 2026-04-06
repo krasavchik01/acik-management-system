@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
     if (myTasks) {
       where.OR = [
         { assignedToId: user.id },
+        { createdById: user.id },
         { coExecutors: { some: { userId: user.id } } },
         { reviewerId: user.id }
       ]

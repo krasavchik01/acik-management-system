@@ -22,6 +22,7 @@ import {
   FiMoon,
   FiSun,
   FiBell,
+  FiShare2,
 } from 'react-icons/fi'
 import { useState, useEffect, useRef, useCallback } from 'react'
 
@@ -29,6 +30,7 @@ const menuItems = [
   { key: 'dashboard',      href: '/',             icon: FiHome,       module: null },
   { key: 'projects',       href: '/projects',     icon: FiFolder,     module: 'projects' },
   { key: 'tasks',          href: '/tasks',        icon: FiCheckSquare,module: 'tasks' },
+  { key: 'taskHub',        href: '/tasks/hub',    icon: FiShare2,     module: 'tasks' },
   { key: 'members',        href: '/members',      icon: FiUsers,      module: 'members' },
   { key: 'events',         href: '/events',       icon: FiCalendar,   module: 'events' },
   { key: 'finance',        href: '/finance',      icon: FiDollarSign, module: 'finance' },

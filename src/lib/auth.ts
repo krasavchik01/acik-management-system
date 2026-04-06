@@ -18,7 +18,7 @@ export async function getAuthUser(): Promise<{ user: UserProfile | null; error?:
     const admin = getSupabaseAdmin()
     const { data: profile, error: profileError } = await admin
       .from('User')
-      .select('id, supabaseId, email, name, role, department, avatar, phone, isActive, isDemo')
+      .select('id, supabaseId, email, name, role, department, avatar, phone, isActive, isDemo, permissions')
       .eq('supabaseId', user.id)
       .single()
 
